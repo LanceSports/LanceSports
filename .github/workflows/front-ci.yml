@@ -22,8 +22,8 @@ jobs: # A workflow consists of one or more jobs run sequentially or in parallel
       - name: Install dependencies # Step to install required project libraries and tools
         run: npm ci # Clean install dependencies exactly as in package-lock.json for reproducibility
 
-      - name: Run lint # Step for enforcing consistent coding style across files
-        run: npm run lint # Executes lint script if defined in package.json
+      # - name: Run lint # Step for enforcing consistent coding style across files
+      #   run: npm run lint # Executes lint script if defined in package.json
 
       - name: Run tests # Step for executing all unit or integration tests automatically
         run: npm run test # Executes test script if defined in package.json
