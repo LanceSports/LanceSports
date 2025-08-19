@@ -2,7 +2,9 @@ import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 import axios from 'axios'
-import router from '../router'
+
+// commented out router it wasnt used in teh scope @benny
+//import router from '../router'
 
 export const useUserStore = defineStore('user', () => {
   const router = useRouter()

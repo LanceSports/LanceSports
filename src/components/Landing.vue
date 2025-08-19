@@ -6,13 +6,18 @@ import pitch from './soccerPitch.vue'
 import {useUserStore} from '../store/useUserStore'
 import { storeToRefs } from 'pinia'
 
+//user data has some complexities that im unfamiliar with so for the purposes of tesing
+// i made userdata this const obj, the test tests if the heading contains the name thats stored in userdata
+// dynamically itys the userenetered name but for now i made  it static 
+//@benny 19/08
+// feel free to uncomment the useUserStroe() and remove the static obj {name: obj}
+const userData =  {name:"John Doe"}//useUserStore();  
 
-const {userData} = useUserStore();
-//console.log(userData.name);
+console.log(userData.name, "ddd");
 
 const sports = ref([
   {
-    sport: 'Soccer',
+    sport: 'Football',
     image: cole,
     headline: 'Relive the Club World Cup final once more',
     link: 'https://youtu.be/A3t_uUgTm5k?si=BisNvMRddYZAf7C6'

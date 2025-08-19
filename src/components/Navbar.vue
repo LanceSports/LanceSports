@@ -2,7 +2,8 @@
 import { ref,computed,nextTick } from 'vue'
 import {useUserStore} from '../store/useUserStore'
 import { storeToRefs } from 'pinia'
-import router from '../router'
+//router wasnt used here i simply commented it out it was messing with testing @benny
+//import router from '../router'
 import {googleLogout} from 'vue3-google-login'
 
 const navOpen = ref(false)
