@@ -11,7 +11,7 @@ import { storeToRefs } from 'pinia'
 // dynamically itys the userenetered name but for now i made  it static 
 //@benny 19/08
 // feel free to uncomment the useUserStroe() and remove the static obj {name: obj}
-const userData =  {name:"John Doe"}//useUserStore();  
+const userData =  useUserStore();  
 
 console.log(userData.name, "ddd");
 
