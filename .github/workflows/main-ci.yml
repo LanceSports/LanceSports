@@ -1,0 +1,37 @@
+name: Main Branch CD
+
+on:
+  push:
+    branches:
+      - main   # Trigger only when main is updated
+
+jobs:
+  deploy:
+    name: Build and Deploy Frontend to Render
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the main branch
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 24
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Build frontend (Vite)
+      - name: Build frontend
+        run: npm run build
+
+      # Step 5: Deploy to Render via API
+      - name: Trigger Render deploy
+        uses: render-examples/trigger-deploy@v1
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}   # Your Render service ID
+          api-key: ${{ secrets.RENDER_API_KEY }}         # Render API key
