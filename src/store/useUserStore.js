@@ -46,6 +46,8 @@ export const useUserStore = defineStore('user', () => {
           userData.value = userObj.data
           console.log("Success")
           router.push('/')
+          //window.location.reload()
+
         }
         else {
           // Handle the case where userResponse or userResponse.data is undefined

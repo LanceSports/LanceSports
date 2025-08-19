@@ -8,6 +8,7 @@ import { storeToRefs } from 'pinia'
 
 
 const {userData} = useUserStore();
+//console.log(userData.name);
 
 const sports = ref([
   {
@@ -25,7 +26,7 @@ const sports = ref([
 ])
 
 const games = ref([
-    {sport:'Football',time:'Sun, 17 Aug 15:00 ',fixture:'Chelsea vs Crystal Palace', league: 'Premier League', link:'./soccerPitch.vue'},
+    {sport:'Football',time:'Sun, 17 Aug 15:00 ',fixture:'Chelsea vs Crystal Palace', league: 'Premier League', link:'/soccerPitch'},
     {sport: 'Rugby', time: 'Sun, 17 Aug 15:00',fixture:'Springboks vs Wallabies', league: 'The Rugby Championship', link:''}
 ])
 </script>
@@ -34,7 +35,7 @@ const games = ref([
   <div class="flex px-4 py-6 gap-6">
     <!-- Main content -->
     <section class="flex-1 space-y-6">
-    <h1 v-if="userData.name"> Welcome, {{ userData.name }} </h1>
+    <h1 v-if="userData.name" class="text-2xl font-serif mb-4"> Welcome, {{ userData.name }} </h1>
       <h1 v-else class="text-2xl font-serif mb-4">
         The Future of Sports, all in one place.
       </h1>
@@ -60,25 +61,36 @@ const games = ref([
     </section>
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-purple-100 rounded p-4">
+    <<aside class="w-64 bg-purple-100 rounded p-4">
   <h2 class="text-xl font-serif mb-4">Fixtures</h2>
   <ul class="space-y-2">
-    <li v-for="(game, index) in games" :key="index" class="hover:bg-purple-200 font-serif p-2 rounded">
+    <li
+      v-for="(game, index) in games"
+      :key="index"
+      class="hover:bg-purple-200 font-serif p-2 rounded"
+    >
       <h3>
-        <a :href="game.link" target="_blank" class="text-blue-600 hover:underline">
+        <router-link
+          :to="game.link"
+          class="text-blue-600 hover:underline"
+        >
           {{ game.sport }}
-        </a>
+        </router-link>
       </h3>
       <h3>
-        <a :href="game.link" target="_blank" class="text-blue-600 hover:underline">
+        <router-link
+          :to="game.link"
+          class="text-blue-600 hover:underline"
+        >
           {{ game.fixture }}
-        </a>
+        </router-link>
       </h3>
       <h3>League: {{ game.league }}</h3>
       <h3>Time: {{ game.time }}</h3>
     </li>
   </ul>
 </aside>
+
 
   </div>
 </template>

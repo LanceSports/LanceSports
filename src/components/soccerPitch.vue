@@ -93,7 +93,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Navbar/>
+
   <div class="p-4 flex gap-6">
     <!-- Soccer field -->
     <div>

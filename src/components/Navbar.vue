@@ -1,8 +1,27 @@
 <script setup>
-import { ref } from 'vue'
+import { ref,computed,nextTick } from 'vue'
+import {useUserStore} from '../store/useUserStore'
+import { storeToRefs } from 'pinia'
+import router from '../router'
+import {googleLogout} from 'vue3-google-login'
 
 const navOpen = ref(false)
+const {userData} = useUserStore();
+const loggedIn = computed(()=> !userData.value)
+console.log(loggedIn.value)
 
+const logout = () => {
+  googleLogout()
+  
+  // clear user data and move to login screen
+  localStorage.clear()
+  userData.value = {}
+
+  nextTick(() => {
+    router.push('/Login')
+    //window.location.reload()
+  })
+}
 </script>
 
 <template>
@@ -35,9 +54,22 @@ const navOpen = ref(false)
         <router-link to="/rugby" class="block">Rugby</router-link>
         <router-link to="/cricket" class="block">Cricket</router-link>
         <!-- Login button is also a router link -->
-        <router-link to="/login" class="block bg-white text-purple-500 px-4 py-2 rounded font-semibold text-center hover:bg-purple-100 transition">
-          Login
-        </router-link>
+        <router-link
+    v-if="!loggedIn"
+    to="/login"
+    class="block bg-white text-purple-500 px-4 py-2 rounded font-semibold text-center hover:bg-purple-100 transition"
+  >
+    Login
+  </router-link>
+
+  <!-- Show Logout button when logged in -->
+  <button
+    v-else
+    @click="logout"
+    class="block bg-white text-purple-500 px-4 py-2 rounded font-semibold text-center hover:bg-purple-100 transition"
+  >
+    Logout
+  </button>
       </nav>
     </div>
 
@@ -54,9 +86,21 @@ const navOpen = ref(false)
         <router-link to="/rugby" class="block">Rugby</router-link>
         <router-link to="/cricket" class="block">Cricket</router-link>
         <!-- Login button as a router link -->
-        <router-link to="/login" class="ml-auto bg-white text-purple-500 px-4 py-2 rounded font-semibold hover:bg-purple-100 transition">
-          Login
-        </router-link>
+         <router-link
+      v-if="!loggedIn"
+      to="/login"
+      class="ml-auto bg-white text-purple-500 px-4 py-2 rounded font-semibold hover:bg-purple-100 transition"
+    >
+      Login
+    </router-link>
+
+    <button
+      v-else
+      @click="logout"
+      class="ml-auto bg-white text-purple-500 px-4 py-2 rounded font-semibold hover:bg-purple-100 transition"
+    >
+      Logout
+    </button>
       </div>
     </div>
   </div>
