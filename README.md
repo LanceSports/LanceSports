@@ -5,8 +5,8 @@ npm install @supabase/supabase-js
 
 This is the directory structure for LanceSports.
 
--├── src/
--│   ├── components/
+--├── src/
+--│   ├── components/
 -│   │   ├── common/
 -│   │   ├── live-games/
 -│   │   ├── game-card/
