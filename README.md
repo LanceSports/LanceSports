@@ -5,43 +5,43 @@ npm install @supabase/supabase-js
 
 This is the directory structure for LanceSports.
 
-├── src/
-│   ├── components/
-│   │   ├── common/
-│   │   ├── live-games/
-│   │   ├── game-card/
-│   │   ├── scoreboard/
-│   │   └── countdown/
-│   ├── screens/
-│   │   ├── home/
-│   │   ├── live/
-│   │   ├── standings/
-│   │   ├── news/
-│   │   └── settings/
-│   ├── services/
-│   │   ├── api/
-│   │   ├── websocket/
-│   │   └── storage/
-│   ├── utils/
-│   │   ├── helpers/
-│   │   └── constants/
-│   ├── assets/
-│   │   ├── images/
-│   │   ├── icons/
-│   │   └── fonts/
-│   └── styles/
-│       ├── themes/
-│       └── components/
-├── tests/
-│   ├── unit/
-│   └── integration/
-├── docs/
-│   ├── api/
-│   └── deployment/
-├── scripts/
-├── config/
-├── public/
-└── dist/
+-├── src/
+-│   ├── components/
+-│   │   ├── common/
+-│   │   ├── live-games/
+-│   │   ├── game-card/
+-│   │   ├── scoreboard/
+-│   │   └── countdown/
+-│   ├── screens/
+-│   │   ├── home/
+-│   │   ├── live/
+-│   │   ├── standings/
+-│   │   ├── news/
+-│   │   └── settings/
+-│   ├── services/
+-│   │   ├── api/
+-│   │   ├── websocket/
+-│   │   └── storage/
+-│   ├── utils/
+-│   │   ├── helpers/
+-│   │   └── constants/
+-│   ├── assets/
+-│   │   ├── images/
+-│   │   ├── icons/
+-│   │   └── fonts/
+-│   └── styles/
+-│       ├── themes/
+-│       └── components/
+-├── tests/
+-│   ├── unit/
+-│   └── integration/
+-├── docs/
+-│   ├── api/
+-│   └── deployment/
+-├── scripts/
+-├── config/
+-├── public/
+-└── dist/
 
 Root Level
 /src/ (Src): The heart of the application. Contains all the human-written source code for the app.
