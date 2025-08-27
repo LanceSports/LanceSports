@@ -1,7 +1,7 @@
 // server/index.js
 const express = require('express');
 const cors = require('cors');
-const userRoutes = require('./services/routes/UserRegistration');
+const userRoutes = require('./src/services/routes/UserRegistration');
 
 const app = express();
 

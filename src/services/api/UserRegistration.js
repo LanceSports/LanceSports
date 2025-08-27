@@ -1,5 +1,5 @@
-// server/repositories/userRepo.js
-const supabase = require('../supabase');
+
+const supabase = require('../../../scripts/supabase');
 
 async function ensureUser(googleId) {
   const { error } = await supabase
