@@ -29,6 +29,7 @@ export function Navbar({ onLoginClick, isSignedIn = false, onLogout }: NavbarPro
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
           {navItems.map((item) => (
+            // puts each nav item in a link structure 
             <a
               key={item.name}
               href={item.href}
