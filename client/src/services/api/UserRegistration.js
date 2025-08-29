@@ -1,5 +1,5 @@
 
-const supabase = require('../../../scripts/supabase');
+const supabase = require('../../../../scripts/supabase');
 
 async function ensureUser(googleId) {
   const { error } = await supabase
