@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { SportsSlideshow } from './components/SportsSlideshow';
 import { FixturesSidebar } from './components/FixturesSidebar';
@@ -58,31 +58,51 @@ function Home({ isSignedIn, userData }) {
   );
 }
 
-export default function App() {
+function AppContent() {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [userData, setUserData] = useState<any>(null);
+  const navigate = useNavigate();
 
-  const handleSignIn = (userData?: any) => {
+  const handleSignIn = (userData?: any, redirectTo?: string) => {
     setIsSignedIn(true);
     if (userData) {
       setUserData(userData);
       console.log('User signed in:', userData);
     }
+    
+    // Redirect to specified path or default to home
+    if (redirectTo) {
+      navigate(redirectTo);
+    }
   };
 
   const handleLogout = () => {
+    console.log('Logout clicked - redirecting to home page');
     setIsSignedIn(false);
     setUserData(null);
+    
+    // Force redirect to home page
+    window.location.href = '/';
   };
 
   return (
-    <BrowserRouter>
-      <Navbar isSignedIn={isSignedIn} onLogout={handleLogout} />
+    <>
+      <Navbar isSignedIn={isSignedIn} onLogout={handleLogout} userData={userData} />
       <Routes>
         <Route path="/" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
         <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
         <Route path="/premier-league" element={<PremierLeague />} />
+        {/* Catch all route to ensure navigation works */}
+        <Route path="*" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
       </Routes>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }

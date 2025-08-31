@@ -6,9 +6,10 @@ import { useState } from 'react';
 interface NavbarProps {
   isSignedIn?: boolean;
   onLogout?: () => void;
+  userData?: any;
 }
 
-export function Navbar({ isSignedIn = false, onLogout }: NavbarProps) {
+export function Navbar({ isSignedIn = false, onLogout, userData }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
@@ -33,15 +34,36 @@ export function Navbar({ isSignedIn = false, onLogout }: NavbarProps) {
             </Link>
           ))}
         </div>
-        <div className="hidden md:block">
+        <div className="hidden md:flex items-center space-x-4">
           {isSignedIn ? (
-            <Button
-              onClick={onLogout}
-              variant="outline"
-              className="text-green-600 border-white bg-white hover:bg-green-50"
-            >
-              Logout
-            </Button>
+            <>
+              {/* User Profile */}
+              <div className="flex items-center space-x-3 bg-white/10 rounded-full px-4 py-2">
+                {userData?.avatar_url ? (
+                  <img
+                    src={userData.avatar_url}
+                    alt={userData.name}
+                    className="w-8 h-8 rounded-full border-2 border-white/20"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">
+                      {userData?.name?.charAt(0) || 'U'}
+                    </span>
+                  </div>
+                )}
+                <div className="text-sm">
+                  <p className="font-medium text-white">{userData?.name || 'User'}</p>
+                </div>
+              </div>
+              <Button
+                onClick={onLogout}
+                variant="outline"
+                className="text-green-600 border-white bg-white hover:bg-green-50"
+              >
+                Logout
+              </Button>
+            </>
           ) : (
             <Link
               to="/signin"
@@ -77,13 +99,34 @@ export function Navbar({ isSignedIn = false, onLogout }: NavbarProps) {
             ))}
             <div className="pt-2">
               {isSignedIn ? (
-                <Button
-                  onClick={onLogout}
-                  variant="outline"
-                  className="text-green-600 border-white bg-white hover:bg-green-50 w-full"
-                >
-                  Logout
-                </Button>
+                <>
+                  {/* Mobile User Profile */}
+                  <div className="flex items-center space-x-3 bg-white/10 rounded-lg px-3 py-2 mb-3">
+                    {userData?.avatar_url ? (
+                      <img
+                        src={userData.avatar_url}
+                        alt={userData.name}
+                        className="w-10 h-10 rounded-full border-2 border-white/20"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                        <span className="text-white text-sm font-medium">
+                          {userData?.name?.charAt(0) || 'U'}
+                        </span>
+                      </div>
+                    )}
+                    <div className="text-sm">
+                      <p className="font-medium text-white">{userData?.name || 'User'}</p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={onLogout}
+                    variant="outline"
+                    className="text-green-600 border-white bg-white hover:bg-green-50 w-full"
+                  >
+                    Logout
+                  </Button>
+                </>
               ) : (
                 <Link
                   to="/signin"
