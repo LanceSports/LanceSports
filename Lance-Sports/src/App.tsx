@@ -1,12 +1,12 @@
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { SportsSlideshow } from './components/SportsSlideshow';
 import { FixturesSidebar } from './components/FixturesSidebar';
 import { SignIn } from './components/SignIn';
 import { PremierLeague } from './components/PremierLeague';
-import { useState } from 'react';
 
-function Home({ isSignedIn }) {
+function Home({ isSignedIn, userData }) {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-8">
@@ -16,9 +16,16 @@ function Home({ isSignedIn }) {
           </h1>
           {isSignedIn && (
             <div className="text-center mb-4">
-              <p className="text-green-600 bg-green-50 inline-block px-4 py-2 rounded-full">
-                ✓ Welcome back! You are now signed in.
-              </p>
+              <div className="bg-green-50 inline-block px-6 py-3 rounded-full">
+                <p className="text-green-600 font-medium">
+                  ✓ Welcome back! You are now signed in.
+                </p>
+                {userData && (
+                  <p className="text-green-700 text-sm mt-1">
+                    Signed in as: {userData.name} ({userData.email})
+                  </p>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -53,20 +60,26 @@ function Home({ isSignedIn }) {
 
 export default function App() {
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
 
-  const handleSignIn = () => {
+  const handleSignIn = (userData?: any) => {
     setIsSignedIn(true);
+    if (userData) {
+      setUserData(userData);
+      console.log('User signed in:', userData);
+    }
   };
 
   const handleLogout = () => {
     setIsSignedIn(false);
+    setUserData(null);
   };
 
   return (
     <BrowserRouter>
       <Navbar isSignedIn={isSignedIn} onLogout={handleLogout} />
       <Routes>
-        <Route path="/" element={<Home isSignedIn={isSignedIn} />} />
+        <Route path="/" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
         <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
         <Route path="/premier-league" element={<PremierLeague />} />
       </Routes>
