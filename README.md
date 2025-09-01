@@ -1,3 +1,21 @@
+| Completed Tasks | Uncompleted Tasks |
+|-----------------|-------------------|
+| Authentication | Full Match Viewer (game clock, possession, key events) |
+| Home Page (basic UI) | Event Feed (live timeline, animations) |
+| Premier League Page (partial) | Match Setup (UI and API) |
+| Navigation and Routing | Live Input (manual event input, pause/resume) |
+| Database (Users) | Live Update API |
+| | Feed API |
+| | Match Setup API |
+| | Display API |
+| | Live Scoreboard (UI) |
+| | Event Timeline (UI) |
+| | Match Setup Screen (UI) |
+| | Manual Input Panel (UI) |
+| | Database (Match Info) |
+| | Database (Event Log) |
+| | Database (Display State) |
+| | Database (Player & Team Data) |
 # Live Sports App
 
 npm install @supabase/supabase-js
