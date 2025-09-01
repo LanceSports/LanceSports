@@ -80,7 +80,7 @@ export function SignIn({ onSignIn }: SignInProps) {
               setIsSuccess(true);
               // Show success message briefly before redirecting to Premier League
               setTimeout(() => {
-                onSignIn(userInfo, '/premier-league');
+                onSignIn(userInfo, '/');
               }, 1500);
             }
                      } catch (supabaseError) {

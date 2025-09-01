@@ -4,8 +4,8 @@ import { Navbar } from './components/Navbar';
 import { SportsSlideshow } from './components/SportsSlideshow';
 import { FixturesSidebar } from './components/FixturesSidebar';
 import { SignIn } from './components/SignIn';
-import { PremierLeague } from './components/PremierLeague';
-import { useState } from 'react';
+import { PremierLeague } from './PremierLeague';
+//import { useState } from 'react';
 //import '/App.css'
 function Home({ isSignedIn, userData }) {
   return (
@@ -70,6 +70,7 @@ function AppContent() {
       setUserData(userData);
       console.log('User signed in:', userData);
     }
+    console.log(userData);
     
     // Redirect to specified path or default to home
     if (redirectTo) {
