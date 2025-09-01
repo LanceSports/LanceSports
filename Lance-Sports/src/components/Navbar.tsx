@@ -43,18 +43,20 @@ export function Navbar({ isSignedIn = false, onLogout, userData }: NavbarProps) 
                 {userData?.avatar_url ? (
                   <img
                     src={userData.avatar_url}
-                    alt={userData.name}
+                    alt={userData.name || userData.username || userData.displayName || 'User'}
                     className="w-8 h-8 rounded-full border-2 border-white/20"
                   />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                     <span className="text-white text-sm font-medium">
-                      {userData?.name?.charAt(0) || 'U'}
+                      {(userData?.name || userData?.username || userData?.displayName || 'U').charAt(0)}
                     </span>
                   </div>
                 )}
                 <div className="text-sm">
-                  <p className="font-medium text-white">{userData?.name || 'User'}</p>
+                  <p className="font-medium text-white">
+                    {userData?.name || userData?.username || userData?.displayName || 'User'}
+                  </p>
                 </div>
               </div>
               <Button
@@ -106,18 +108,20 @@ export function Navbar({ isSignedIn = false, onLogout, userData }: NavbarProps) 
                     {userData?.avatar_url ? (
                       <img
                         src={userData.avatar_url}
-                        alt={userData.name}
+                        alt={userData.name || userData.username || userData.displayName || 'User'}
                         className="w-10 h-10 rounded-full border-2 border-white/20"
                       />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">
-                          {userData?.name?.charAt(0) || 'U'}
-                        </span>
+                                              <span className="text-white text-sm font-medium">
+                        {(userData?.name || userData?.username || userData?.displayName || 'U').charAt(0)}
+                      </span>
                       </div>
                     )}
                     <div className="text-sm">
-                      <p className="font-medium text-white">{userData?.name || 'User'}</p>
+                      <p className="font-medium text-white">
+                        {userData?.name || userData?.username || userData?.displayName || 'User'}
+                      </p>
                     </div>
                   </div>
                   <Button

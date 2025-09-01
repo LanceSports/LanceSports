@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { SportsSlideshow } from './components/SportsSlideshow';
 import { FixturesSidebar } from './components/FixturesSidebar';
 import { SignIn } from './components/SignIn';
 import { PremierLeague } from './PremierLeague';
+import { useSession } from './hooks/useSession';
+import { Button } from './components/ui/button';
 //import { useState } from 'react';
 //import '/App.css'
-function Home({ isSignedIn, userData }) {
+interface HomeProps {
+  isSignedIn: boolean;
+  userData: any;
+}
+
+function Home({ isSignedIn, userData }: HomeProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-8">
@@ -21,11 +28,13 @@ function Home({ isSignedIn, userData }) {
                 <p className="text-green-600 font-medium">
                   ✓ Welcome back! You are now signed in.
                 </p>
-                {userData && (
-                  <p className="text-green-700 text-sm mt-1">
-                    Signed in as: {userData.name} ({userData.email})
-                  </p>
-                )}
+                                 {userData && (
+                   <div className="text-green-700 text-sm mt-1">
+                     <p>
+                       Signed in as: {userData.name || userData.username || userData.displayName || 'User'} ({userData.email})
+                     </p>
+                   </div>
+                 )}
               </div>
             </div>
           )}
@@ -60,17 +69,22 @@ function Home({ isSignedIn, userData }) {
 }
 
 function AppContent() {
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
+  const { isSignedIn, userData, signIn, signOut, refreshSession } = useSession();
   const navigate = useNavigate();
 
   const handleSignIn = (userData?: any, redirectTo?: string) => {
-    setIsSignedIn(true);
     if (userData) {
-      setUserData(userData);
+      signIn(userData);
       console.log('User signed in:', userData);
+      console.log('User data structure:', {
+        name: userData.name,
+        username: userData.username,
+        displayName: userData.displayName,
+        email: userData.email,
+        avatar_url: userData.avatar_url,
+        picture: userData.picture
+      });
     }
-    console.log(userData);
     
     // Redirect to specified path or default to home
     if (redirectTo) {
@@ -80,8 +94,7 @@ function AppContent() {
 
   const handleLogout = () => {
     console.log('Logout clicked - redirecting to home page');
-    setIsSignedIn(false);
-    setUserData(null);
+    signOut();
     
     // Force redirect to home page
     window.location.href = '/';
