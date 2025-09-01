@@ -1,9 +1,11 @@
 import React from 'react';
 import { useState } from 'react';
+import '../prem.css';
 import { useGoogleLogin } from '@react-oauth/google';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { supabase } from '../lib/supabase';
+
 
 interface SignInProps {
   onSignIn: (userData?: any, redirectTo?: string) => void;
