@@ -3,7 +3,7 @@ import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useMatchClock } from '../hooks/useMatchClock';
-import { Match, Team, MatchStatus } from '../types/match';
+import { Match, Team, MatchStatus } from '../types/match.ts';
 
 interface ScoreboardProps {
   match: Match;

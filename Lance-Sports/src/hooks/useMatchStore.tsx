@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
-import { Match, MatchEvent, Team, Player, MatchStatus, EventType } from '../types/match';
+import { Match, MatchEvent, Team, Player, MatchStatus, EventType } from '../types/match.ts';
 
 interface MatchState {
   teams: Team[];
