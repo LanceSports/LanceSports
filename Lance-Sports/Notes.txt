@@ -1,0 +1,11 @@
+what do i need to implement.
+
+Major.
+try and retrieve from the API and display the things.
+
+Minor
+1. Middleware for sessions.
+2. Update the design
+3. Store the things properly on the database
+4. Store user preferences.
+

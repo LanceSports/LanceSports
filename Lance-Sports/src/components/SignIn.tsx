@@ -45,52 +45,71 @@ export function SignIn({ onSignIn }: SignInProps) {
         }).then((res) => res.json());
         
         console.log('User info:', userInfo);
+        console.log('User info structure:', {
+          name: userInfo.name,
+          username: userInfo.username,
+          displayName: userInfo.displayName,
+          email: userInfo.email,
+          sub: userInfo.sub,
+          picture: userInfo.picture
+        });
         
-                 // Save user data to Supabase
-         try {
-           console.log('Attempting to save user to Supabase:', {
-             google_id: userInfo.sub,
-             username: userInfo.name,
-             email: userInfo.email,
-             avatar_url: userInfo.picture
-           });
-           
-           const { data, error } = await supabase
-             .from('users')
-             .upsert({
-               google_id: userInfo.sub,
-               username: userInfo.name,
-               email: userInfo.email,
-               avatar_url: userInfo.picture,
-               last_sign_in: new Date().toISOString(),
-             }, {
-               onConflict: 'google_id'
-             });
-           
-           if (error) {
-             console.error('Error saving user to Supabase:', error);
-             console.error('Error details:', {
-               message: error.message,
-               details: error.details,
-               hint: error.hint,
-               code: error.code
-             });
-                       } else {
-              console.log('✅ User successfully saved to Supabase:', data);
-              setIsSuccess(true);
-              // Show success message briefly before redirecting to Premier League
-              setTimeout(() => {
-                onSignIn(userInfo, '/');
-              }, 1500);
-            }
-                     } catch (supabaseError) {
-             console.error('❌ Supabase error:', supabaseError);
-             onSignIn(userInfo, '/premier-league'); // Still proceed even if DB save fails
-           }
-             } catch (error) {
-         console.error('Failed to get user info:', error);
-         onSignIn(undefined, '/premier-league'); // Fallback to basic sign in
-       } finally {
+        // For now, let's use a simpler approach without Supabase OAuth
+        // We'll just use the Google user info directly
+        console.log('✅ Using Google user info directly');
+        
+        // Create a simple user object with the data we need
+        const userData = {
+          id: userInfo.sub, // Use Google ID as unique identifier
+          google_id: userInfo.sub,
+          name: userInfo.name,
+          username: userInfo.name,
+          email: userInfo.email,
+          avatar_url: userInfo.picture,
+          picture: userInfo.picture,
+          displayName: userInfo.name
+        };
+        
+        // Try to save to Supabase users table (optional)
+        try {
+          const { data, error } = await supabase
+            .from('users')
+            .upsert({
+              id: userInfo.sub, // Use Google ID
+              google_id: userInfo.sub,
+              username: userInfo.name,
+              email: userInfo.email,
+              avatar_url: userInfo.picture,
+              last_sign_in: new Date().toISOString(),
+            }, {
+              onConflict: 'id' // Use Google ID as conflict key
+            });
+          
+          if (error) {
+            console.error('Error saving user to users table:', error);
+          } else {
+            console.log('✅ User data saved to users table:', data);
+          }
+        } catch (dbError) {
+          console.error('❌ Database error:', dbError);
+        }
+        
+        setIsSuccess(true);
+        // Show success message briefly before redirecting
+        setTimeout(() => {
+          onSignIn(userData, '/');
+        }, 1500);
+      } catch (error) {
+        console.error('Failed to authenticate:', error);
+        // Create a basic user object even if there's an error
+        const fallbackUserData = {
+          id: 'fallback',
+          name: 'User',
+          email: 'user@example.com',
+          avatar_url: null
+        };
+        onSignIn(fallbackUserData, '/premier-league');
+      } finally {
         setIsLoading(false);
       }
     },
