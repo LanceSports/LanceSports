@@ -7,7 +7,7 @@ import { MatchProvider } from './hooks/useMatchStore';
 import './prem.css'
 
 export function PremierLeague() {
-  const [currentPage, setCurrentPage] = useState<'live' | 'setup'>('setup');
+  const [currentPage, setCurrentPage] = useState<'live' | 'setup'>('live');
   const [fixtures, setFixtures] = useState([]); // For live or upcoming fixtures
   const [teams, setTeams] = useState([]); // For teams in setup
   const [loading, setLoading] = useState(true);

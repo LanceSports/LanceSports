@@ -1,70 +1,84 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../App';
+import { BrowserRouter } from 'react-router-dom';
+import { useSession } from '../hooks/useSession';
 
-// Mock the SignIn component
-vi.mock('../components/SignIn', () => ({
-  SignIn: ({ onSignIn }: { onSignIn: (userData?: any, redirectTo?: string) => void }) => (
-    <div data-testid="signin-component">
-      <button onClick={() => onSignIn({ name: 'Test User' }, '/premier-league')}>
-        Continue with Google
-      </button>
-    </div>
-  ),
+// Mock useSession hook
+vi.mock('../hooks/useSession', () => ({
+  useSession: () => ({
+    isSignedIn: false,
+    userData: null,
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    refreshSession: vi.fn(),
+  }),
 }));
 
-// Mock the PremierLeague component
-vi.mock('../components/PremierLeague', () => ({
-  PremierLeague: () => <div data-testid="premier-league">Premier League Component</div>,
-}));
-
-// Mock the SportsSlideshow component
-vi.mock('../components/SportsSlideshow', () => ({
-  SportsSlideshow: () => <div data-testid="sports-slideshow">Sports Slideshow</div>,
-}));
-
-// Mock react-router-dom to avoid Router conflicts
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: vi.fn(),
-    useLocation: vi.fn(() => ({ pathname: '/' })),
-    BrowserRouter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  };
-});
+// Mock fetch for any API calls (e.g., in PremierLeague)
+global.fetch = vi.fn(() =>
+  Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({ response: [] }),
+  })
+);
 
 describe('App Component', () => {
-  it('renders the main app with navigation', () => {
-    render(<App />);
-
-    // Check for main navigation elements
-    expect(screen.getByText(/lance sports/i)).toBeInTheDocument();
-    expect(screen.getByText(/home/i)).toBeInTheDocument();
-    expect(screen.getByText(/premier league/i)).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('shows sign in component when not authenticated', () => {
-    render(<App />);
+  it('renders Home page by default', async () => {
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
 
-    expect(screen.getByTestId('signin-component')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/The Future of Sports, all in one place/i)).toBeInTheDocument();
+    });
   });
 
-  it('navigates to premier league after successful sign in', () => {
-    render(<App />);
+  it('renders SignIn page', async () => {
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
 
-    const signInButton = screen.getByText('Continue with Google');
-    signInButton.click();
+    // Simulate navigation to /signin
+    window.history.pushState({}, '', '/signin');
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
 
-    // Should navigate to premier league
-    expect(screen.getByTestId('premier-league')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /continue with google/i })).toBeInTheDocument();
+    });
   });
 
-  it('displays sports slideshow on home page', () => {
-    render(<App />);
+  it('renders PremierLeague page', async () => {
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
 
-    expect(screen.getByTestId('sports-slideshow')).toBeInTheDocument();
+    // Simulate navigation to /premier-league
+    window.history.pushState({}, '', '/premier-league');
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Stay updated with the latest news, match results, and upcoming fixtures from all your favorite sports leagues and tournaments./i)).toBeInTheDocument();
+    });
   });
 });

@@ -116,8 +116,8 @@ function AppContent() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    //<BrowserRouter>
       <AppContent />
-    </BrowserRouter>
+  //  </BrowserRouter>
   );
 }

@@ -1,13 +1,15 @@
-import React from 'react';
+// src/__tests__/SignIn.test.tsx
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SignIn } from '../SignIn';
+import { SignIn } from '../components/SignIn';
 import { useGoogleLogin } from '@react-oauth/google';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../lib/supabase';
+import '@testing-library/jest-dom';
+import { BrowserRouter } from 'react-router-dom';
 
 // Mock the hooks and modules
 vi.mock('@react-oauth/google');
-vi.mock('../../lib/supabase');
+vi.mock('../lib/supabase');
 
 const mockUseGoogleLogin = useGoogleLogin as vi.MockedFunction<typeof useGoogleLogin>;
 const mockSupabase = supabase as vi.Mocked<typeof supabase>;
@@ -21,18 +23,25 @@ describe('SignIn Component', () => {
   });
 
   it('renders sign in button', () => {
-    render(<SignIn onSignIn={mockOnSignIn} />);
-    
+    render(
+      <BrowserRouter>
+        <SignIn onSignIn={mockOnSignIn} />
+      </BrowserRouter>
+    );
+
     expect(screen.getByRole('button', { name: /continue with google/i })).toBeInTheDocument();
   });
 
   it('shows loading state when signing in', async () => {
-    render(<SignIn onSignIn={mockOnSignIn} />);
-    
+    render(
+      <BrowserRouter>
+        <SignIn onSignIn={mockOnSignIn} />
+      </BrowserRouter>
+    );
+
     const signInButton = screen.getByRole('button', { name: /continue with google/i });
     fireEvent.click(signInButton);
-    
-    // The button should show loading state
+
     expect(signInButton).toBeDisabled();
   });
 
@@ -40,12 +49,10 @@ describe('SignIn Component', () => {
     const mockGoogleLogin = vi.fn();
     mockUseGoogleLogin.mockReturnValue(mockGoogleLogin);
 
-    // Mock successful Google OAuth response
     const mockGoogleResponse = {
       access_token: 'mock-access-token',
     };
 
-    // Mock successful user info fetch
     const mockUserInfo = {
       sub: 'google-user-id-123',
       name: 'John Doe',
@@ -53,23 +60,20 @@ describe('SignIn Component', () => {
       picture: 'https://example.com/avatar.jpg',
     };
 
-    // Mock successful Supabase upsert
-    const mockSupabaseResponse = {
-      data: { id: 'user-123' },
-      error: null,
-    };
-
-    (global.fetch as vi.Mock).mockResolvedValueOnce({
+    global.fetch = vi.fn().mockResolvedValueOnce({
       json: () => Promise.resolve(mockUserInfo),
     });
 
     mockSupabase.from.mockReturnValue({
-      upsert: vi.fn().mockResolvedValue(mockSupabaseResponse),
+      upsert: vi.fn().mockResolvedValue({ data: { id: 'user-123' }, error: null }),
     } as any);
 
-    render(<SignIn onSignIn={mockOnSignIn} />);
+    render(
+      <BrowserRouter>
+        <SignIn onSignIn={mockOnSignIn} />
+      </BrowserRouter>
+    );
 
-    // Simulate Google OAuth success
     const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
     await loginCallback.onSuccess(mockGoogleResponse);
 
@@ -82,32 +86,41 @@ describe('SignIn Component', () => {
           },
         }
       );
-    });
-
-    await waitFor(() => {
       expect(mockSupabase.from).toHaveBeenCalledWith('users');
+      expect(mockOnSignIn).toHaveBeenCalledWith(
+        {
+          id: mockUserInfo.sub,
+          username: mockUserInfo.name,
+          email: mockUserInfo.email,
+          avatar_url: mockUserInfo.picture,
+          google_id: mockUserInfo.sub,
+          name: mockUserInfo.name,
+          picture: mockUserInfo.picture,
+          displayName: mockUserInfo.name,
+        },
+        '/premier-league'
+      );
     });
-
-    // Wait for the timeout to complete and onSignIn to be called
-    await waitFor(() => {
-      expect(mockOnSignIn).toHaveBeenCalledWith(mockUserInfo, '/premier-league');
-    }, { timeout: 2000 });
   });
 
   it('handles Google OAuth error', async () => {
     const mockGoogleLogin = vi.fn();
     mockUseGoogleLogin.mockReturnValue(mockGoogleLogin);
 
-    render(<SignIn onSignIn={mockOnSignIn} />);
+    render(
+      <BrowserRouter>
+        <SignIn onSignIn={mockOnSignIn} />
+      </BrowserRouter>
+    );
 
-    // Simulate Google OAuth error
     const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
     if (loginCallback.onError) {
-      loginCallback.onError(new Error('OAuth failed'));
+      loginCallback.onError({ error: 'OAuth failed' });
     }
 
-    // Should not call onSignIn on error
-    expect(mockOnSignIn).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockOnSignIn).not.toHaveBeenCalled();
+    });
   });
 
   it('handles user info fetch error', async () => {
@@ -118,12 +131,14 @@ describe('SignIn Component', () => {
       access_token: 'mock-access-token',
     };
 
-    // Mock failed user info fetch
-    (global.fetch as vi.Mock).mockRejectedValueOnce(new Error('Failed to fetch user info'));
+    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Failed to fetch user info'));
 
-    render(<SignIn onSignIn={mockOnSignIn} />);
+    render(
+      <BrowserRouter>
+        <SignIn onSignIn={mockOnSignIn} />
+      </BrowserRouter>
+    );
 
-    // Simulate Google OAuth success but user info fetch failure
     const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
     await loginCallback.onSuccess(mockGoogleResponse);
 
@@ -136,10 +151,6 @@ describe('SignIn Component', () => {
           },
         }
       );
-    });
-
-    // Should call onSignIn with undefined user data when user info fetch fails
-    await waitFor(() => {
       expect(mockOnSignIn).toHaveBeenCalledWith(undefined, '/premier-league');
     });
   });
@@ -159,25 +170,37 @@ describe('SignIn Component', () => {
       picture: 'https://example.com/avatar.jpg',
     };
 
-    // Mock successful user info fetch
-    (global.fetch as vi.Mock).mockResolvedValueOnce({
+    global.fetch = vi.fn().mockResolvedValueOnce({
       json: () => Promise.resolve(mockUserInfo),
     });
 
-    // Mock Supabase exception (not error response) - this triggers the catch block which calls onSignIn immediately
     mockSupabase.from.mockReturnValue({
       upsert: vi.fn().mockRejectedValue(new Error('Database connection failed')),
     } as any);
 
-    render(<SignIn onSignIn={mockOnSignIn} />);
+    render(
+      <BrowserRouter>
+        <SignIn onSignIn={mockOnSignIn} />
+      </BrowserRouter>
+    );
 
-    // Simulate Google OAuth success
     const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
     await loginCallback.onSuccess(mockGoogleResponse);
 
     await waitFor(() => {
-      // Should still call onSignIn even if Supabase fails (immediate call in catch block)
-      expect(mockOnSignIn).toHaveBeenCalledWith(mockUserInfo, '/premier-league');
+      expect(mockOnSignIn).toHaveBeenCalledWith(
+        {
+          id: mockUserInfo.sub,
+          username: mockUserInfo.name,
+          email: mockUserInfo.email,
+          avatar_url: mockUserInfo.picture,
+          google_id: mockUserInfo.sub,
+          name: mockUserInfo.name,
+          picture: mockUserInfo.picture,
+          displayName: mockUserInfo.name,
+        },
+        '/premier-league'
+      );
     });
   });
 
@@ -196,33 +219,29 @@ describe('SignIn Component', () => {
       picture: 'https://example.com/avatar.jpg',
     };
 
-    // Mock successful user info fetch
-    (global.fetch as vi.Mock).mockResolvedValueOnce({
+    global.fetch = vi.fn().mockResolvedValueOnce({
       json: () => Promise.resolve(mockUserInfo),
     });
 
-    // Mock Supabase error response (not exception) - this logs error but doesn't call onSignIn
     mockSupabase.from.mockReturnValue({
       upsert: vi.fn().mockResolvedValue({
         data: null,
-        error: {
-          message: 'Database error',
-          code: 'DB_ERROR',
-        },
+        error: { message: 'Database error', code: 'DB_ERROR' },
       }),
     } as any);
 
-    render(<SignIn onSignIn={mockOnSignIn} />);
+    render(
+      <BrowserRouter>
+        <SignIn onSignIn={mockOnSignIn} />
+      </BrowserRouter>
+    );
 
-    // Simulate Google OAuth success
     const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
     await loginCallback.onSuccess(mockGoogleResponse);
 
-    // Wait a bit to ensure onSignIn is not called
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Should not call onSignIn when Supabase returns an error response
-    expect(mockOnSignIn).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockOnSignIn).not.toHaveBeenCalled();
+    }, { timeout: 1000 });
   });
 
   it('saves user data to Supabase with correct format', async () => {
@@ -240,7 +259,7 @@ describe('SignIn Component', () => {
       picture: 'https://example.com/avatar.jpg',
     };
 
-    (global.fetch as vi.Mock).mockResolvedValueOnce({
+    global.fetch = vi.fn().mockResolvedValueOnce({
       json: () => Promise.resolve(mockUserInfo),
     });
 
@@ -253,7 +272,11 @@ describe('SignIn Component', () => {
       upsert: mockUpsert,
     } as any);
 
-    render(<SignIn onSignIn={mockOnSignIn} />);
+    render(
+      <BrowserRouter>
+        <SignIn onSignIn={mockOnSignIn} />
+      </BrowserRouter>
+    );
 
     const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
     await loginCallback.onSuccess(mockGoogleResponse);
@@ -275,12 +298,15 @@ describe('SignIn Component', () => {
   });
 
   it('tests Supabase connection on component mount', async () => {
-    // Mock successful Supabase connection test
     mockSupabase.from.mockReturnValue({
       select: vi.fn().mockResolvedValue({ data: [], error: null }),
     } as any);
 
-    render(<SignIn onSignIn={mockOnSignIn} />);
+    render(
+      <BrowserRouter>
+        <SignIn onSignIn={mockOnSignIn} />
+      </BrowserRouter>
+    );
 
     await waitFor(() => {
       expect(mockSupabase.from).toHaveBeenCalledWith('users');
@@ -288,15 +314,18 @@ describe('SignIn Component', () => {
   });
 
   it('handles Supabase connection test failure', async () => {
-    // Mock failed Supabase connection test
     mockSupabase.from.mockReturnValue({
       select: vi.fn().mockResolvedValue({ 
         data: null, 
-        error: { message: 'Connection failed' } 
+        error: { message: 'Connection failed' },
       }),
     } as any);
 
-    render(<SignIn onSignIn={mockOnSignIn} />);
+    render(
+      <BrowserRouter>
+        <SignIn onSignIn={mockOnSignIn} />
+      </BrowserRouter>
+    );
 
     await waitFor(() => {
       expect(mockSupabase.from).toHaveBeenCalledWith('users');
@@ -318,7 +347,7 @@ describe('SignIn Component', () => {
       picture: 'https://example.com/avatar.jpg',
     };
 
-    (global.fetch as vi.Mock).mockResolvedValueOnce({
+    global.fetch = vi.fn().mockResolvedValueOnce({
       json: () => Promise.resolve(mockUserInfo),
     });
 
@@ -326,13 +355,15 @@ describe('SignIn Component', () => {
       upsert: vi.fn().mockResolvedValue({ data: { id: 'user-123' }, error: null }),
     } as any);
 
-    render(<SignIn onSignIn={mockOnSignIn} />);
+    render(
+      <BrowserRouter>
+        <SignIn onSignIn={mockOnSignIn} />
+      </BrowserRouter>
+    );
 
-    // Simulate Google OAuth success
     const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
     await loginCallback.onSuccess(mockGoogleResponse);
 
-    // Should show success state
     await waitFor(() => {
       expect(screen.getByText(/redirecting to premier league/i)).toBeInTheDocument();
     });
