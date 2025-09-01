@@ -12,6 +12,7 @@ This document provides comprehensive information about the testing setup for the
 - **Data Integration**: ✅ User data fetching, validation, and storage
 - **Component States**: ✅ Loading, success, and error states
 - **Supabase Integration**: ✅ Database operations and error handling
+- **Navbar Components** : ✅ Correct navbar routing
 
 ### ❌ **Known Issues (5/19)**
 1. **Router Context Issues** (4 failures): App component tests failing due to Router context
