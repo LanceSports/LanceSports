@@ -7,7 +7,7 @@ import { MatchProvider } from './hooks/useMatchStore';
 import './prem.css'
 
 export function PremierLeague() {
-  const [currentPage, setCurrentPage] = useState<'live' | 'setup'>('setup');
+  const [currentPage, setCurrentPage] = useState<'live' | 'setup'>('live');
   const [fixtures, setFixtures] = useState([]); // For live or upcoming fixtures
   const [teams, setTeams] = useState([]); // For teams in setup
   const [loading, setLoading] = useState(true);
@@ -100,12 +100,12 @@ const API_KEY = import.meta.env.VITE_API_FOOTBALL_KEY || '';
                 >
                   Match Setup
                 </button>
-                <span className="text-xs">v1.0.0</span>
+                {/* <span className="text-xs">v1.0.0</span> */}
               </div>
             </div>
             <div className="mt-4 pt-4 border-t border-border/50">
               <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                <span>🔴 Press G for Goal</span>
+                <span>h Press G for Goal</span>
                 <span>🟡 Press Y for Yellow Card</span>
                 <span>🟥 Press R for Red Card</span>
                 <span>⚽ Press P for Pause/Resume</span>

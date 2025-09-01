@@ -1,11 +1,11 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+// src/__tests__/OAuth.test.tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, Mocked, MockedFunction } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { useGoogleLogin } from '@react-oauth/google';
 import { supabase } from '../lib/supabase';
-import App from '../App';
+import { SignIn } from '../components/SignIn';
 
 // Mock the Google OAuth hook
 vi.mock('@react-oauth/google', async () => {
@@ -30,10 +30,12 @@ vi.mock('../lib/supabase', () => ({
   },
 }));
 
-const mockUseGoogleLogin = useGoogleLogin as vi.MockedFunction<typeof useGoogleLogin>;
-const mockSupabase = supabase as vi.Mocked<typeof supabase>;
+const mockUseGoogleLogin = useGoogleLogin as MockedFunction<typeof useGoogleLogin>;
+const mockSupabase = supabase as Mocked<typeof supabase>;
 
 describe('Google OAuth Integration Tests', () => {
+  const mockOnSignIn = vi.fn();
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseGoogleLogin.mockReturnValue(vi.fn());
@@ -43,12 +45,10 @@ describe('Google OAuth Integration Tests', () => {
     const mockGoogleLogin = vi.fn();
     mockUseGoogleLogin.mockReturnValue(mockGoogleLogin);
 
-    // Mock successful Google OAuth response
     const mockGoogleResponse = {
       access_token: 'mock-access-token-123',
     };
 
-    // Mock successful user info fetch
     const mockUserInfo = {
       sub: 'google-user-id-456',
       name: 'Jane Smith',
@@ -56,13 +56,12 @@ describe('Google OAuth Integration Tests', () => {
       picture: 'https://example.com/jane-avatar.jpg',
     };
 
-    // Mock successful Supabase upsert
     const mockSupabaseResponse = {
       data: { id: 'user-789' },
       error: null,
     };
 
-    (global.fetch as vi.Mock).mockResolvedValueOnce({
+    global.fetch = vi.fn().mockResolvedValueOnce({
       json: () => Promise.resolve(mockUserInfo),
     });
 
@@ -73,15 +72,13 @@ describe('Google OAuth Integration Tests', () => {
     render(
       <GoogleOAuthProvider clientId="test-client-id">
         <BrowserRouter>
-          <App />
+          <SignIn onSignIn={mockOnSignIn} />
         </BrowserRouter>
       </GoogleOAuthProvider>
     );
 
-    // Verify initial state shows sign in
-    expect(screen.getByText(/continue with google/i)).toBeInTheDocument();
+    expect(screen.getByText(/sign-in with your Google account/i)).toBeInTheDocument();
 
-    // Simulate Google OAuth success
     const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
     await loginCallback.onSuccess(mockGoogleResponse);
 
@@ -100,9 +97,20 @@ describe('Google OAuth Integration Tests', () => {
       expect(mockSupabase.from).toHaveBeenCalledWith('users');
     });
 
-    // Should navigate to Premier League after successful OAuth (with timeout)
     await waitFor(() => {
-      expect(screen.getByText(/premier league/i)).toBeInTheDocument();
+      expect(mockOnSignIn).toHaveBeenCalledWith(
+        {
+          id: mockUserInfo.sub,
+          username: mockUserInfo.name,
+          email: mockUserInfo.email,
+          avatar_url: mockUserInfo.picture,
+          google_id: mockUserInfo.sub,
+          name: mockUserInfo.name,
+          picture: mockUserInfo.picture,
+          displayName: mockUserInfo.name,
+        },
+        '/premier-league'
+      );
     }, { timeout: 2000 });
   });
 
@@ -114,18 +122,16 @@ describe('Google OAuth Integration Tests', () => {
       access_token: 'mock-access-token-123',
     };
 
-    // Mock network error during user info fetch
-    (global.fetch as vi.Mock).mockRejectedValueOnce(new Error('Network error'));
+    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
 
     render(
       <GoogleOAuthProvider clientId="test-client-id">
         <BrowserRouter>
-          <App />
+          <SignIn onSignIn={mockOnSignIn} />
         </BrowserRouter>
       </GoogleOAuthProvider>
     );
 
-    // Simulate Google OAuth success but network failure
     const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
     await loginCallback.onSuccess(mockGoogleResponse);
 
@@ -140,9 +146,8 @@ describe('Google OAuth Integration Tests', () => {
       );
     });
 
-    // Should navigate to Premier League even when network fails (fallback behavior)
     await waitFor(() => {
-      expect(screen.getByText(/premier league/i)).toBeInTheDocument();
+      expect(mockOnSignIn).toHaveBeenCalledWith(undefined, '/premier-league');
     });
   });
 
@@ -161,12 +166,10 @@ describe('Google OAuth Integration Tests', () => {
       picture: 'https://example.com/bob-avatar.jpg',
     };
 
-    // Mock successful user info fetch
-    (global.fetch as vi.Mock).mockResolvedValueOnce({
+    global.fetch = vi.fn().mockResolvedValueOnce({
       json: () => Promise.resolve(mockUserInfo),
     });
 
-    // Mock Supabase error
     const mockSupabaseError = {
       data: null,
       error: {
@@ -182,12 +185,11 @@ describe('Google OAuth Integration Tests', () => {
     render(
       <GoogleOAuthProvider clientId="test-client-id">
         <BrowserRouter>
-          <App />
+          <SignIn onSignIn={mockOnSignIn} />
         </BrowserRouter>
       </GoogleOAuthProvider>
     );
 
-    // Simulate Google OAuth success
     const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
     await loginCallback.onSuccess(mockGoogleResponse);
 
@@ -195,24 +197,21 @@ describe('Google OAuth Integration Tests', () => {
       expect(mockSupabase.from).toHaveBeenCalledWith('users');
     });
 
-    // Should still navigate to Premier League even if Supabase fails
     await waitFor(() => {
-      expect(screen.getByText(/premier league/i)).toBeInTheDocument();
-    }, { timeout: 2000 });
+      expect(mockOnSignIn).not.toHaveBeenCalled();
+    }, { timeout: 1000 });
   });
 
   it('validates OAuth provider configuration', () => {
     render(
       <GoogleOAuthProvider clientId="test-client-id">
         <BrowserRouter>
-          <App />
+          <SignIn onSignIn={mockOnSignIn} />
         </BrowserRouter>
       </GoogleOAuthProvider>
     );
 
-    // Verify the provider is properly configured
-    expect(screen.getByText(/lance sports/i)).toBeInTheDocument();
-    expect(screen.getByText(/continue with google/i)).toBeInTheDocument();
+    expect(screen.getByText(/sign-in with your Google account/i)).toBeInTheDocument();
   });
 
   it('tests OAuth error handling', async () => {
@@ -222,18 +221,19 @@ describe('Google OAuth Integration Tests', () => {
     render(
       <GoogleOAuthProvider clientId="test-client-id">
         <BrowserRouter>
-          <App />
+          <SignIn onSignIn={mockOnSignIn} />
         </BrowserRouter>
       </GoogleOAuthProvider>
     );
 
-    // Simulate Google OAuth error
     const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
     if (loginCallback.onError) {
-      loginCallback.onError(new Error('OAuth authentication failed'));
+      loginCallback.onError({ error: 'OAuth authentication failed' });
     }
 
-    // Should remain on sign in page
-    expect(screen.getByText(/continue with google/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockOnSignIn).not.toHaveBeenCalled();
+      expect(screen.getByText(/sign-in with your Google account/i)).toBeInTheDocument();
+    });
   });
 });

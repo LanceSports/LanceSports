@@ -9,7 +9,7 @@ import { Textarea } from './ui/textarea';
 import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
 import { Match, Team } from '../types/match.ts';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 interface MatchSetupFormProps {
   teams: Team[];
