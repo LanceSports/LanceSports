@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
+import './prem.css'
 import { Toaster } from './components/ui/sonner';
 import { HeaderBar } from './components/HeaderBar';
 import { LiveOverlay } from './components/LiveOverlay';
 import { Setup } from './components/Setup';
 import { MatchProvider } from './hooks/useMatchStore';
-import './prem.css'
+
 
 export function PremierLeague() {
   const [currentPage, setCurrentPage] = useState<'live' | 'setup'>('live');
