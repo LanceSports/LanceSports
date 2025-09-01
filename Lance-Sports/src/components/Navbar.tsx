@@ -21,7 +21,8 @@ export function Navbar({ isSignedIn = false, onLogout }: NavbarProps) {
   return (
     <nav className="bg-green-600 text-white px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="text-xl font-semibold">LanceSports</div>
+        
+        <div className="text-xl font-semibold"><a href="/">LanceSports</a></div>
         <div className="hidden md:flex items-center space-x-8">
           {navItems.map((item) => (
             <Link

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { MatchStatus } from '../types/match';
+import { MatchStatus } from '../types/match.ts';
 
 interface UseMatchClockProps {
   initialClock: string;

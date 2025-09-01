@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Textarea } from './ui/textarea';
 import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
-import { Match, Team } from '../types/match';
+import { Match, Team } from '../types/match.ts';
 import { toast } from 'sonner@2.0.3';
 
 interface MatchSetupFormProps {
