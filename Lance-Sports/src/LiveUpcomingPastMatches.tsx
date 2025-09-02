@@ -134,6 +134,7 @@ const MatchCard: React.FC<{ match: Fixture; vertical?: boolean }> = ({ match, ve
   const handleClick = () => {
     navigate('/match', { state: { match } });
   };
+
   return (
     <button
       onClick={handleClick}
@@ -151,32 +152,8 @@ const MatchCard: React.FC<{ match: Fixture; vertical?: boolean }> = ({ match, ve
         display: 'block',
       }}
     >
-      <div style={{ textAlign: 'center', marginBottom: '10px', color: '#666', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+      <div style={{ textAlign: 'center', marginBottom: '10px', color: '#666', fontSize: '12px' }}>
         {league.name} | {date}
-        {['1H', '2H', 'ET', 'LIVE'].includes(fixture.status.short) && (
-          <span style={{ display: 'inline-flex', alignItems: 'center', marginLeft: 10 }}>
-            <span
-              style={{
-                display: 'inline-block',
-                width: 10,
-                height: 10,
-                borderRadius: '50%',
-                background: 'red',
-                marginRight: 5,
-                animation: 'flash-red-dot 1s infinite',
-              }}
-            />
-            <span style={{ color: 'red', fontWeight: 'bold', fontSize: 12 }}>LIVE</span>
-            <style>
-              {`
-                @keyframes flash-red-dot {
-                  0%, 100% { opacity: 1; }
-                  50% { opacity: 0.2; }
-                }
-              `}
-            </style>
-          </span>
-        )}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ textAlign: 'center', flex: 1 }}>
