@@ -1,0 +1,21 @@
+{
+  "name": "lance-sports",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/server.js",
+  "description": "npm install @supabase/supabase-js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LanceSports/LanceSports.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LanceSports/LanceSports/issues"
+  },
+  "homepage": "https://github.com/LanceSports/LanceSports#readme"
+}
