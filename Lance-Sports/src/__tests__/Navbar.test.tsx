@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react"
+import {vi} from "vitest"
 import { BrowserRouter } from "react-router-dom"
 import { Navbar } from "../components/Navbar"
 import '@testing-library/jest-dom';
