@@ -21,110 +21,274 @@
 npm install @supabase/supabase-js
 
 
-This is the directory structure for LanceSports.
+LanceSports API
 
-- ├── src/
-- │   ├── components/
-- │   │   ├── common/
-- │   │   ├── live-games/
-- │   │   ├── game-card/
-- │   │   ├── scoreboard/
-- │   │   └── countdown/
-- │   ├── screens/
-- │   │   ├── home/
-- │   │   ├── live/
-- │   │   ├── standings/
-- │   │   ├── news/
-- │   │   └── settings/
-- │   ├── services/
-- │   │   ├── api/
-- │   │   ├── websocket/
-- │   │   └── storage/
-- │   ├── utils/
-- │   │   ├── helpers/
-- │   │   └── constants/
-- │   ├── assets/
-- │   │   ├── images/
-- │   │   ├── icons/
-- │   │   └── fonts/
-- │   └── styles/
-- │       ├── themes/
-- │       └── components/
-- ├── tests/
-- │   ├── unit/
-- │   └── integration/
-- ├── docs/
-- │   ├── api/
-- │   └── deployment/
-- ├── scripts/
-- ├── config/
-- ├── public/
-- └── dist/
+A Node.js + Express backend to fetch, store, and serve football fixtures using the API-FOOTBALL
+ API and Supabase.
 
-Root Level
-/src/ (Src): The heart of the application. Contains all the human-written source code for the app.
+Base URL
+https://<your-deployed-backend>.onrender.com
 
-/tests/: Contains all the automated tests to ensure the app works correctly. Separated into unit (tests for small, isolated functions) and integration (tests for how larger parts work together).
+Environment Variables
 
-/docs/: Holds project documentation, like api specifications (how to interact with the backend) and deployment instructions (how to publish the app).
+Before running or deploying, make sure to set:
 
-/scripts/: Contains utility scripts for developers (e.g., build automation, database setup, deployment tasks).
+SUPABASE_URL=<your_supabase_url>
+SUPABASE_SERVICE_ROLE_KEY=<your_supabase_service_role_key>
+API_SPORTS_KEY=<your_api_football_key>
 
-/config/: Stores configuration files for different environments (development, testing, production).
 
-/public/: Holds static assets that are served directly to the browser without processing, like the main HTML file, favicon, or robots.txt.
+Never commit .env with real keys to GitHub.
 
-/dist/ (Distributable): The output of the build process. Contains the minified, optimized, and bundled code ready to be deployed to a web server. (This is typically auto-generated and not edited directly).
+Installation & Running Locally
+git clone <repo-url>
+cd LanceSports
+npm install
+npm start
 
-Inside /src/
-/src/components/: Contains reusable UI components (like Lego blocks).
 
-common/: Very generic components used everywhere (Buttons, Headers, Loaders).
+The backend runs on http://localhost:3000
+ by default.
 
-live-games/: Components for listing and selecting ongoing games.
+Use Postman or a browser to test endpoints.
 
-game-card/: A component that displays a snapshot of a single game's status.
+Endpoints
+GET /fixtures
 
-scoreboard/: A component that shows the detailed current score and game clock.
+Retrieve all fixtures for a given date.
 
-countdown/: A component for displaying time until a game starts.
+Query Parameters
 
-/src/screens/ (or /src/pages/): Contains top-level components that represent entire pages/screens of the app.
+Parameter	Type	Required	Description
+date	string	Yes	Fixture date in YYYY-MM-DD format
 
-home/: The main landing page of the app.
+Example Request
 
-live/: The screen where a user watches a live game.
+GET http://localhost:3000/fixtures?date=2025-09-01
 
-standings/: The screen showing league tables and rankings.
 
-news/: The screen for displaying sports news articles.
+Example Response
 
-settings/: The screen where a user configures app preferences.
+{
+  "fixtures": [
+    {
+      "fixture_id": 1331490,
+      "match_date": "2025-09-01T00:00:00+00:00",
+      "referee": "Leandro Rey Hilfer",
+      "status_long": "Match Finished",
+      "status_short": "FT",
+      "elapsed": 90,
+      "extra": 1,
+      "leagues": {
+        "league_id": 129,
+        "name": "Primera Nacional",
+        "country": "Argentina",
+        "logo_url": "...",
+        "flag_url": "...",
+        "season": 2025,
+        "round": "Regular Season - 29",
+        "standings": true
+      },
+      "venues": {
+        "venue_id": 105,
+        "name": "Estadio La Ciudadela",
+        "city": "San Miguel de Tucumán"
+      },
+      "fixture_goals": {
+        "home_goals": 0,
+        "away_goals": 3
+      },
+      "fixture_scores": {
+        "halftime_home": 0,
+        "halftime_away": 2,
+        "fulltime_home": 0,
+        "fulltime_away": 3
+      },
+      "fixture_teams": [
+        {
+          "team_id": 485,
+          "side": "home",
+          "winner": false,
+          "name": "San Martin Tucuman",
+          "logo_url": "..."
+        },
+        {
+          "team_id": 459,
+          "side": "away",
+          "winner": true,
+          "name": "Arsenal Sarandi",
+          "logo_url": "..."
+        }
+      ]
+    }
+  ]
+}
 
-/src/services/: Contains code for interacting with external systems and APIs.
 
-api/: Handles all HTTP requests to the backend server (fetching scores, news, etc.).
+Errors
 
-websocket/: Manages the persistent connection for receiving real-time live updates (goals, scores, clock).
+Status	Message	Description
+400	"Invalid date format"	Date must be YYYY-MM-DD
+500	"Internal server error"	Backend or database issues
+Notes
 
-storage/: Handles saving and loading data from the device's local storage.
+All match_date values are UTC. Convert for display as needed.
 
-/src/utils/ (Utilities): Contains helper functions and constants.
+The backend automatically stores fetched fixtures in Supabase when a request is made.
 
-helpers/: Reusable utility functions (e.g., formatting dates, calculating time differences).
+Future versions may include authentication, cron jobs, and additional endpoints.
 
-constants/: Application-wide constant values (e.g., team names, API base URLs, game status types).
+Do you want me to add a “Database Schema” section in this README so developers can see how fixtures, leagues, venues, and teams are structured? This is very useful for anyone using your API.
 
-/src/assets/: Contains static media files used by the application.
+You said:
+can you give me a nice markdown file of my documentation
+ChatGPT said:
 
-images/: Pictures (logos, player photos, backgrounds).
+Got it 🚀 I’ll prepare you a clean Markdown README.md file you can paste straight into your GitHub repo.
 
-icons/: Small icon files.
+Here’s a complete version with formatting, code blocks, and tables:
 
-fonts/: Custom font files.
+# LanceSports API ⚽
 
-/src/styles/: Contains global styling and theming files.
+A Node.js + Express backend that fetches, stores, and serves football fixtures using the [API-FOOTBALL](https://www.api-football.com/documentation-v3) API and [Supabase](https://supabase.com/).
 
-themes/: Definitions of color palettes and styles for light/dark mode.
+---
 
-components/: Centralized styling that applies to specific components.
+## 🌍 Base URL
+
+```http
+https://<your-deployed-backend>.onrender.com
+
+
+When running locally:
+
+http://localhost:3000
+
+⚙️ Environment Variables
+
+Create a .env file in your root directory:
+
+SUPABASE_URL=<your_supabase_url>
+SUPABASE_SERVICE_ROLE_KEY=<your_supabase_service_role_key>
+API_SPORTS_KEY=<your_api_football_key>
+
+
+🔒 Do not commit .env to GitHub.
+
+🚀 Installation & Running Locally
+git clone <repo-url>
+cd LanceSports
+npm install
+npm start
+
+
+Server runs on http://localhost:3000
+
+Test endpoints with Postman or your browser
+
+📡 Endpoints
+GET /fixtures
+
+Retrieve all fixtures for a given date.
+
+Query Parameters
+Parameter	Type	Required	Description
+date	string	✅ Yes	Fixture date in YYYY-MM-DD format
+Example Request
+GET http://localhost:3000/fixtures?date=2025-09-01
+
+Example Response
+{
+  "fixtures": [
+    {
+      "fixture_id": 1331490,
+      "match_date": "2025-09-01T00:00:00+00:00",
+      "referee": "Leandro Rey Hilfer",
+      "status_long": "Match Finished",
+      "status_short": "FT",
+      "elapsed": 90,
+      "extra": 1,
+      "leagues": {
+        "league_id": 129,
+        "name": "Primera Nacional",
+        "country": "Argentina",
+        "logo_url": "...",
+        "flag_url": "...",
+        "season": 2025,
+        "round": "Regular Season - 29",
+        "standings": true
+      },
+      "venues": {
+        "venue_id": 105,
+        "name": "Estadio La Ciudadela",
+        "city": "San Miguel de Tucumán"
+      },
+      "fixture_goals": {
+        "home_goals": 0,
+        "away_goals": 3
+      },
+      "fixture_scores": {
+        "halftime_home": 0,
+        "halftime_away": 2,
+        "fulltime_home": 0,
+        "fulltime_away": 3
+      },
+      "fixture_teams": [
+        {
+          "team_id": 485,
+          "side": "home",
+          "winner": false,
+          "name": "San Martin Tucuman",
+          "logo_url": "..."
+        },
+        {
+          "team_id": 459,
+          "side": "away",
+          "winner": true,
+          "name": "Arsenal Sarandi",
+          "logo_url": "..."
+        }
+      ]
+    }
+  ]
+}
+
+Error Responses
+Status	Example Message	Cause
+400	"Invalid date format"	Date must be YYYY-MM-DD
+403	"Request failed with status code 403"	Invalid API key / Supabase policy
+500	"Internal server error"	Backend or database issues
+🗄 Database Schema (Simplified)
+
+The API writes and fetches data from Supabase with the following main tables:
+
+fixtures → Links to leagues, venues, and teams
+
+leagues → Competition info
+
+venues → Stadium data
+
+teams → Club info
+
+Foreign key constraints ensure consistency (e.g., fixtures.league_id → leagues.league_id).
+
+📝 Notes
+
+All match_date values are in UTC.
+
+Fixtures are stored automatically in Supabase when first requested.
+
+Future roadmap: authentication, scheduled updates, more endpoints.
+
+🤝 Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss your ideas.
+
+📜 License
+
+MIT License. See LICENSE for details.
+
+
+---
+
+Do you want me to also make an **ASCII-style database diagram** (tables + relationships) in the READM
