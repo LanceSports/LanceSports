@@ -16,21 +16,21 @@ interface SportEvent {
 const sportsEvents: SportEvent[] = [
   {
     id: 1,
-    title: "Premier League Championship Final",
-    description: "Experience the ultimate football showdown as top teams battle for the championship title.",
-    image: "https://images.unsplash.com/photo-1551390415-0de411440ca3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHNvY2NlciUyMGNlbGVicmF0aW9uJTIwc3RhZGl1bXxlbnwxfHx8fDE3NTU2ODEyMjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    title: "Manchester City lose away to Brighton",
+    description: "Watch the highlights of Manchester City vs Brighton",
+    image: "https://images.unsplash.com/photo-1612387050703-685c779375d4?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     category: "Football",
     date: "Sun, 25 Aug 15:00",
-    link: "#premier-league-final"
+    link: "https://youtu.be/WBkCZ8MaAl8?si=Q2NqRO07_-bmBRXP"
   },
   {
     id: 2,
-    title: "Rugby World Cup Semi-Final",
+    title: "Watch the fiercest battles between the Springboks and All-Blacks before the game this weekend",
     description: "Witness the intensity and passion as rugby's finest compete for a spot in the world cup final.",
     image: "https://images.unsplash.com/photo-1574602904316-f84f62477265?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxydWdieSUyMHdvcmxkJTIwY3VwJTIwY2VsZWJyYXRpb258ZW58MXx8fHwxNzU1NjgxMjI2fDA&ixlib=rb-4.1.0&q=80&w=1080",
     category: "Rugby",
     date: "Sat, 24 Aug 14:30",
-    link: "#rugby-world-cup"
+    link: "https://www.youtube.com/live/G19sNbJ3lF8?si=HpoS7M-HQzQZtg68"
   },
   {
     id: 3,
@@ -39,16 +39,16 @@ const sportsEvents: SportEvent[] = [
     image: "https://images.unsplash.com/photo-1730739463889-34c7279277a9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcmlja2V0JTIwc3RhZGl1bSUyMG1hdGNofGVufDF8fHx8MTc1NTYxNTc0OXww&ixlib=rb-4.1.0&q=80&w=1080",
     category: "Cricket",
     date: "Mon, 26 Aug 10:00",
-    link: "#cricket-championship"
+    link: "https://youtu.be/SExrNuWTK20?si=KQKb9EmYjZjpOkMr"
   },
   {
     id: 4,
-    title: "Premier League Derby",
+    title: "Manchester United vs Arsenal",
     description: "A classic rivalry renewed as two historic clubs face off in this highly anticipated match.",
     image: "https://images.unsplash.com/photo-1616124619460-ff4ed8f4683c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcmVtaWVyJTIwbGVhZ3VlJTIwZm9vdGJhbGx8ZW58MXx8fHwxNzU1NjgxMjI3fDA&ixlib=rb-4.1.0&q=80&w=1080",
     category: "Football",
-    date: "Tue, 27 Aug 19:45",
-    link: "#premier-league-derby"
+    date: "Sun, 17 Aug 17:00",
+    link: "https://youtu.be/GmwP-j2B8EU?si=xyVbw-9ec7hvQsn-"
   }
 ];
 
@@ -76,7 +76,9 @@ export function SportsSlideshow() {
   const handleEventClick = (link: string) => {
     // In a real app, this would navigate to the event page
     console.log(`Navigating to ${link}`);
-    alert(`Redirecting to ${sportsEvents[currentSlide].title}`);
+    //alert(`Redirecting to ${sportsEvents[currentSlide].title}`);
+    window.open(link, "_blank");
+
   };
 
   return (
