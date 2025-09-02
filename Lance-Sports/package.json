@@ -89,6 +89,8 @@
             "dev:full": "concurrently \"npm run dev\" \"npm run server:dev\""
       },
       "optionalDependencies": {
-            "@rollup/rollup-linux-x64-gnu": "^4.50.0"
+            "@rollup/rollup-linux-x64-gnu": "^4.50.0",
+            "@rollup/rollup-linux-x64-musl": "^4.50.0"
+
       }
 }
