@@ -87,5 +87,8 @@
             "server:build": "cd server && npm run build",
             "server:start": "cd server && npm start",
             "dev:full": "concurrently \"npm run dev\" \"npm run server:dev\""
+      },
+      "optionalDependencies": {
+            "@rollup/rollup-linux-x64-gnu": "^4.50.0"
       }
 }
