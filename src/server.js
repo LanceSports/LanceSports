@@ -1,7 +1,6 @@
 // src/server.js
 import express from "express";
 import fixturesRouter from "./routes/fixturesRoutes.js";
-import express from "express";
 import cors from "cors";
 
 
