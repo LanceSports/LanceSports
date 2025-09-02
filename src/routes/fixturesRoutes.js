@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   const { date } = req.query;
   try {
-    const fixtures = await fetchFixturesByDate(date);  // 👈 should call your function
+    const fixtures = await fetchFixturesByDate(date);  
     await saveFixtures(fixtures);
     res.json({ fixtures });
   } catch (err) {

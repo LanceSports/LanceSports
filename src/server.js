@@ -1,8 +1,14 @@
 // src/server.js
 import express from "express";
 import fixturesRouter from "./routes/fixturesRoutes.js";
+import express from "express";
+import cors from "cors";
+
+
 
 const app = express();
+app.use(cors()); // allows all origins by default
+
 
 app.use("/fixtures", fixturesRouter);
 
