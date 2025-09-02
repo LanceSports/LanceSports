@@ -1,7 +1,7 @@
 // src/components/tests/unit/PremierLeague.test.tsx
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
-import { PremierLeague } from '../../../PremierLeague';
+import { PremierLeague } from '../PremierLeague';
 
 // Mock data to match what LiveOverlay & Setup expect
 const mockFixtures = {
