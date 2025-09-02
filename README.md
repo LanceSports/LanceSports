@@ -20,7 +20,7 @@
 
 npm install @supabase/supabase-js
 
-
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 LanceSports API
 
 A Node.js + Express backend to fetch, store, and serve football fixtures using the API-FOOTBALL
@@ -152,7 +152,8 @@ Here’s a complete version with formatting, code blocks, and tables:
 
 A Node.js + Express backend that fetches, stores, and serves football fixtures using the [API-FOOTBALL](https://www.api-football.com/documentation-v3) API and [Supabase](https://supabase.com/).
 
----
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 ## 🌍 Base URL
 
@@ -290,5 +291,3 @@ MIT License. See LICENSE for details.
 
 
 ---
-
-Do you want me to also make an **ASCII-style database diagram** (tables + relationships) in the READM
