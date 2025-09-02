@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+// Using backend proxy (CORS enabled)
 import './prem.css'
 import { Toaster } from './components/ui/sonner';
 import { HeaderBar } from './components/HeaderBar';
@@ -9,42 +10,29 @@ import { MatchProvider } from './hooks/useMatchStore';
 
 export function PremierLeague() {
   const [currentPage, setCurrentPage] = useState<'live' | 'setup'>('live');
-  const [fixtures, setFixtures] = useState([]); // For live or upcoming fixtures
-  const [teams, setTeams] = useState([]); // For teams in setup
+  const [fixtures, setFixtures] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-const API_KEY = import.meta.env.VITE_API_FOOTBALL_KEY || '';
-  const BASE_URL = 'https://v3.football.api-sports.io';
-  const LEAGUE_ID = 39; // Premier League ID
-  const SEASON = 2025; // Adjust based on current season (e.g., 2025 for 2025/26)
+  // Use backend proxy to fetch fixtures (avoids CORS to external API)
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        let fixtureUrl;
-        if (currentPage === 'live') {
-          // Fetch live fixtures for Premier League
-          fixtureUrl = `${BASE_URL}/fixtures?live=${LEAGUE_ID}`;
-        } else {
-          // Fetch upcoming fixtures and teams for setup
-          fixtureUrl = `${BASE_URL}/fixtures?league=${LEAGUE_ID}&season=${SEASON}&next=10`;
-          const teamsResponse = await fetch(`${BASE_URL}/teams?league=${LEAGUE_ID}&season=${SEASON}`, {
-            headers: { 'x-apisports-key': API_KEY },
-          });
-          if (!teamsResponse.ok) throw new Error('Failed to fetch teams');
-          const teamsData = await teamsResponse.json();
-          setTeams(teamsData.response || []);
+        const currentDate = new Date().toISOString().split('T')[0];
+        // @ts-ignore - Vite provides import.meta.env
+        const base = (import.meta.env?.VITE_API_URL || 'http://localhost:3000/api');
+        const res = await fetch(`${base}/fixtures?date=${currentDate}`);
+        if (!res.ok) throw new Error(`Failed to fetch fixtures (HTTP ${res.status})`);
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+          const text = await res.text();
+          throw new Error(`Non-JSON response: ${text.slice(0, 80)}`);
         }
-
-        const fixturesResponse = await fetch(fixtureUrl, {
-          headers: { 'x-apisports-key': API_KEY },
-        });
-        if (!fixturesResponse.ok) throw new Error('Failed to fetch fixtures');
-        const fixturesData = await fixturesResponse.json();
-        setFixtures(fixturesData.response || []);
+        const data = await res.json();
+        setFixtures((data?.fixtures || []) as any[]);
       } catch (err) {
         setError(err.message);
         console.error('API Fetch Error:', err);
@@ -53,16 +41,11 @@ const API_KEY = import.meta.env.VITE_API_FOOTBALL_KEY || '';
       }
     };
 
-    if (API_KEY) {
-      fetchData();
-    } else {
-      console.warn('API key missing; using dummy mode or skipping fetch.');
-      setLoading(false); // Fallback to dummy if no key
-    }
-  }, [currentPage, API_KEY]);
+    fetchData();
+  }, [currentPage]);
 
-  if (loading) return <div>Loading data from API-Football...</div>;
-  if (error) return <div>Error: {error} (Check API key or network)</div>;
+  if (loading) return <div>Loading fixtures...</div>;
+  if (error) return <div>Error: {String(error)}</div>;
 
   return (
     <div className='prempage'>
@@ -71,9 +54,9 @@ const API_KEY = import.meta.env.VITE_API_FOOTBALL_KEY || '';
         <HeaderBar />
         <main className="min-h-[calc(100vh-4rem)]">
           {currentPage === 'setup' ? (
-            <Setup fixtures={fixtures} teams={teams} />
+            <Setup />
           ) : (
-            <LiveOverlay fixtures={fixtures} />
+            <LiveOverlay />
           )}
         </main>
         <footer className="border-t bg-muted/50 py-6 mt-12">
