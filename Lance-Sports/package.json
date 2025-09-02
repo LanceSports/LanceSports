@@ -1,5 +1,6 @@
 {
       "name": "Sports Landing Page with Slideshow",
+      "proxy": "https://lancesports-fixtures-api.onrender.com",
       "version": "0.1.0",
       "private": true,
       "dependencies": {

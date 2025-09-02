@@ -30,7 +30,7 @@
 /bin
 /obj
 /node_modules
-
+../src/node_modules
 
 
 # Compiled object files for C/C++

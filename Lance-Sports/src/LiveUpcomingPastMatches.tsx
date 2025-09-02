@@ -38,24 +38,25 @@ const LiveUpcomingPastMatches: React.FC = () => {
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const currentDate = new Date().toISOString().split('T')[0];
-    fetch(`https://lancesports-fixtures-api.onrender.com/fixtures?date=${currentDate}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setFixtures(data.fixtures || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Error fetching fixtures:', err);
-        setLoading(false);
-      });
-  }, []);
+useEffect(() => {
+  const currentDate = "2025-09-01"//new Date().toISOString().split('T')[0];
+  fetch(`/fixtures?date=${currentDate}`)
+    .then((res) => res.json())
+    .then((data) => {
+      setFixtures(data.fixtures || []);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error('Error fetching fixtures:', err);
+      setLoading(false);
+    });
+}, []);
 
   if (loading) {
     return <div style={{ textAlign: 'center', padding: '20px', color: '#333' }}>Loading matches...</div>;
   }
-
+// npm install react@18 react-dom@18
+// npm install --save-dev @types/react @types/react-dom
   const liveMatches = fixtures.filter((f) => !['NS', 'FT', 'PST', 'CANC'].includes(f.fixture.status.short));
   const upcomingMatches = fixtures.filter((f) => f.fixture.status.short === 'NS');
   const pastMatches = fixtures.filter((f) => f.fixture.status.short === 'FT');
