@@ -7,6 +7,7 @@ import { FixturesSidebar } from './components/FixturesSidebar';
 import { SignIn } from './components/SignIn';
 import { PremierLeague } from './PremierLeague';
 import { useSession } from './hooks/useSession';
+import LiveUpcomingPastMatches from './LiveUpcomingPastMatches'
 
 
 import { Button } from './components/ui/button';
@@ -109,7 +110,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
         <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
-        <Route path="/premier-league" element={<PremierLeague />} />
+        <Route path="/premier-league" element={<LiveUpcomingPastMatches />} />
         {/* Catch all route to ensure navigation works */}
         <Route path="*" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
       </Routes>
