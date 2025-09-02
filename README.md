@@ -22,7 +22,7 @@
 ## 🌍 Base URL
 
 ```http
-https://<your-deployed-backend>.onrender.com
+https://lance-fixtures-api.onrender.com
 
 
 When running locally:
