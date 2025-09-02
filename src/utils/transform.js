@@ -27,8 +27,8 @@ export function transformFixture(apiFixture) {
       standings: apiFixture.league.standings,
     },
     venues: {
-      venue_id: apiFixture.fixture.venue.id,
-      name: apiFixture.fixture.venue.name,
+      venue_id: apiFixture.fixture.venue.id || "1",
+      name: apiFixture.fixture.venue.name ||"Some unkown stadium",
       city: apiFixture.fixture.venue.city,
     },
     teams: [
