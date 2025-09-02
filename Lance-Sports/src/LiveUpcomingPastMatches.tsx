@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// Using backend proxy (CORS enabled)
 
 interface Fixture {
   fixture: {
@@ -38,19 +39,19 @@ const LiveUpcomingPastMatches: React.FC = () => {
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const currentDate = "2025-09-01"//new Date().toISOString().split('T')[0];
-  fetch(`/fixtures?date=${currentDate}`)
-    .then((res) => res.json())
-    .then((data) => {
-      setFixtures(data.fixtures || []);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error('Error fetching fixtures:', err);
-      setLoading(false);
-    });
-}, []);
+  useEffect(() => {
+    const currentDate = new Date().toISOString().split('T')[0];
+    fetch(`https://lancesports-fixtures-api.onrender.com/fixtures?date=${currentDate}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setFixtures(data.fixtures || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error fetching fixtures:', err);
+        setLoading(false);
+      });
+  }, []);
 
   if (loading) {
     return <div style={{ textAlign: 'center', padding: '20px', color: '#333' }}>Loading matches...</div>;
@@ -91,7 +92,7 @@ useEffect(() => {
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
           }}
         >
-          <h2 style={{ marginBottom: '10px', color: '#333' }}>Upcoming Matches</h2>
+          <h2 style={{ marginBottom: '10px', color: '#333', textAlign: 'center', fontWeight: 'bold', fontSize: '22px' }}>Upcoming matches</h2>
           {upcomingMatches.length > 0 ? (
             upcomingMatches.map((match) => <MatchCard key={match.fixture.id} match={match} vertical />)
           ) : (
@@ -107,7 +108,7 @@ useEffect(() => {
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
           }}
         >
-          <h2 style={{ marginBottom: '10px', color: '#333' }}>Past Matches</h2>
+          <h2 style={{ marginBottom: '10px', color: '#333', textAlign: 'center', fontWeight: 'bold', fontSize: '22px' }}>Past matches</h2>
           {pastMatches.length > 0 ? (
             pastMatches.map((match) => <MatchCard key={match.fixture.id} match={match} vertical />)
           ) : (
@@ -152,7 +153,15 @@ const MatchCard: React.FC<{ match: Fixture; vertical?: boolean }> = ({ match, ve
           <p style={{ marginTop: '5px', fontSize: '14px', color: '#333' }}>{teams.away.name}</p>
         </div>
       </div>
-      <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '12px', color: '#999' }}>
+      <div
+        style={{
+          textAlign: 'center',
+          marginTop: '10px',
+          fontSize: '12px',
+          color: (fixture.status.long === 'First Half' || fixture.status.short === '1H') ? '#16A34A' : '#999',
+          fontWeight: (fixture.status.long === 'First Half' || fixture.status.short === '1H') ? 'bold' : 'normal'
+        }}
+      >
         {fixture.status.long}
       </div>
     </div>

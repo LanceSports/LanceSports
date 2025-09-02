@@ -13,10 +13,8 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(helmet()); // Security headers
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Your Vite dev server
-  credentials: true
-}));
+// TEMP: allow all origins in development to avoid CORS blocks
+app.use(cors());
 app.use(morgan('combined')); // Logging
 app.use(express.json()); // Parse JSON bodies
 
@@ -100,6 +98,25 @@ app.post('/api/matches', authenticateToken, (req, res) => {
     message: 'Match created successfully',
     match: newMatch
   });
+});
+
+// Public proxy route to avoid browser CORS when calling external fixtures API
+app.get('/api/fixtures', async (req, res) => {
+  try {
+    const dateParam = (req.query as any)['date'] as string | undefined;
+    const date = dateParam || new Date().toISOString().slice(0, 10);
+    const targetUrl = `https://lancesports-fixtures-api.onrender.com/fixtures?date=${encodeURIComponent(date)}`;
+    const response = await fetch(targetUrl);
+    if (!response.ok) {
+      const text = await response.text();
+      return res.status(response.status).send(text);
+    }
+    const data = await response.json();
+    return res.json(data);
+  } catch (err: any) {
+    console.error('Fixtures proxy error:', err);
+    return res.status(500).json({ error: 'Failed to fetch fixtures' });
+  }
 });
 
 // Error handling middleware
