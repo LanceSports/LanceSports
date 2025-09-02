@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 // Using backend proxy (CORS enabled)
 
 interface Fixture {
@@ -35,16 +37,19 @@ interface Fixture {
   };
 }
 
+
 const LiveUpcomingPastMatches: React.FC = () => {
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+ useEffect(() => {
     const currentDate = new Date().toISOString().split('T')[0];
     fetch(`https://lancesports-fixtures-api.onrender.com/fixtures?date=${currentDate}`)
       .then((res) => res.json())
       .then((data) => {
-        setFixtures(data.fixtures || []);
+        // Filter for Premier League matches only
+       
+        setFixtures(data.fixtures);
         setLoading(false);
       })
       .catch((err) => {
@@ -58,6 +63,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
   }
 // npm install react@18 react-dom@18
 // npm install --save-dev @types/react @types/react-dom
+const fixturess = fixtures.filter
   const liveMatches = fixtures.filter((f) => !['NS', 'FT', 'PST', 'CANC'].includes(f.fixture.status.short));
   const upcomingMatches = fixtures.filter((f) => f.fixture.status.short === 'NS');
   const pastMatches = fixtures.filter((f) => f.fixture.status.short === 'FT');
@@ -123,9 +129,15 @@ const LiveUpcomingPastMatches: React.FC = () => {
 const MatchCard: React.FC<{ match: Fixture; vertical?: boolean }> = ({ match, vertical = false }) => {
   const { fixture, league, teams, goals } = match;
   const date = new Date(fixture.date).toLocaleString();
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate('/match', { state: { match } });
+  };
 
   return (
-    <div
+    <button
+      onClick={handleClick}
       style={{
         backgroundColor: 'white',
         padding: '15px',
@@ -135,6 +147,9 @@ const MatchCard: React.FC<{ match: Fixture; vertical?: boolean }> = ({ match, ve
         width: vertical ? '100%' : 'auto',
         marginBottom: vertical ? '10px' : '0',
         border: '1px solid rgba(144, 238, 144, 0.2)',
+        cursor: 'pointer',
+        textAlign: 'left',
+        display: 'block',
       }}
     >
       <div style={{ textAlign: 'center', marginBottom: '10px', color: '#666', fontSize: '12px' }}>
@@ -159,13 +174,12 @@ const MatchCard: React.FC<{ match: Fixture; vertical?: boolean }> = ({ match, ve
           marginTop: '10px',
           fontSize: '12px',
           color: (fixture.status.long === 'First Half' || fixture.status.short === '1H') ? '#16A34A' : '#999',
-          fontWeight: (fixture.status.long === 'First Half' || fixture.status.short === '1H') ? 'bold' : 'normal'
+          fontWeight: (fixture.status.long === 'First Half' || fixture.status.short === '1H') ? 'bold' : 'normal',
         }}
       >
         {fixture.status.long}
       </div>
-    </div>
+    </button>
   );
 };
-
 export default LiveUpcomingPastMatches;

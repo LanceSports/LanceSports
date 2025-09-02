@@ -110,7 +110,8 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
         <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
-        <Route path="/premier-league" element={<LiveUpcomingPastMatches />} />
+        <Route path="/match" element={<PremierLeague />} />
+        <Route path="/football-leagues" element={<LiveUpcomingPastMatches />} />
         {/* Catch all route to ensure navigation works */}
         <Route path="*" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
       </Routes>
@@ -120,8 +121,8 @@ function AppContent() {
 
 export default function App() {
   return (
-    //<BrowserRouter>
+   // //<BrowserRouter>
       <AppContent />
-  //  </BrowserRouter>
+ // //  </BrowserRouter>
   );
 }

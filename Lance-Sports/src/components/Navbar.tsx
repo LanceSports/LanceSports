@@ -13,7 +13,7 @@ export function Navbar({ isSignedIn = false, onLogout, userData }: NavbarProps) 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
-    { name: 'Premier League', to: '/premier-league' },
+    { name: 'Football Leagues', to: '/football-leagues' },
     { name: 'PSL', to: '#psl' }, // Update these later if needed
     { name: 'Rugby', to: '#rugby' },
     { name: 'Cricket', to: '#cricket' },
