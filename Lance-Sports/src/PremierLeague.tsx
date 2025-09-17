@@ -15,7 +15,6 @@ export function PremierLeague() {
   const [error, setError] = useState(null);
 
   // Use backend proxy to fetch fixtures (avoids CORS to external API)
-
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
