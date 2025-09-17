@@ -42,9 +42,11 @@ const LiveUpcomingPastMatches: React.FC = () => {
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
   const [loading, setLoading] = useState(true);
 
- useEffect(() => {
-    const currentDate = new Date().toISOString().split('T')[0];
-    fetch(`https://lancesports-fixtures-api.onrender.com/fixtures?date=${currentDate}`)
+  useEffect(() => {
+     const d = new Date();
+     d.setDate(d.getDate() - 1);
+     const currentDate = d.toISOString().split('T')[0];
+     fetch(`https://lancesports-fixtures-api.onrender.com/fixtures?date=${currentDate}`)
       .then((res) => res.json())
       .then((data) => {
         // Filter for Premier League matches only
