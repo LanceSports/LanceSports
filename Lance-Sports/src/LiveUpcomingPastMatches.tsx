@@ -48,7 +48,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
       .then((res) => res.json())
       .then((data) => {
         // Filter for Premier League matches only
-       
+       console.log(data.fixtures);
         setFixtures(data.fixtures);
         setLoading(false);
       })
@@ -63,7 +63,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
   }
 // npm install react@18 react-dom@18
 // npm install --save-dev @types/react @types/react-dom
-const fixturess = fixtures.filter
+//const fixturess = fixtures.f
   const liveMatches = fixtures.filter((f) => !['NS', 'FT', 'PST', 'CANC'].includes(f.fixture.status.short));
   const upcomingMatches = fixtures.filter((f) => f.fixture.status.short === 'NS');
   const pastMatches = fixtures.filter((f) => f.fixture.status.short === 'FT');

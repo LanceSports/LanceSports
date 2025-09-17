@@ -48,7 +48,7 @@ interface Fixture {
 //   // Use match data for rendering
 // };
 export function PremierLeague() {
-  const [currentPage, setCurrentPage] = useState<'live' | 'setup' | 'match'>('live');
+  const [currentPage, setCurrentPage] = useState<'live' | 'setup' | 'match'>('match');
   const { state } = useLocation();
   const match = state?.match as Fixture | undefined;
   const initialPage = state?.currentPage as 'live' | 'setup' | 'match' | undefined;
