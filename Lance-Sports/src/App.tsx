@@ -6,6 +6,7 @@ import { SportsSlideshow } from './components/SportsSlideshow';
 import { FixturesSidebar } from './components/FixturesSidebar';
 import { SignIn } from './components/SignIn';
 import { PremierLeague } from './PremierLeague';
+import { MatchPage } from './components/MatchPage';
 import { useSession } from './hooks/useSession';
 import LiveUpcomingPastMatches from './LiveUpcomingPastMatches'
 
@@ -110,7 +111,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
         <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
-        <Route path="/match" element={<PremierLeague />} />
+        <Route path="/match" element={<MatchPage />} />
         <Route path="/football-leagues" element={<LiveUpcomingPastMatches />} />
         {/* Catch all route to ensure navigation works */}
         <Route path="*" element={<Home isSignedIn={isSignedIn} userData={userData} />} />

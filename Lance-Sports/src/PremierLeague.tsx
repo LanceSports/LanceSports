@@ -6,6 +6,7 @@ import { HeaderBar } from './components/HeaderBar';
 import { LiveOverlay } from './components/LiveOverlay';
 import { Setup } from './components/Setup';
 import { MatchProvider } from './hooks/useMatchStore';
+import { fetchWithCacheJSON } from './lib/cache';
 
 
 export function PremierLeague() {
@@ -23,17 +24,12 @@ export function PremierLeague() {
         const currentDate = new Date().toISOString().split('T')[0];
         // @ts-ignore - Vite provides import.meta.env
         const base = (import.meta.env?.VITE_API_URL || 'http://localhost:3000/api');
-        const res = await fetch(`${base}/fixtures?date=${currentDate}`);
-        if (!res.ok) throw new Error(`Failed to fetch fixtures (HTTP ${res.status})`);
-        const ct = res.headers.get('content-type') || '';
-        if (!ct.includes('application/json')) {
-          const text = await res.text();
-          throw new Error(`Non-JSON response: ${text.slice(0, 80)}`);
-        }
-        const data = await res.json();
+        const url = `${base}/fixtures?date=${currentDate}`;
+        const { data } = await fetchWithCacheJSON<{ fixtures: any[] }>(url, 5 * 60 * 1000);
         setFixtures((data?.fixtures || []) as any[]);
       } catch (err) {
-        setError(err.message);
+        // @ts-ignore
+        setError(err.message || String(err));
         console.error('API Fetch Error:', err);
       } finally {
         setLoading(false);

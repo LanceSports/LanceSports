@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { fetchWithCacheJSON } from './lib/cache';
 
 // Using backend proxy (CORS enabled)
 
@@ -43,21 +44,25 @@ const LiveUpcomingPastMatches: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-     const d = new Date();
-     d.setDate(d.getDate() - 1);
-     const currentDate = d.toISOString().split('T')[0];
-     fetch(`https://lancesports-fixtures-api.onrender.com/fixtures?date=${currentDate}`)
-      .then((res) => res.json())
-      .then((data) => {
-        // Filter for Premier League matches only
-       console.log(data.fixtures);
-        setFixtures(data.fixtures);
-        setLoading(false);
-      })
-      .catch((err) => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        // Use local date to avoid timezone off-by-one issues
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const currentDate = `${year}-${month}-${day}`;
+        const url = `https://lancesports-fixtures-api.onrender.com/fixtures?date=${currentDate}`;
+        const { data } = await fetchWithCacheJSON<{ fixtures: Fixture[] }>(url, 5 * 60 * 1000);
+        setFixtures(data.fixtures || []);
+      } catch (err) {
         console.error('Error fetching fixtures:', err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    load();
   }, []);
 
   if (loading) {
@@ -66,9 +71,22 @@ const LiveUpcomingPastMatches: React.FC = () => {
 // npm install react@18 react-dom@18
 // npm install --save-dev @types/react @types/react-dom
 //const fixturess = fixtures.f
-  const liveMatches = fixtures.filter((f) => !['NS', 'FT', 'PST', 'CANC'].includes(f.fixture.status.short));
-  const upcomingMatches = fixtures.filter((f) => f.fixture.status.short === 'NS');
-  const pastMatches = fixtures.filter((f) => f.fixture.status.short === 'FT');
+  const liveStatuses = new Set(['1H', 'HT', '2H', 'ET', 'P']);
+  const finishedStatuses = new Set(['FT', 'AET', 'PEN']);
+  const upcomingStatuses = new Set(['NS', 'TBD', 'PST']);
+  const cancelledStatuses = new Set(['CANC', 'ABD', 'AWD', 'WO']);
+
+  const getBucket = (short: string) => {
+    if (finishedStatuses.has(short) || cancelledStatuses.has(short)) return 'past';
+    if (upcomingStatuses.has(short)) return 'upcoming';
+    if (liveStatuses.has(short)) return 'live';
+    // Fallback: if unknown, assume live to surface it
+    return 'live';
+  };
+
+  const liveMatches = fixtures.filter((f) => getBucket(f.fixture.status.short) === 'live');
+  const upcomingMatches = fixtures.filter((f) => getBucket(f.fixture.status.short) === 'upcoming');
+  const pastMatches = fixtures.filter((f) => getBucket(f.fixture.status.short) === 'past');
 
   return (
     <div style={{ backgroundColor: '#f8f9fa', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
