@@ -19,7 +19,7 @@ export function PremierLeague() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      console.log("fetching tata in LiveUpcomingPastMatches.tsx");
+      console.log("fetchingrf tata in LiveUpcomingPastMatches.tsx");
       setError(null);
       try {
         const currentDate = new Date().toISOString().split('T')[0];
