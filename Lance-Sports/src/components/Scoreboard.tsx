@@ -4,6 +4,7 @@ import { Card } from './ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useMatchClock } from '../hooks/useMatchClock';
 import { Match, Team, MatchStatus } from '../types/match.ts';
+import { ScorecardMenu } from "./ScoreMenu";
 
 interface ScoreboardProps {
   match: Match;
@@ -199,6 +200,12 @@ export function Scoreboard({
           </div>
         </div>
       )}
+      
+       {/* Scorecard menu tabs (Lineups & Timeline) */}
+      <div className="mt-10">
+        <ScorecardMenu />
+      </div>
+
     </div>
   );
 }
