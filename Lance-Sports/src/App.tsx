@@ -59,7 +59,7 @@ function Home({ isSignedIn, userData }: HomeProps) {
                 <h3 className="text-lg mb-3">Live Scores & Updates</h3>
                 <p className="text-gray-600 text-sm">
                   Get real-time scores, live commentary, and instant updates 
-                  during matches across Premier League, Rugby, Cricket, and more.
+                  during matches across Football.
                 </p>
               </div>
             </div>
