@@ -15,7 +15,7 @@
 | | Database (Match Info) |
 | | Database (Event Log) |
 | | Database (Display State) |
-| | Database (Player & Team Data) |
+| | Database (Player & Team Data) 
 # Live Sports App
 
 
