@@ -45,7 +45,7 @@ jobs:
 
       - name: Evaluate test pass rate threshold
         run: |
-          node -e "
+          node - <<'NODE'
           const fs = require('fs');
           const path = 'vitest-report.json';
           if (!fs.existsSync(path)) { console.log('No vitest-report.json found; treating as 0 tests.'); process.exit(1); }
@@ -90,13 +90,13 @@ jobs:
           } else {
             console.log('Pass rate meets threshold. Continuing.');
           }
-          "
+          NODE
 
       - name: Upload test report artifact (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: vitest-report
-          path: vitest-report.json
+          path: Lance-Sports/vitest-report.json
 
 
