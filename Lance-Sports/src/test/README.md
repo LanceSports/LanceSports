@@ -10,6 +10,70 @@ src/test/
 ├── setup.ts            # Test environment setup and mocks
 └── utils.tsx           # Test utilities and helper functions
 ```
+### ===== 29 SEPTEMBER 2025 TESTING INOF THAT CAN BE USED FOR THE DOCU SITE  ============
+# Test Suite Overview
+
+## Summary
+- **Framework:** Vitest  
+- **Total files:** 15  
+- **Total tests:** 45  
+- **Results:** 31 passing, 14 failing  
+- **Runtime:** ~70 seconds  
+
+---
+
+## Passing Areas
+- **Accessibility:** `a11y.roles.test.tsx` validates role-based rendering and passes, supporting baseline accessibility compliance.  
+- **UI Components:** Core components such as `HeaderBar`, `fixturesSidebar`, and `navbar.smoke` consistently render and behave as expected.  
+- **Rendering Logic:** `LiveUpcomingPastMatches` and `main.test.tsx` confirm that essential application pages mount reliably.  
+- **Cache Layer:** `cache.test.ts` ensures caching logic is functioning as intended.  
+
+---
+
+## Failing Areas
+- **API Layer:**  
+  - `api.health.test.ts` fails, suggesting issues with backend health checks or mock configuration.  
+
+- **Routing and Navigation:**  
+  - `app.routing.test.tsx` and `App.test.tsx` failures point to instability in route handling or state synchronization.  
+  - `Navbar.test.tsx` fails beyond smoke testing, highlighting deeper integration inconsistencies.  
+
+- **Authentication and Session:**  
+  - `OAuth.integration.test.tsx` fails, likely due to environment variables, token handling, or missing mocks.  
+  - `SignIn.test.tsx` passes most UI checks but fails on the login callback (`onSignIn after successful login`).  
+  - `useSession.test.ts` fails, indicating unreliable session persistence or authentication state handling.  
+
+- **Feature Module:**  
+  - `PremierLeague.test.tsx` fails, suggesting fragile data-fetching logic or incorrect assumptions about API responses.  
+
+---
+
+## Inferred Insights
+- **Authentication flow** is the weakest layer. Failures in `OAuth`, `SignIn`, and `useSession` point to systemic issues in login and session management rather than isolated bugs.  
+- **Routing and navigation** issues indicate that context providers or navigation hooks may not be fully configured in test environments.  
+- **API instability** undermines confidence in end-to-end reliability. Failures may stem from mock data setup or backend availability.  
+- **UI rendering** is comparatively strong. Most component rendering and accessibility checks pass, providing a stable base for further fixes.  
+
+---
+
+## Next Steps
+1. **Authentication and Session:**  
+   - Review login callback logic and ensure mocks are aligned with production behavior.  
+   - Stabilize OAuth integration by verifying token exchange flows and environment setup.  
+   - Address session persistence issues in `useSession` by checking state management and test isolation.  
+
+2. **Routing and Navigation:**  
+   - Validate route provider setup in the test environment.  
+   - Confirm that navigation hooks and context values are properly mocked.  
+
+3. **API Layer:**  
+   - Revisit API mocks and ensure data responses align with production expectations.  
+   - If using live services, verify backend availability during test runs.  
+
+4. **Feature Reliability:**  
+   - Debug `PremierLeague` tests for assumptions about API responses or timing.  
+
+# =================STOPS HERE=========================
 
 ## 🔧 Files Overview
 
