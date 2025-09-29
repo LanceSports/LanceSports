@@ -23,7 +23,7 @@ function Home({ isSignedIn, userData }: HomeProps) {
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl mb-8 text-center text-gray-800">
-            The Future of Sports, all in one place.
+            The Future of Sportss, all in one place.
           </h1>
           {isSignedIn && (
             <div className="text-center mb-4">
