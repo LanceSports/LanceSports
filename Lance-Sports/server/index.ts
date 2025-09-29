@@ -105,6 +105,7 @@ app.post('/api/matches', authenticateToken, (req, res) => {
 // Public proxy route to avoid browser CORS when calling external fixtures API
 app.get('/api/fixtures', async (req, res) => {
   try {
+    console.log("fetching tata in server/index.ts");
     const q = req.query as any;
     const dateParam = q['date'] as string | undefined;
     const limitParam = q['limit'] as string | undefined;
@@ -112,8 +113,7 @@ app.get('/api/fixtures', async (req, res) => {
     const limit = limitParam ? Math.max(1, Math.min(500, parseInt(limitParam, 10) || 0)) : undefined;
 
     const date = dateParam || new Date().toISOString().slice(0, 10);
-    const targetUrl = `https://lancesports-fixtures-api.onrender.com/fixtures?date=${encodeURIComponent(date)}?limit=20`;
-
+    const targetUrl = `https://lancesports-fixtures-api.onrender.com/fixtures?date=${encodeURIComponent(date)}&limit=20`;
     const response = await fetch(targetUrl);
     if (!response.ok) {
       const text = await response.text();

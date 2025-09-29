@@ -7,25 +7,25 @@ type CachedEntry<T> = {
   value: T;
 };
 
-// Clear cache on page refresh
-const REFRESH_KEY = 'lancesports_page_refresh';
-const currentRefreshId = Date.now().toString();
-const lastRefreshId = safeGetItem(REFRESH_KEY);
+// // Clear cache on page refresh
+// const REFRESH_KEY = 'lancesports_page_refresh';
+// const currentRefreshId = Date.now().toString();
+// const lastRefreshId = safeGetItem(REFRESH_KEY);
 
-if (lastRefreshId !== currentRefreshId) {
-  // Page was refreshed, clear all cache entries
-  try {
-    const keys = Object.keys(window.localStorage);
-    keys.forEach(key => {
-      if (key.startsWith('cache:')) {
-        window.localStorage.removeItem(key);
-      }
-    });
-    safeSetItem(REFRESH_KEY, currentRefreshId);
-  } catch {
-    // ignore errors
-  }
-}
+// if (lastRefreshId !== currentRefreshId) {
+//   // Page was refreshed, clear all cache entries
+//   try {
+//     const keys = Object.keys(window.localStorage);
+//     keys.forEach(key => {
+//       if (key.startsWith('cache:')) {
+//         window.localStorage.removeItem(key);
+//       }
+//     });
+//     safeSetItem(REFRESH_KEY, currentRefreshId);
+//   } catch {
+//     // ignore errors
+//   }
+// }
 
 function safeGetItem(key: string): string | null {
   try {
@@ -65,7 +65,7 @@ export function setCachedJSON<T = unknown>(key: string, value: T, ttlMs: number)
 export async function fetchWithCacheJSON<T = unknown>(
   url: string,
   ttlMs: number, // ttlMs is the time to live in milliseconds
-  init?: RequestInit
+  init?: RequestInit 
 ): Promise<{ data: T; fromCache: boolean }> {
   const key = `cache:${url}`;
   const cached = getCachedJSON<T>(key);

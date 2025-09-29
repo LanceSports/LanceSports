@@ -54,10 +54,10 @@ const LiveUpcomingPastMatches: React.FC = () => {
         const day = String(now.getDate()).padStart(2, '0');
         const currentDate = `${year}-${month}-${day}`;
         // @ts-ignore - Vite provides import.meta.env
-        console.log("fetching tata in LiveUpcomingPastMatches.tsx");
+        console.log("fetching ttata in LiveUpcomingPastMatches.tsx");
         const base = import.meta.env?.VITE_API_URL || 'http://localhost:3001/api';
-        const url = `${base}/fixtures?date=${currentDate}&limit=20&compact=1`; // tried limitining payload to lenght 20 to speed up but not working
-        const { data } = await fetchWithCacheJSON<{ fixtures: Fixture[] }>(url, 5 * 60 * 1000);
+        const url = `${base}/fixtures?date=${currentDate}&limit=20`; // tried limitining payload to lenght 20 to speed up but not working
+        const { data } = await fetchWithCacheJSON<{ fixtures: Fixture[] }>(url, 2 * 60 * 1000 /**te time to live is  */);
         // Log size in KB
         setFixtures((data.fixtures || []).slice(0, 60));
       } catch (err) {
@@ -181,14 +181,14 @@ const MatchCard: React.FC<{ match: Fixture; vertical?: boolean }> = ({ match, ve
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ textAlign: 'center', flex: 1 }}>
-          <img src={teams.home.logo} alt={teams.home.name} style={{ width: '40px', height: '40px' }} />
+          <img src={teams.home.logo} alt={teams.home.name} loading="lazy" style={{ width: '40px', height: '40px' }} />
           <p style={{ marginTop: '5px', fontSize: '14px', color: '#333' }}>{teams.home.name}</p>
         </div>
         <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#333', padding: '0 20px' }}>
           {goals.home ?? '-'} : {goals.away ?? '-'}
         </div>
         <div style={{ textAlign: 'center', flex: 1 }}>
-          <img src={teams.away.logo} alt={teams.away.name} style={{ width: '40px', height: '40px' }} />
+          <img src={teams.away.logo} alt={teams.away.name} loading="lazy" style={{ width: '40px', height: '40px' }} />
           <p style={{ marginTop: '5px', fontSize: '14px', color: '#333' }}>{teams.away.name}</p>
         </div>
       </div>
