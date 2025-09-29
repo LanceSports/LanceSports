@@ -1,44 +1,22 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { SportsSlideshow } from './SportsSlideshow';
 import { FixturesSidebar } from './FixturesSidebar';
 import { SignIn } from './SignIn';
+import { MatchPage } from './MatchPage';
+import LiveUpcomingPastMatches from './LiveUpcomingPastMatches';
+import { useSession } from './hooks/useSession.ts';
+import { ChatbotButton } from './ChatbotButton';
 
-export default function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'signin'>('home');
-  const [isSignedIn, setIsSignedIn] = useState(false);
+interface HomeProps {
+  isSignedIn: boolean;
+  userData: any;
+}
 
-  // Set dark mode as default and only theme
-  useEffect(() => {
-    document.documentElement.classList.add('dark');
-  }, []);
-
-  const handleLoginClick = () => {
-    setCurrentView('signin');
-  };
-
-  const handleSignIn = () => {
-    setIsSignedIn(true);
-    setCurrentView('home');
-  };
-
-  const handleLogout = () => {
-    setIsSignedIn(false);
-    setCurrentView('home');
-  };
-
-  if (currentView === 'signin') {
-    return <SignIn onSignIn={handleSignIn} />;
-  }
-
+function Home({ isSignedIn, userData }: HomeProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-950 to-gray-900 transition-colors duration-200">
-      <Navbar 
-        onLoginClick={handleLoginClick}
-        isSignedIn={isSignedIn}
-        onLogout={handleLogout}
-      />
-      
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="mb-8">
@@ -48,7 +26,7 @@ export default function App() {
           {isSignedIn && (
             <div className="text-center mb-4">
               <p className="text-green-400 glass-green-dark inline-block px-6 py-3 rounded-full glass-glow">
-                ✓ Welcome back! You are now signed in.
+                ✓ Welcome back, {userData?.name || userData?.username || 'User'}!
               </p>
             </div>
           )}
@@ -59,8 +37,7 @@ export default function App() {
           {/* Slideshow Section */}
           <div className="lg:col-span-3">
             <SportsSlideshow />
-            
-            {/* Additional Content */}
+
             <div className="mt-8 space-y-6">
               <div className="glass-card-dark p-6 rounded-xl glass-hover-dark glass-glow">
                 <h3 className="text-lg mb-3 text-gray-100">Latest Sports News</h3>
@@ -69,7 +46,7 @@ export default function App() {
                   from all your favorite sports leagues and tournaments.
                 </p>
               </div>
-              
+
               <div className="glass-card-dark p-6 rounded-xl glass-hover-dark glass-glow glass-shimmer">
                 <h3 className="text-lg mb-3 text-gray-100">Live Scores & Updates</h3>
                 <p className="text-gray-300 text-sm">
@@ -86,6 +63,60 @@ export default function App() {
           </div>
         </div>
       </main>
+      <ChatbotButton/>
     </div>
+  );
+}
+
+function AppContent() {
+  const { isSignedIn, userData, signIn, signOut } = useSession();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    document.documentElement.classList.add('dark'); // Force dark mode
+  }, []);
+
+  const handleSignIn = (userData?: any, redirectTo?: string) => {
+    if (userData) {
+      signIn(userData);
+    }
+    if (redirectTo) navigate(redirectTo);
+  };
+
+  const handleLogout = () => {
+    signOut();
+    navigate('/');
+  };
+
+  // ✅ Add handleLoginClick
+  const handleLoginClick = () => {
+    navigate('/SignIn');
+  };
+
+  return (
+    <>
+      <Navbar
+        isSignedIn={isSignedIn}
+        onLogout={handleLogout}
+        userData={userData}
+        onLoginClick={handleLoginClick} // ✅ pass it down
+      />
+      <Routes>
+        <Route path="/" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
+        <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
+        <Route path="/match" element={<MatchPage />} />
+        <Route path="/football-leagues" element={<LiveUpcomingPastMatches />} />
+        {/* fallback */}
+        <Route path="*" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
+      </Routes>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }

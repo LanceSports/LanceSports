@@ -8,7 +8,7 @@ import {
   DrawerClose,
 } from './ui/drawer';
 import { Button } from './ui/button';
-import { X, Home, Trophy, Calendar, User } from 'lucide-react';
+import { X, Home, Trophy, Calendar, User, Globe } from 'lucide-react';
 
 interface NavigationDrawerProps {
   isOpen: boolean;
@@ -26,12 +26,11 @@ export function NavigationDrawer({
   onLogout
 }: NavigationDrawerProps) {
   const navItems = [
-    { name: 'Home', href: '#home', icon: Home },
+    { name: 'Home', href: '/', icon: Home },
     { name: 'Premier League', href: '#premier-league', icon: Trophy },
     { name: 'PSL', href: '#psl', icon: Trophy },
-    { name: 'Rugby', href: '#rugby', icon: Trophy },
-    { name: 'Cricket', href: '#cricket', icon: Trophy },
-    { name: 'Fixtures', href: '#fixtures', icon: Calendar },
+    {name: 'Champions League', href:'#champions-league', icon: Trophy },
+    { name: 'Fixtures', href: '/football-leagues', icon: Globe },
   ];
 
   const handleItemClick = () => {
