@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { authenticateToken, optionalAuth } from './authMiddleware';
+import compression from 'compression';
 
 // Load environment variables
 dotenv.config();
@@ -12,6 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
+app.use(compression()); // Compress responses
 app.use(helmet()); // Security headers
 // TEMP: allow all origins in development to avoid CORS blocks
 app.use(cors());
@@ -103,16 +105,45 @@ app.post('/api/matches', authenticateToken, (req, res) => {
 // Public proxy route to avoid browser CORS when calling external fixtures API
 app.get('/api/fixtures', async (req, res) => {
   try {
-    const dateParam = (req.query as any)['date'] as string | undefined;
+    const q = req.query as any;
+    const dateParam = q['date'] as string | undefined;
+    const limitParam = q['limit'] as string | undefined;
+    const compact = q['compact'] === '1' || q['compact'] === 'true';
+    const limit = limitParam ? Math.max(1, Math.min(500, parseInt(limitParam, 10) || 0)) : undefined;
+
     const date = dateParam || new Date().toISOString().slice(0, 10);
-    const targetUrl = `https://lancesports-fixtures-api.onrender.com/fixtures?date=${encodeURIComponent(date)}`;
+    const targetUrl = `https://lancesports-fixtures-api.onrender.com/fixtures?date=${encodeURIComponent(date)}?limit=20`;
+
     const response = await fetch(targetUrl);
     if (!response.ok) {
       const text = await response.text();
       return res.status(response.status).send(text);
     }
-    const data = await response.json();
-    return res.json(data);
+    const payload = await response.json();
+
+    let fixtures = Array.isArray(payload?.fixtures) ? payload.fixtures : [];
+
+    if (typeof limit === 'number') {
+      fixtures = fixtures.slice(0, limit);
+    }
+
+    if (compact) {
+      fixtures = fixtures.map((f: any) => ({
+        fixture: {
+          id: f?.fixture?.id,
+          date: f?.fixture?.date,
+          status: { long: f?.fixture?.status?.long, short: f?.fixture?.status?.short }
+        },
+        league: { name: f?.league?.name },
+        teams: {
+          home: { name: f?.teams?.home?.name, logo: f?.teams?.home?.logo },
+          away: { name: f?.teams?.away?.name, logo: f?.teams?.away?.logo }
+        },
+        goals: { home: f?.goals?.home ?? null, away: f?.goals?.away ?? null }
+      }));
+    }
+
+    return res.json({ fixtures });
   } catch (err: any) {
     console.error('Fixtures proxy error:', err);
     return res.status(500).json({ error: 'Failed to fetch fixtures' });

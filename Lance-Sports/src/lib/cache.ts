@@ -64,7 +64,7 @@ export function setCachedJSON<T = unknown>(key: string, value: T, ttlMs: number)
 
 export async function fetchWithCacheJSON<T = unknown>(
   url: string,
-  ttlMs: number,
+  ttlMs: number, // ttlMs is the time to live in milliseconds
   init?: RequestInit
 ): Promise<{ data: T; fromCache: boolean }> {
   const key = `cache:${url}`;

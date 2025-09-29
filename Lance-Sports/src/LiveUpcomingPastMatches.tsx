@@ -44,7 +44,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const load = async () => {
+    const load = async () => { // the funtion called load will load fixtures info
       setLoading(true);
       try {
         // Use local date to avoid timezone off-by-one issues
@@ -53,13 +53,13 @@ const LiveUpcomingPastMatches: React.FC = () => {
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const currentDate = `${year}-${month}-${day}`;
-        const url = `https://lancesports-fixtures-api.onrender.com/fixtures?date=${currentDate}`;
+        // @ts-ignore - Vite provides import.meta.env
+        console.log("fetching tata in LiveUpcomingPastMatches.tsx");
+        const base = import.meta.env?.VITE_API_URL || 'http://localhost:3001/api';
+        const url = `${base}/fixtures?date=${currentDate}&limit=20&compact=1`; // tried limitining payload to lenght 20 to speed up but not working
         const { data } = await fetchWithCacheJSON<{ fixtures: Fixture[] }>(url, 5 * 60 * 1000);
         // Log size in KB
-        const jsonSize = new Blob([JSON.stringify(data)]).size / 1024;
-        console.log(`API response size: ${jsonSize.toFixed(2)} KB`);
-
-        setFixtures(data.fixtures || []);
+        setFixtures((data.fixtures || []).slice(0, 60));
       } catch (err) {
         console.error('Error fetching fixtures:', err);
       } finally {
