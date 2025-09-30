@@ -1,7 +1,7 @@
 // src/services/dbService.js
 import supabase from "../config/supabase.js"; 
 import { transformFixture } from "../utils/transform.js";
-
+import { transformFixturePlayers } from "../utils/transform.js";
 
 export async function getFixturesByDate(date) {
   const { data, error } = await supabase
@@ -15,7 +15,6 @@ export async function getFixturesByDate(date) {
       status_short,
       elapsed,
       extra,
-
       leagues (
         league_id,
         name,
@@ -25,30 +24,25 @@ export async function getFixturesByDate(date) {
         season,
         round
       ),
-
       venues (
         venue_id,
         name,
         city
       ),
-
       fixture_goals (
         home_goals,
         away_goals
       ),
-
       fixture_scores (
         halftime_home, halftime_away,
         fulltime_home, fulltime_away,
         extratime_home, extratime_away,
         penalty_home, penalty_away
       ),
-
       fixture_periods (
         first_half_start,
         second_half_start
       ),
-
       fixture_teams (
         team_id,
         side,
@@ -57,37 +51,6 @@ export async function getFixturesByDate(date) {
           team_id,
           name,
           logo_url
-        )
-      ),
-
-      fixture_events (
-        event_id,
-        team_id,
-        player_id,
-        type,
-        detail,
-        comments,
-        elapsed,
-        extra
-      ),
-
-      fixture_stats (
-        team_id,
-        type,
-        value
-      ),
-
-      fixture_players (
-        team_id,
-        player_id,
-        name,
-        number,
-        position,
-        grid,
-
-        fixture_player_stats (
-          type,
-          value
         )
       )
     `)
@@ -99,96 +62,93 @@ export async function getFixturesByDate(date) {
 }
 
 
-// Save/update fixtures (upsert)
+
 export async function saveFixtures(apiFixtures) {
   for (const apiFixture of apiFixtures) {
+    // Transform main fixture data
     const transformed = transformFixture(apiFixture);
 
-    // === Core entities ===
-    if (transformed.leagues.length) {
-      const { error } = await supabase
-        .from("leagues")
-        .upsert(transformed.leagues, { onConflict: "league_id" });
-      if (error) throw error;
-    }
+    // Upsert leagues
+    let { error: leaguesError } = await supabase
+      .from("leagues")
+      .upsert(transformed.leagues, { onConflict: "league_id" });
+    if (leaguesError) throw leaguesError;
 
-    if (transformed.venues.length) {
-      const { error } = await supabase
-        .from("venues")
-        .upsert(transformed.venues, { onConflict: "venue_id" });
-      if (error) throw error;
-    }
+    // Upsert venues
+    let { error: venuesError } = await supabase
+      .from("venues")
+      .upsert(transformed.venues, { onConflict: "venue_id" });
+    if (venuesError) throw venuesError;
 
-    if (transformed.teams.length) {
-      const { error } = await supabase
-        .from("teams")
-        .upsert(transformed.teams, { onConflict: "team_id" });
-      if (error) throw error;
-    }
+    // Upsert fixtures
+    let { error: fixturesError } = await supabase
+      .from("fixtures")
+      .upsert(transformed.fixtures, { onConflict: "fixture_id" });
+    if (fixturesError) throw fixturesError;
 
-    if (transformed.fixtures.length) {
-      const { error } = await supabase
-        .from("fixtures")
-        .upsert(transformed.fixtures, { onConflict: "fixture_id" });
-      if (error) throw error;
-    }
+    // Upsert teams
+    let { error: teamsError } = await supabase
+      .from("teams")
+      .upsert(transformed.teams, { onConflict: "team_id" });
+    if (teamsError) throw teamsError;
 
-    // === Relations ===
-    if (transformed.fixture_teams.length) {
-      const { error } = await supabase
-        .from("fixture_teams")
-        .upsert(transformed.fixture_teams, { onConflict: ["fixture_id", "team_id"] });
-      if (error) throw error;
-    }
+    // Upsert fixture_teams
+    let { error: fixtureTeamsError } = await supabase
+      .from("fixture_teams")
+      .upsert(transformed.fixture_teams, { onConflict: ["fixture_id","team_id"] });
+    if (fixtureTeamsError) throw fixtureTeamsError;
 
-    if (transformed.fixture_goals.length) {
-      const { error } = await supabase
-        .from("fixture_goals")
-        .upsert(transformed.fixture_goals, { onConflict: "fixture_id" });
-      if (error) throw error;
-    }
+    // Upsert fixture_goals
+    let { error: goalsError } = await supabase
+      .from("fixture_goals")
+      .upsert(transformed.fixture_goals, { onConflict: "fixture_id" });
+    if (goalsError) throw goalsError;
 
-    if (transformed.fixture_scores.length) {
-      const { error } = await supabase
-        .from("fixture_scores")
-        .upsert(transformed.fixture_scores, { onConflict: "fixture_id" });
-      if (error) throw error;
-    }
+    // Upsert fixture_scores
+    let { error: scoresError } = await supabase
+      .from("fixture_scores")
+      .upsert(transformed.fixture_scores, { onConflict: "fixture_id" });
+    if (scoresError) throw scoresError;
 
-    if (transformed.fixture_periods.length) {
-      const { error } = await supabase
-        .from("fixture_periods")
-        .upsert(transformed.fixture_periods, { onConflict: "fixture_id" });
-      if (error) throw error;
-    }
+    // Upsert fixture_periods
+    let { error: periodsError } = await supabase
+      .from("fixture_periods")
+      .upsert(transformed.fixture_periods, { onConflict: "fixture_id" });
+    if (periodsError) throw periodsError;
 
-    // === Events, stats, players ===
-    if (transformed.fixture_events.length) {
-      const { error } = await supabase
+    // Upsert fixture_events
+    const events = transformed.fixture_events || [];
+    if (events.length) {
+      let { error: eventsError } = await supabase
         .from("fixture_events")
-        .upsert(transformed.fixture_events, { onConflict: "event_id" });
-      if (error) throw error;
+        .upsert(events, { onConflict: "event_id" });
+      if (eventsError) throw eventsError;
     }
 
-    if (transformed.fixture_stats.length) {
-      const { error } = await supabase
+    // Upsert fixture stats
+    const stats = transformed.fixture_stats || [];
+    if (stats.length) {
+      let { error: statsError } = await supabase
         .from("fixture_stats")
-        .upsert(transformed.fixture_stats, { onConflict: ["fixture_id", "team_id", "type"] });
-      if (error) throw error;
+        .upsert(stats, { onConflict: ["fixture_id","team_id","type"] });
+      if (statsError) throw statsError;
     }
 
-    if (transformed.fixture_players.length) {
-      const { error } = await supabase
+    // Upsert players and player stats
+    const { players, playerStats } = transformFixturePlayers(apiFixture);
+
+    if (players.length) {
+      let { error: playersError } = await supabase
         .from("fixture_players")
-        .upsert(transformed.fixture_players, { onConflict: ["fixture_id", "team_id", "player_id"] });
-      if (error) throw error;
+        .upsert(players, { onConflict: ["fixture_id","team_id","player_id"] });
+      if (playersError) throw playersError;
     }
 
-    if (transformed.fixture_player_stats.length) {
-      const { error } = await supabase
+    if (playerStats.length) {
+      let { error: playerStatsError } = await supabase
         .from("fixture_player_stats")
-        .upsert(transformed.fixture_player_stats, { onConflict: ["fixture_id", "team_id", "player_id", "type"] });
-      if (error) throw error;
+        .upsert(playerStats, { onConflict: ["fixture_id","team_id","player_id","type"] });
+      if (playerStatsError) throw playerStatsError;
     }
   }
 }
