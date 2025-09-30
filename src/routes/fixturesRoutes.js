@@ -5,8 +5,8 @@ import { saveFixtures } from "../services/dbService.js";
 
 const router = express.Router();
 
-router.get("/:date", async (req, res) => {
-  const { date } = req.params;
+router.get("/", async (req, res) => {
+  const { date } = req.query
 
   try {
     // 1. Fetch fixtures from API
