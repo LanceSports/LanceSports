@@ -1,3 +1,3 @@
-[Documentation Site](https://sdp-documentation.netlify.app/)
+[Documentation Site](https://sdpdocs.netlify.app/)
 
 #
