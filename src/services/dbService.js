@@ -98,46 +98,118 @@ export async function getFixturesByDate(date) {
   return data;
 }
 
+// Helper: Convert BigInt → String (safe for Supabase JSON serialization)
+function sanitizeBigInt(obj) {
+  return JSON.parse(
+    JSON.stringify(obj, (_, value) =>
+      typeof value === "bigint" ? value.toString() : value
+    )
+  );
+}
+
 export async function saveFixtures(apiFixtures) {
   for (const apiFixture of apiFixtures) {
     const transformed = transformFixture(apiFixture);
 
-    // 🔹 Upsert logic for leagues, venues, fixtures, teams...
-    // (same as you already have)
+    // 🔹 Sanitize all transformed data
+    const leagues = sanitizeBigInt(transformed.leagues || []);
+    const venues = sanitizeBigInt(transformed.venues || []);
+    const fixtures = sanitizeBigInt(transformed.fixtures || []);
+    const teams = sanitizeBigInt(transformed.teams || []);
+    const fixtureTeams = sanitizeBigInt(transformed.fixture_teams || []);
+    const fixtureGoals = sanitizeBigInt(transformed.fixture_goals || []);
+    const fixtureScores = sanitizeBigInt(transformed.fixture_scores || []);
+    const fixturePeriods = sanitizeBigInt(transformed.fixture_periods || []);
+    const events = sanitizeBigInt(transformed.fixture_events || []);
+    const stats = sanitizeBigInt(transformed.fixture_stats || []);
 
-    // Upsert fixture_events
-    const events = transformed.fixture_events || [];
+    const { players, playerStats } = transformFixturePlayers(apiFixture);
+    const sanitizedPlayers = sanitizeBigInt(players || []);
+    const sanitizedPlayerStats = sanitizeBigInt(playerStats || []);
+
+    // 🔹 Upserts
+    if (leagues.length) {
+      let { error } = await supabase
+        .from("leagues")
+        .upsert(leagues, { onConflict: "league_id" });
+      if (error) throw error;
+    }
+
+    if (venues.length) {
+      let { error } = await supabase
+        .from("venues")
+        .upsert(venues, { onConflict: "venue_id" });
+      if (error) throw error;
+    }
+
+    if (fixtures.length) {
+      let { error } = await supabase
+        .from("fixtures")
+        .upsert(fixtures, { onConflict: "fixture_id" });
+      if (error) throw error;
+    }
+
+    if (teams.length) {
+      let { error } = await supabase
+        .from("teams")
+        .upsert(teams, { onConflict: "team_id" });
+      if (error) throw error;
+    }
+
+    if (fixtureTeams.length) {
+      let { error } = await supabase
+        .from("fixture_teams")
+        .upsert(fixtureTeams, { onConflict: ["fixture_id","team_id"] });
+      if (error) throw error;
+    }
+
+    if (fixtureGoals.length) {
+      let { error } = await supabase
+        .from("fixture_goals")
+        .upsert(fixtureGoals, { onConflict: "fixture_id" });
+      if (error) throw error;
+    }
+
+    if (fixtureScores.length) {
+      let { error } = await supabase
+        .from("fixture_scores")
+        .upsert(fixtureScores, { onConflict: "fixture_id" });
+      if (error) throw error;
+    }
+
+    if (fixturePeriods.length) {
+      let { error } = await supabase
+        .from("fixture_periods")
+        .upsert(fixturePeriods, { onConflict: "fixture_id" });
+      if (error) throw error;
+    }
+
     if (events.length) {
-      let { error: eventsError } = await supabase
+      let { error } = await supabase
         .from("fixture_events")
         .upsert(events, { onConflict: "event_id" });
-      if (eventsError) throw eventsError;
+      if (error) throw error;
     }
 
-    // Upsert fixture_stats
-    const stats = transformed.fixture_stats || [];
     if (stats.length) {
-      let { error: statsError } = await supabase
+      let { error } = await supabase
         .from("fixture_stats")
         .upsert(stats, { onConflict: ["fixture_id","team_id","type"] });
-      if (statsError) throw statsError;
+      if (error) throw error;
     }
 
-    // 🔹 Handle players + stats with our local helper
-    const { players, playerStats } = transformFixturePlayers(apiFixture);
-
-    if (players.length) {
-      let { error: playersError } = await supabase
+    if (sanitizedPlayers.length) {
+      let { error } = await supabase
         .from("fixture_players")
-        .upsert(players, { onConflict: ["fixture_id","team_id","player_id"] });
-      if (playersError) throw playersError;
+        .upsert(sanitizedPlayers, { onConflict: ["fixture_id","team_id","player_id"] });
+      if (error) throw error;
     }
 
-    if (playerStats.length) {
-      let { error: playerStatsError } = await supabase
+    if (sanitizedPlayerStats.length) {
+      let { error } = await supabase
         .from("fixture_player_stats")
-        .upsert(playerStats, { onConflict: ["fixture_id","team_id","player_id","type"] });
-      if (playerStatsError) throw playerStatsError;
+        .upsert(sanitizedPlayerStats, { onConflict: ["fixture_id","team_id","player_id","type"] });
+      if (error) throw error;
     }
   }
 }
