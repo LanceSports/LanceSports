@@ -7,6 +7,7 @@ This document provides comprehensive information about the testing setup for the
 **Overall Status: 14/19 tests passing (74% success rate)**
 
 ### ✅ **Working Tests (14/19)**
+
 - **Google OAuth Flow**: ✅ Complete OAuth authentication flow
 - **Error Handling**: ✅ OAuth errors, network errors, Supabase errors
 - **Data Integration**: ✅ User data fetching, validation, and storage
@@ -15,6 +16,7 @@ This document provides comprehensive information about the testing setup for the
 - **Navbar Components** : ✅ Correct navbar routing
 
 ### ❌ **Known Issues (5/19)**
+
 1. **Router Context Issues** (4 failures): App component tests failing due to Router context
 2. **Button Loading State** (1 failure): SignIn button loading state test
 3. **Import Resolution**: One integration test can't resolve Radix UI imports
@@ -38,6 +40,7 @@ src/
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 ```bash
 # Ensure you have the testing dependencies installed
 npm install --save-dev vitest @testing-library/react @testing-library/jest-dom jsdom
@@ -46,6 +49,7 @@ npm install --save-dev vitest @testing-library/react @testing-library/jest-dom j
 ### Running Tests
 
 #### **Basic Commands**
+
 ```bash
 # Run all tests in watch mode (recommended for development)
 npm test
@@ -61,6 +65,7 @@ npm run test:coverage
 ```
 
 #### **Running Specific Tests**
+
 ```bash
 # Run only SignIn component tests (most reliable)
 npm test SignIn
@@ -82,6 +87,7 @@ npm test -- --grep "OAuth"
 The testing suite comprehensively covers the complete Google OAuth flow:
 
 #### **1. SignIn Component Tests** (`src/components/__tests__/SignIn.test.tsx`)
+
 - **✅ Rendering**: Verifies the sign-in button renders correctly
 - **✅ Loading States**: Tests loading state during authentication
 - **✅ Success Flow**: Complete OAuth success scenario with timeout
@@ -91,17 +97,20 @@ The testing suite comprehensively covers the complete Google OAuth flow:
 - **✅ State Management**: Tests success states and UI transitions
 
 #### **2. App Component Tests** (`src/__tests__/App.test.tsx`)
+
 - **❌ Navigation**: Tests routing and navigation after authentication
 - **❌ Component Integration**: Verifies components work together
 - **❌ Authentication State**: Tests authenticated vs unauthenticated states
 - **❌ UI Components**: Tests sports slideshow and other components
 
 #### **3. Main Entry Point Tests** (`src/__tests__/main.test.tsx`)
+
 - **✅ Environment Variables**: Tests Google Client ID configuration
 - **✅ Provider Setup**: Verifies Google OAuth provider configuration
 - **✅ Fallback Handling**: Tests behavior when environment variables are missing
 
 #### **4. Integration Tests** (`src/__tests__/OAuth.integration.test.tsx`)
+
 - **✅ End-to-End Flow**: Complete OAuth flow from start to finish
 - **✅ Error Scenarios**: Network failures, database errors
 - **✅ Provider Configuration**: Validates OAuth provider setup
@@ -110,24 +119,26 @@ The testing suite comprehensively covers the complete Google OAuth flow:
 ## 🔧 Test Configuration
 
 ### **Vitest Configuration** (`vitest.config.ts`)
+
 ```typescript
 export default defineConfig({
   plugins: [react()],
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
     css: true,
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'src/test/', '**/*.d.ts'],
+      provider: "v8",
+      reporter: ["text", "json", "html"],
+      exclude: ["node_modules/", "src/test/", "**/*.d.ts"],
     },
   },
 });
 ```
 
 ### **Test Setup** (`src/test/setup.ts`)
+
 - **Jest-DOM Matchers**: Extends Vitest with DOM testing utilities
 - **Environment Mocks**: Mocks Vite environment variables
 - **Google OAuth Mocks**: Mocks `@react-oauth/google` library
@@ -137,30 +148,32 @@ export default defineConfig({
 ## 🎭 Mock Data & Utilities
 
 ### **Mock Data** (`src/test/utils.tsx`)
+
 ```typescript
 export const mockGoogleOAuthData = {
-  accessToken: 'mock-access-token-123',
+  accessToken: "mock-access-token-123",
   userInfo: {
-    sub: 'google-user-id-456',
-    name: 'Test User',
-    email: 'test@example.com',
-    picture: 'https://example.com/avatar.jpg',
+    sub: "google-user-id-456",
+    name: "Test User",
+    email: "test@example.com",
+    picture: "https://example.com/avatar.jpg",
   },
   supabaseResponse: {
-    data: { id: 'user-789' },
+    data: { id: "user-789" },
     error: null,
   },
   supabaseError: {
     data: null,
     error: {
-      message: 'Database error',
-      code: 'DB_ERROR',
+      message: "Database error",
+      code: "DB_ERROR",
     },
   },
 };
 ```
 
 ### **Test Utilities**
+
 - **`customRender()`**: Renders components with necessary providers
 - **`mockGoogleOAuthSuccess()`**: Creates mock OAuth success data
 - **`mockGoogleOAuthError()`**: Creates mock OAuth error
@@ -170,6 +183,7 @@ export const mockGoogleOAuthData = {
 ## 🧪 Test Scenarios Covered
 
 ### **Success Scenarios** ✅
+
 1. ✅ User clicks "Continue with Google"
 2. ✅ Google OAuth popup opens and user authenticates
 3. ✅ Access token is received from Google
@@ -179,6 +193,7 @@ export const mockGoogleOAuthData = {
 7. ✅ Success state is displayed with timeout
 
 ### **Error Scenarios** ✅
+
 1. ✅ Google OAuth fails (user cancels, network issues)
 2. ✅ User info fetch fails (network error, invalid token)
 3. ✅ Supabase save fails (database error, connection issues)
@@ -186,6 +201,7 @@ export const mockGoogleOAuthData = {
 5. ✅ Invalid Google Client ID
 
 ### **Edge Cases** ✅
+
 1. ✅ User already exists in database (upsert behavior)
 2. ✅ Missing user data fields
 3. ✅ Network timeouts
@@ -195,6 +211,7 @@ export const mockGoogleOAuthData = {
 ## 🚨 Known Issues & Workarounds
 
 ### **1. Router Context Issues**
+
 **Problem**: App component tests fail with "Cannot destructure property 'basename' of 'React10.useContext(...)' as it is null"
 
 **Status**: Router mocking needs improvement
@@ -202,6 +219,7 @@ export const mockGoogleOAuthData = {
 **Workaround**: Focus on SignIn component tests which are fully functional
 
 ### **2. Button Loading State Test**
+
 **Problem**: One test expects button to be disabled after click, but it's not
 
 **Status**: Minor test logic issue
@@ -209,6 +227,7 @@ export const mockGoogleOAuthData = {
 **Workaround**: Test passes when OAuth flow is properly mocked
 
 ### **3. Import Resolution Issues**
+
 **Problem**: Integration tests can't resolve some Radix UI imports
 
 **Status**: Vite alias configuration issue
@@ -220,20 +239,26 @@ export const mockGoogleOAuthData = {
 ### **Common Issues**
 
 #### **Tests failing due to missing mocks**
+
 ```bash
 # Ensure all external dependencies are mocked in setup.ts
 # Check that @react-oauth/google and @supabase/supabase-js are mocked
 ```
 
 #### **Async test failures**
+
 ```typescript
 // Use waitFor for async operations
-await waitFor(() => {
-  expect(mockOnSignIn).toHaveBeenCalledWith(userInfo, '/premier-league');
-}, { timeout: 2000 });
+await waitFor(
+  () => {
+    expect(mockOnSignIn).toHaveBeenCalledWith(userInfo, "/premier-league");
+  },
+  { timeout: 2000 },
+);
 ```
 
 #### **Provider errors**
+
 ```typescript
 // Ensure components are wrapped with necessary providers
 render(
@@ -244,18 +269,20 @@ render(
 ```
 
 #### **Environment variable issues**
+
 ```typescript
 // Check that mocks are properly set up in setup.ts
-vi.mock('import.meta.env', () => ({
+vi.mock("import.meta.env", () => ({
   env: {
-    VITE_GOOGLE_CLIENT_ID: 'test-google-client-id',
-    VITE_SUPABASE_URL: 'https://test.supabase.co',
-    VITE_SUPABASE_ANON_KEY: 'test-anon-key',
+    VITE_GOOGLE_CLIENT_ID: "test-google-client-id",
+    VITE_SUPABASE_URL: "https://test.supabase.co",
+    VITE_SUPABASE_ANON_KEY: "test-anon-key",
   },
 }));
 ```
 
 ### **Debug Mode**
+
 ```bash
 # Run tests in debug mode to see more detailed output
 npm test -- --reporter=verbose
@@ -267,6 +294,7 @@ npm test -- --grep "handles successful Google OAuth flow" --reporter=verbose
 ## 📈 Continuous Integration
 
 ### **CI/CD Ready**
+
 The testing setup is designed to work with CI/CD pipelines:
 
 ```yaml
@@ -279,7 +307,9 @@ The testing setup is designed to work with CI/CD pipelines:
 ```
 
 ### **Coverage Reports**
+
 After running `npm run test:coverage`, find reports in:
+
 - **Console output**: Summary statistics
 - **`coverage/` directory**: Detailed HTML report
 - **`coverage/coverage.json`**: JSON format for CI tools
@@ -287,6 +317,7 @@ After running `npm run test:coverage`, find reports in:
 ## 🎯 Best Practices
 
 ### **Test Organization**
+
 1. **Isolation**: Each test is isolated and doesn't depend on others
 2. **Mocking**: External dependencies are properly mocked
 3. **Async Testing**: Proper use of `waitFor` and async/await
@@ -294,13 +325,14 @@ After running `npm run test:coverage`, find reports in:
 5. **Coverage**: High test coverage for critical OAuth functionality
 
 ### **Writing New Tests**
+
 ```typescript
 // Use the existing mock patterns
 const mockGoogleLogin = vi.fn();
 mockUseGoogleLogin.mockReturnValue(mockGoogleLogin);
 
 // Test both success and error paths
-it('handles new scenario', async () => {
+it("handles new scenario", async () => {
   // Arrange
   // Act
   // Assert
@@ -310,12 +342,14 @@ it('handles new scenario', async () => {
 ## 🔮 Future Improvements
 
 ### **Planned Enhancements**
+
 1. **Fix Router Context Issues**: Improve App component test mocking
 2. **Resolve Import Issues**: Fix Vite alias configuration for integration tests
 3. **Add E2E Tests**: Consider adding Cypress or Playwright for full user journey testing
 4. **Performance Testing**: Add tests for OAuth flow performance under load
 
 ### **Current Priority**
+
 - **High**: Core OAuth functionality is fully tested ✅
 - **Medium**: Fix remaining 5 test failures
 - **Low**: Add additional edge case coverage
@@ -323,12 +357,14 @@ it('handles new scenario', async () => {
 ## 📞 Support
 
 ### **Getting Help**
+
 1. **Check this documentation** for common issues and solutions
 2. **Review test setup** in `src/test/setup.ts`
 3. **Examine working tests** in `src/components/__tests__/SignIn.test.tsx`
 4. **Run tests with verbose output** for detailed error information
 
 ### **Test Maintenance**
+
 - **Regular Updates**: Keep mocks in sync with actual dependencies
 - **Coverage Monitoring**: Monitor test coverage for new features
 - **Performance**: Ensure tests run quickly for developer productivity

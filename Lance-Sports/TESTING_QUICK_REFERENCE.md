@@ -31,7 +31,7 @@ npm run test:coverage
 ✅ **Error Handling**: All error scenarios covered  
 ✅ **Data Integration**: Supabase operations fully tested  
 ✅ **Component States**: Loading, success, error states  
-✅ **User Experience**: Complete user journey testing  
+✅ **User Experience**: Complete user journey testing
 
 ## 🚨 Known Issues
 
@@ -58,21 +58,22 @@ src/
 
 ```typescript
 // Google OAuth
-vi.mock('@react-oauth/google')
+vi.mock("@react-oauth/google");
 
 // Supabase
-vi.mock('../lib/supabase')
+vi.mock("../lib/supabase");
 
 // Environment variables
-vi.mock('import.meta.env')
+vi.mock("import.meta.env");
 
 // Fetch API
-global.fetch = vi.fn()
+global.fetch = vi.fn();
 ```
 
 ## 📝 Writing Tests
 
 ### Basic Test Pattern
+
 ```typescript
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -81,10 +82,10 @@ describe('Component Name', () => {
   it('should do something', async () => {
     // Arrange
     const mockFunction = vi.fn();
-    
+
     // Act
     render(<Component onAction={mockFunction} />);
-    
+
     // Assert
     await waitFor(() => {
       expect(mockFunction).toHaveBeenCalled();
@@ -94,24 +95,25 @@ describe('Component Name', () => {
 ```
 
 ### OAuth Test Pattern
+
 ```typescript
 it('handles OAuth success', async () => {
   // Mock OAuth response
   const mockGoogleResponse = { access_token: 'token' };
   const mockUserInfo = { name: 'User', email: 'user@example.com' };
-  
+
   // Mock fetch and Supabase
   (global.fetch as vi.Mock).mockResolvedValueOnce({
     json: () => Promise.resolve(mockUserInfo)
   });
-  
+
   // Test component
   render(<SignIn onSignIn={mockOnSignIn} />);
-  
+
   // Simulate OAuth success
   const loginCallback = mockUseGoogleLogin.mock.calls[0][0];
   await loginCallback.onSuccess(mockGoogleResponse);
-  
+
   // Assert
   await waitFor(() => {
     expect(mockOnSignIn).toHaveBeenCalledWith(mockUserInfo, '/premier-league');
@@ -122,6 +124,7 @@ it('handles OAuth success', async () => {
 ## 🛠️ Troubleshooting
 
 ### Test Not Running
+
 ```bash
 # Check dependencies
 npm install --save-dev vitest @testing-library/react @testing-library/jest-dom jsdom
@@ -131,19 +134,24 @@ npm run test:run -- --reporter=verbose
 ```
 
 ### Mock Not Working
+
 ```typescript
 // Ensure mock is in setup.ts or before test
-vi.mock('@react-oauth/google', () => ({
+vi.mock("@react-oauth/google", () => ({
   useGoogleLogin: vi.fn(),
 }));
 ```
 
 ### Async Test Failing
+
 ```typescript
 // Use waitFor with timeout
-await waitFor(() => {
-  expect(something).toBeTruthy();
-}, { timeout: 2000 });
+await waitFor(
+  () => {
+    expect(something).toBeTruthy();
+  },
+  { timeout: 2000 },
+);
 ```
 
 ## 📈 Coverage

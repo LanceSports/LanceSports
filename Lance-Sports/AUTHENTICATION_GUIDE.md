@@ -116,24 +116,28 @@ npm run server:dev
 ## 🔐 How Authentication Works
 
 ### Step 1: User Signs In
+
 1. User clicks "Continue with Google" button
 2. Google OAuth popup opens
 3. User authorizes the application
 4. Google returns an access token
 
 ### Step 2: Supabase Integration
+
 1. Frontend sends the Google token to Supabase
 2. Supabase verifies the token with Google
 3. Supabase creates a JWT session token
 4. User data is saved to the `users` table
 
 ### Step 3: API Requests
+
 1. Frontend automatically includes JWT in requests
 2. Backend middleware extracts the token
 3. Middleware verifies token with Supabase
 4. User info is attached to `req.user`
 
 ### Step 4: Protected Routes
+
 1. Route handlers can safely access `req.user.id`
 2. User data is guaranteed to be valid
 3. No additional authentication checks needed
@@ -141,17 +145,20 @@ npm run server:dev
 ## 🛡️ Security Features
 
 ### Frontend Security
+
 - **Google OAuth**: Secure third-party authentication
 - **JWT Storage**: Tokens stored securely in Supabase session
 - **Automatic Token Inclusion**: API calls automatically include auth headers
 
 ### Backend Security
+
 - **JWT Verification**: All tokens verified with Supabase
 - **Middleware Protection**: Routes protected at the middleware level
 - **CORS Configuration**: Restricted to your frontend domain
 - **Security Headers**: Helmet.js provides additional security
 
 ### Database Security
+
 - **Service Role Key**: Server uses admin privileges for verification
 - **User Isolation**: Users can only access their own data
 - **Input Validation**: Request data validated before processing
@@ -159,14 +166,17 @@ npm run server:dev
 ## 📡 API Endpoints
 
 ### Public Endpoints
+
 - `GET /api/health` - Health check (no auth required)
 
 ### Protected Endpoints
+
 - `GET /api/user/profile` - Get user profile
 - `GET /api/user/matches` - Get user's matches
 - `POST /api/matches` - Create a new match
 
 ### Optional Auth Endpoints
+
 - `GET /api/public/sports` - Get sports data (personalized if authenticated)
 
 ## 💻 Frontend Usage
@@ -174,16 +184,16 @@ npm run server:dev
 ### Making Authenticated API Calls
 
 ```typescript
-import { api } from '../lib/api';
+import { api } from "../lib/api";
 
 // Get user profile (automatically includes auth token)
 const profile = await api.getUserProfile();
 
 // Create a match (automatically includes auth token)
 const newMatch = await api.createMatch({
-  homeTeam: 'Arsenal',
-  awayTeam: 'Chelsea',
-  sport: 'Football'
+  homeTeam: "Arsenal",
+  awayTeam: "Chelsea",
+  sport: "Football",
 });
 
 // Check if user is authenticated
@@ -197,12 +207,12 @@ try {
   const data = await api.getUserProfile();
   // Handle success
 } catch (error) {
-  if (error.message.includes('No authentication token')) {
+  if (error.message.includes("No authentication token")) {
     // Redirect to sign in
-    navigate('/signin');
+    navigate("/signin");
   } else {
     // Handle other errors
-    console.error('API Error:', error);
+    console.error("API Error:", error);
   }
 }
 ```
@@ -210,23 +220,29 @@ try {
 ## 🔍 Testing the System
 
 ### 1. Start Both Servers
+
 ```bash
 npm run dev:full
 ```
 
 ### 2. Sign In with Google
+
 1. Navigate to your app
 2. Click "Continue with Google"
 3. Complete OAuth flow
 
 ### 3. Test API Endpoints
+
 Use the `ApiTest` component to test all endpoints:
+
 - Health check should work without auth
 - Protected endpoints should work after sign-in
 - Public sports endpoint should work with or without auth
 
 ### 4. Verify Authentication
+
 Check the browser console and server logs to see:
+
 - JWT tokens being generated
 - Middleware verification logs
 - User data being attached to requests
@@ -234,21 +250,28 @@ Check the browser console and server logs to see:
 ## 🚨 Common Issues & Solutions
 
 ### Issue: "Missing Supabase environment variables"
+
 **Solution**: Ensure your `.env` file exists and has all required variables
 
 ### Issue: "Token verification failed"
-**Solution**: 
+
+**Solution**:
+
 - Check if JWT is expired
 - Verify Supabase is accessible
 - Ensure you're using the service role key, not the anon key
 
 ### Issue: CORS errors
-**Solution**: 
+
+**Solution**:
+
 - Check `FRONTEND_URL` in your `.env`
 - Ensure frontend is running on the expected port
 
 ### Issue: "No authentication token available"
-**Solution**: 
+
+**Solution**:
+
 - User needs to sign in again
 - Check if Supabase session is valid
 - Verify Google OAuth is working
@@ -256,31 +279,34 @@ Check the browser console and server logs to see:
 ## 🔄 Adding New Protected Routes
 
 ### 1. Create the Route
+
 ```typescript
 // In server/index.ts
-app.get('/api/user/settings', authenticateToken, (req, res) => {
+app.get("/api/user/settings", authenticateToken, (req, res) => {
   // req.user is guaranteed to exist here
   const userId = req.user!.id;
   const googleId = req.user!.google_id;
-  
+
   // Your route logic here
-  res.json({ message: 'Settings retrieved', userId });
+  res.json({ message: "Settings retrieved", userId });
 });
 ```
 
 ### 2. Add Frontend API Function
+
 ```typescript
 // In src/lib/api.ts
 export const api = {
   // ... existing functions
-  
-  getUserSettings: () => authenticatedRequest('/user/settings'),
+
+  getUserSettings: () => authenticatedRequest("/user/settings"),
 };
 ```
 
 ### 3. Use in Components
+
 ```typescript
-import { api } from '../lib/api';
+import { api } from "../lib/api";
 
 const settings = await api.getUserSettings();
 ```
