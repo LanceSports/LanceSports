@@ -32,7 +32,7 @@ jobs:
       - name: Super-linter
         uses: super-linter/super-linter@v8.1.0 # x-release-please-version
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           # Set your fix mode variables to true
           FIX_SHELL_SHFMT: true
           FIX_YAML_PRETTIER: true
