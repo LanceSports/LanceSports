@@ -1,20 +1,21 @@
 // src/utils/transform.js
 
 // Transform fixture events
-function transformFixtureEvents(apiFixture) {
+export function transformFixtureEvents(apiFixture) {
   const fixtureId = apiFixture.fixture.id;
   if (!apiFixture.events) return [];
 
   return apiFixture.events.map((event, idx) => ({
-    event_id: `${fixtureId}-${idx}`, // composite id
+    // Use a numeric ID by combining fixtureId and index safely
+    event_id: BigInt(fixtureId) * 1000n + BigInt(idx), 
     fixture_id: fixtureId,
-    team_id: event.team?.id,
-    player_id: event.player?.id,
+    team_id: event.team?.id || null,
+    player_id: event.player?.id || null,
     type: event.type,
-    detail: event.detail,
-    comments: event.comments,
-    elapsed: event.time?.elapsed,
-    extra: event.time?.extra,
+    detail: event.detail || null,
+    comments: event.comments || null,
+    elapsed: event.time?.elapsed || null,
+    extra: event.time?.extra || null,
   }));
 }
 
