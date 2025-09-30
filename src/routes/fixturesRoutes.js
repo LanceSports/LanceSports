@@ -1,43 +1,56 @@
-
+// src/routes/fixturesRoutes.js
 import express from "express";
-import { getFixturesByDate, saveFixtures } from "../services/dbService.js";
-import { fetchFixturesByDate } from "../services/apiService.js";
-
+import { fetchFixturesByDate, fetchFixtureDetails } from "../services/apiService.js";
+import { transformFixture } from "../utils/transform.js";
+import { saveFixtures } from "../services/dbService.js";
 
 const router = express.Router();
 
-// GET fixtures by date
+// GET /fixtures?date=YYYY-MM-DD
 router.get("/", async (req, res) => {
+  const { date } = req.query;
+
+  if (!date) {
+    return res.status(400).json({ error: "Missing date query parameter" });
+  }
+
   try {
-    const { date } = req.query;
-    if (!date) {
-      return res.status(400).json({ error: "Missing required 'date' parameter" });
+    // 1️⃣ Fetch fixtures for the date
+    const fixtures = await fetchFixturesByDate(date);
+
+    // 2️⃣ Loop through each fixture to fetch detailed info
+    const detailedFixtures = [];
+    for (const fixture of fixtures) {
+      try {
+        const fixtureId = fixture.fixture.id;
+        // fetch events, stats, players, player stats
+        const details = await fetchFixtureDetails(fixtureId);
+
+        // Merge base fixture data with detailed data
+        const fullFixture = { ...fixture, ...details };
+        detailedFixtures.push(fullFixture);
+      } catch (innerErr) {
+        console.error(`Error fetching details for fixture ${fixture.fixture.id}:`, innerErr.message);
+      }
     }
 
-    // 1. Check DB first
-    let fixtures = await getFixturesByDate(date);
+    // 3️⃣ Transform all detailed fixtures for DB insertion
+    const transformedFixtures = detailedFixtures.map(transformFixture);
 
-    if (!fixtures || fixtures.length === 0) {
-      // 2. If empty, fetch from external API
-      const apiFixtures = await fetchFixturesByDate(date);
-
-      // 3. Save to DB (this also saves events, stats, players, etc.)
-      await saveFixtures(apiFixtures);
-
-      // 4. Query again to return consistent format from DB
-      fixtures = await getFixturesByDate(date);
+    // 4️⃣ Save each fixture (and all nested tables) to DB
+    for (const tf of transformedFixtures) {
+      await saveFixtures([tf]);
     }
 
-    res.json(fixtures);
+    // 5️⃣ Return transformed fixtures to the user
+    res.json(transformedFixtures);
   } catch (err) {
-    console.error("Error in GET /fixtures:", err);
-    res.status(500).json({ error: err.message });
+    console.error("Error fetching fixtures:", err.message);
+    res.status(500).json({ error: "Failed to fetch fixtures" });
   }
 });
 
 export default router;
-
-
 
 /*import express from "express";
 import { getFixturesHandler } from "../controllers/fixturesController.js";
