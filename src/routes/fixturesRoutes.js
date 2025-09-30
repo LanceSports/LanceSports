@@ -6,16 +6,21 @@ import { transformFixture } from "../utils/transform.js";
 
 const router = express.Router();
 
-const MAX_DETAILS_CALLS = 50;
+const MAX_DETAILS_CALLS = 5;
 
 // Helper to safely stringify BigInts
-function stringifyBigInts(obj) {
-  return JSON.parse(
-    JSON.stringify(obj, (_, value) =>
-      typeof value === "bigint" ? value.toString() : value
-    )
-  );
+// Recursive conversion of BigInt to string
+function convertBigInts(obj) {
+  if (typeof obj === "bigint") return obj.toString();
+  if (Array.isArray(obj)) return obj.map(convertBigInts);
+  if (obj !== null && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [k, convertBigInts(v)])
+    );
+  }
+  return obj;
 }
+
 
 router.get("/", async (req, res) => {
   const { date } = req.query;
@@ -51,7 +56,7 @@ router.get("/", async (req, res) => {
       await saveFixtures([apiFixture]); // your dbService handles upserts
     }
 
-    res.status(200).json(stringifyBigInts(fullFixtures));
+    res.status(200).json(convertBigInts(fullFixtures));
   } catch (err) {
     console.error("Error in /fixtures route:", err.message);
     res.status(500).json({ error: "Failed to fetch fixtures" });
