@@ -63,61 +63,82 @@ Example Request
 GET http://localhost:3000/fixtures?date=2025-09-01
 
 Example Response
-{
-  "fixtures": [
-    {
-      "fixture_id": 1331490,
-      "match_date": "2025-09-01T00:00:00+00:00",
-      "referee": "Leandro Rey Hilfer",
-      "status_long": "Match Finished",
-      "status_short": "FT",
+[
+  {
+    "fixture": {
+      "id": 123456,
+      "match_date": "2025-09-30T15:00:00Z",
+      "status": "FT",
       "elapsed": 90,
-      "extra": 1,
-      "leagues": {
-        "league_id": 129,
-        "name": "Primera Nacional",
-        "country": "Argentina",
+      "referee": "John Doe",
+      "timezone": "UTC"
+    },
+    "league": {
+      "id": 1,
+      "name": "Premier League",
+      "country": "England",
+      "season": 2025,
+      "round": "Week 7"
+    },
+    "teams": [
+      {
+        "id": 101,
+        "name": "Team A",
         "logo_url": "...",
-        "flag_url": "...",
-        "season": 2025,
-        "round": "Regular Season - 29",
-        "standings": true
+        "side": "home",
+        "winner": true
       },
-      "venues": {
-        "venue_id": 105,
-        "name": "Estadio La Ciudadela",
-        "city": "San Miguel de Tucumán"
-      },
-      "fixture_goals": {
-        "home_goals": 0,
-        "away_goals": 3
-      },
-      "fixture_scores": {
-        "halftime_home": 0,
-        "halftime_away": 2,
-        "fulltime_home": 0,
-        "fulltime_away": 3
-      },
-      "fixture_teams": [
-        {
-          "team_id": 485,
-          "side": "home",
-          "winner": false,
-          "name": "San Martin Tucuman",
-          "logo_url": "..."
-        },
-        {
-          "team_id": 459,
-          "side": "away",
-          "winner": true,
-          "name": "Arsenal Sarandi",
-          "logo_url": "..."
-        }
-      ]
-    }
-  ]
-}
-
+      {
+        "id": 102,
+        "name": "Team B",
+        "logo_url": "...",
+        "side": "away",
+        "winner": false
+      }
+    ],
+    "scores": {
+      "halftime": { "home": 1, "away": 0 },
+      "fulltime": { "home": 2, "away": 1 },
+      "extratime": { "home": null, "away": null },
+      "penalty": { "home": null, "away": null }
+    },
+    "events": [
+      {
+        "event_id": 1,
+        "team_id": 101,
+        "player_id": 201,
+        "type": "Goal",
+        "detail": "Normal Goal",
+        "elapsed": 23
+      }
+    ],
+    "stats": [
+      {
+        "team_id": 101,
+        "type": "Possession",
+        "value": "55%"
+      }
+    ],
+    "players": [
+      {
+        "player_id": 201,
+        "team_id": 101,
+        "name": "Player One",
+        "number": 10,
+        "position": "Forward",
+        "grid": "4-3-3"
+      }
+    ],
+    "player_stats": [
+      {
+        "player_id": 201,
+        "team_id": 101,
+        "type": "Goals",
+        "value": 1
+      }
+    ]
+  }
+]
 Error Responses
 Status	Example Message	Cause
 400	"Invalid date format"	Date must be YYYY-MM-DD
