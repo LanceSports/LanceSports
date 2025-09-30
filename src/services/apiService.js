@@ -14,7 +14,7 @@ export async function fetchFixturesByDate(date) {
       params: { date },
       headers: { "x-apisports-key": API_KEY },
     });
-    console.log("Raw API response:", JSON.stringify(res.data, null, 2));
+    //console.log("Raw API response:", JSON.stringify(res.data, null, 2));
     return res.data.response;
     
 
