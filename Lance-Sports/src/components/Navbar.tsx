@@ -14,10 +14,9 @@ interface NavbarProps {
 export function Navbar({ onLoginClick, isSignedIn = false, onLogout, userData }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
+const navigate = useNavigate();
   const navItems = [
     { name: 'All Leagues', to: '/football-leagues' },
-    { name: 'PSL', to: '#psl' },
     { name: 'Premier League', to: '#rugby' },
     { name: 'Champions League', to: '#cricket' },
   ];

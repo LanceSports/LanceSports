@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { SportsSlideshow } from './SportsSlideshow';
 import { FixturesSidebar } from './FixturesSidebar';
 import { SignIn } from './SignIn';
-import { MatchPage } from './MatchPage';
+import { MatchDetail } from './MatchDetail';
 import LiveUpcomingPastMatches from './LiveUpcomingPastMatches';
 import { useSession } from './hooks/useSession.ts';
 import { ChatbotButton } from './ChatbotButton';
@@ -88,9 +88,8 @@ function AppContent() {
     navigate('/');
   };
 
-  // ✅ Add handleLoginClick
   const handleLoginClick = () => {
-    navigate('/SignIn');
+    navigate('/signin');
   };
 
   return (
@@ -99,12 +98,13 @@ function AppContent() {
         isSignedIn={isSignedIn}
         onLogout={handleLogout}
         userData={userData}
-        onLoginClick={handleLoginClick} // ✅ pass it down
+        onLoginClick={handleLoginClick}
       />
       <Routes>
         <Route path="/" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
+        <Route path="/preview_page.html" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
         <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
-        <Route path="/match" element={<MatchPage />} />
+        <Route path="/match" element={<MatchDetail />} />
         <Route path="/football-leagues" element={<LiveUpcomingPastMatches />} />
         {/* fallback */}
         <Route path="*" element={<Home isSignedIn={isSignedIn} userData={userData} />} />

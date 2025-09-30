@@ -28,7 +28,6 @@ export function NavigationDrawer({
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'Premier League', href: '#premier-league', icon: Trophy },
-    { name: 'PSL', href: '#psl', icon: Trophy },
     {name: 'Champions League', href:'#champions-league', icon: Trophy },
     { name: 'Fixtures', href: '/football-leagues', icon: Globe },
   ];
