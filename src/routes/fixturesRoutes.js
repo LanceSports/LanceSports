@@ -1,7 +1,8 @@
 
 import express from "express";
 import { getFixturesByDate, saveFixtures } from "../services/dbService.js";
-import { fetchFixturesFromAPI } from "../services/apiService.js";
+import { fetchFixturesByDate } from "../services/apiService.js";
+
 
 const router = express.Router();
 
@@ -18,7 +19,7 @@ router.get("/", async (req, res) => {
 
     if (!fixtures || fixtures.length === 0) {
       // 2. If empty, fetch from external API
-      const apiFixtures = await fetchFixturesFromAPI(date);
+      const apiFixtures = await fetchFixturesByDate(date);
 
       // 3. Save to DB (this also saves events, stats, players, etc.)
       await saveFixtures(apiFixtures);
