@@ -1,58 +1,35 @@
+
 import express from "express";
-import { fetchFixturesByDate } from "../services/apiService.js";
-import { 
-  saveFixtures,
-  saveFixtureEvents,
-  saveFixtureStats,
-  saveFixturePlayers,
-  saveFixturePlayerStats,
-  getFixturesByDate
-} from "../services/dbService.js";
-import { 
-  transformFixtureEvents,
-  transformFixtureStats,
-  transformFixturePlayers
-} from "../utils/transform.js";
+import { getFixturesByDate, saveFixtures } from "../services/dbService.js";
+import { fetchFixturesFromAPI } from "../services/apiService.js";
 
 const router = express.Router();
 
+// GET fixtures by date
 router.get("/", async (req, res) => {
-  const { date } = req.query;
-
   try {
-    // 1. Try to fetch from DB first
+    const { date } = req.query;
+    if (!date) {
+      return res.status(400).json({ error: "Missing required 'date' parameter" });
+    }
+
+    // 1. Check DB first
     let fixtures = await getFixturesByDate(date);
 
     if (!fixtures || fixtures.length === 0) {
-      // 2. If no data in DB, fetch from API
-      const apiFixtures = await fetchFixturesByDate(date);
+      // 2. If empty, fetch from external API
+      const apiFixtures = await fetchFixturesFromAPI(date);
 
-      // 3. Save core fixtures
+      // 3. Save to DB (this also saves events, stats, players, etc.)
       await saveFixtures(apiFixtures);
 
-      // 4. Save related entities (events, stats, players)
-      for (const apiFixture of apiFixtures) {
-        // events
-        const events = transformFixtureEvents(apiFixture);
-        await saveFixtureEvents(events);
-
-        // stats
-        const stats = transformFixtureStats(apiFixture);
-        await saveFixtureStats(stats);
-
-        // players + player stats
-        const { players, playerStats } = transformFixturePlayers(apiFixture);
-        await saveFixturePlayers(players);
-        await saveFixturePlayerStats(playerStats);
-      }
-
-      // 5. Reload enriched fixtures from DB
+      // 4. Query again to return consistent format from DB
       fixtures = await getFixturesByDate(date);
     }
 
-    res.json({ fixtures });
+    res.json(fixtures);
   } catch (err) {
-    console.error("Error in /fixtures:", err);
+    console.error("Error in GET /fixtures:", err);
     res.status(500).json({ error: err.message });
   }
 });
