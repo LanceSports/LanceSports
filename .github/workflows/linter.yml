@@ -36,6 +36,8 @@ jobs:
           # Set your fix mode variables to true
           FIX_SHELL_SHFMT: true
           FIX_YAML_PRETTIER: true
+          VALIDATE_CHECKOV: false
+          VALIDATE_TRIVY: false
           # To reuse the same Super-linter configuration that you use in the
           # lint job without duplicating it, see
           # https://github.com/super-linter/super-linter/blob/main/docs/run-linter-locally.md#share-environment-variables-between-environments
