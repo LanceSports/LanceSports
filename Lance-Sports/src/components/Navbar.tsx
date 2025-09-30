@@ -1,17 +1,16 @@
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
-import { Menu, X, AlignLeft } from 'lucide-react';
-import { NavigationDrawer } from './NavigationDrawer';
+import { Menu, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface NavbarProps {
-  onLoginClick?: () => void;
   isSignedIn?: boolean;
   onLogout?: () => void;
+  userData?: any;
 }
 
-export function Navbar({ onLoginClick, isSignedIn = false, onLogout }: NavbarProps) {
+export function Navbar({ isSignedIn = false, onLogout, userData }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const navItems = [
     { name: 'Football Leagues', to: '/football-leagues' },
@@ -21,117 +20,131 @@ export function Navbar({ onLoginClick, isSignedIn = false, onLogout }: NavbarPro
   ];
 
   return (
-    <>
-      <nav className="glass-green-dark text-white px-4 py-3 transition-all duration-200 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Drawer Toggle Button & Logo */}
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsDrawerOpen(true)}
-              className="text-white hover:bg-white/10 transition-all duration-200"
-            >
-              <AlignLeft size={20} />
-            </Button>
-            <div className="text-xl font-semibold">
-              LanceSports
-            </div>
-          </div>
-
-        {/* Desktop Navigation */}
+    <nav className="bg-green-600 text-white px-4 py-3">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        
+        <div className="text-xl font-semibold"><a href="/">LanceSports</a></div>
         <div className="hidden md:flex items-center space-x-8">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.name}
-              href={item.to}
-              className="hover:text-white/80 transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10"
+              to={item.to}
+              className="hover:text-green-200 transition-colors duration-200"
             >
               {item.name}
-            </a>
+            </Link>
           ))}
         </div>
-
-        {/* Desktop Controls */}
-        <div className="hidden md:flex items-center space-x-2">
+        <div className="hidden md:flex items-center space-x-4">
           {isSignedIn ? (
-            <Button 
-              onClick={onLogout}
-              variant="outline" 
-              className="text-green-600 border-white/30 bg-white/90 hover:bg-white backdrop-blur-sm transition-all duration-200"
-            >
-              Logout
-            </Button>
+            <>
+              {/* User Profile */}
+              <div className="flex items-center space-x-3 bg-white/10 rounded-full px-4 py-2">
+                {userData?.avatar_url ? (
+                  <img
+                    src={userData.avatar_url}
+                    alt={userData.name || userData.username || userData.displayName || 'User'}
+                    className="w-8 h-8 rounded-full border-2 border-white/20"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">
+                      {(userData?.name || userData?.username || userData?.displayName || 'U').charAt(0)}
+                    </span>
+                  </div>
+                )}
+                <div className="text-sm">
+                  <p className="font-medium text-white">
+                    {userData?.name || userData?.username || userData?.displayName || 'User'}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={onLogout}
+                variant="outline"
+                className="text-green-600 border-white bg-white hover:bg-green-50"
+              >
+                Logout
+              </Button>
+            </>
           ) : (
-            <Button 
-              onClick={onLoginClick}
-              variant="outline" 
-              className="text-green-600 border-white/30 bg-white/90 hover:bg-white backdrop-blur-sm transition-all duration-200"
+            <Link
+              to="/signin"
+              className="text-green-600 border-white bg-white hover:bg-green-50 px-4 py-2 rounded"
             >
               Login
-            </Button>
+            </Link>
           )}
         </div>
-
-        {/* Mobile Menu Button */}
         <div className="md:hidden">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-white hover:bg-white/10 transition-all duration-200"
+            className="text-white hover:bg-green-700"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </Button>
         </div>
       </div>
-
-      {/* Mobile Navigation Menu */}
       {isMenuOpen && (
-        <div className="md:hidden mt-4 pb-4 border-t border-white/20 glass-dark rounded-b-lg">
+        <div className="md:hidden mt-4 pb-4 border-t border-green-500">
           <div className="flex flex-col space-y-3 pt-4">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.to}
-                className="hover:text-white/80 transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10"
+                to={item.to}
+                className="hover:text-green-200 transition-colors duration-200 px-2 py-1"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
-            <div className="pt-2 space-y-2">
+            <div className="pt-2">
               {isSignedIn ? (
-                <Button 
-                  onClick={onLogout}
-                  variant="outline" 
-                  className="text-green-300 border-gray-300 bg-gray-100 hover:bg-gray-200 w-full"
-                >
-                  Logout
-                </Button>
+                <>
+                  {/* Mobile User Profile */}
+                  <div className="flex items-center space-x-3 bg-white/10 rounded-lg px-3 py-2 mb-3">
+                    {userData?.avatar_url ? (
+                      <img
+                        src={userData.avatar_url}
+                        alt={userData.name || userData.username || userData.displayName || 'User'}
+                        className="w-10 h-10 rounded-full border-2 border-white/20"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                                              <span className="text-white text-sm font-medium">
+                        {(userData?.name || userData?.username || userData?.displayName || 'U').charAt(0)}
+                      </span>
+                      </div>
+                    )}
+                    <div className="text-sm">
+                      <p className="font-medium text-white">
+                        {userData?.name || userData?.username || userData?.displayName || 'User'}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={onLogout}
+                    variant="outline"
+                    className="text-green-600 border-white bg-white hover:bg-green-50 w-full"
+                  >
+                    Logout
+                  </Button>
+                </>
               ) : (
-                <Button 
-                  onClick={onLoginClick}
-                  variant="outline" 
-                  className="text-green-300 border-gray-300 bg-gray-100 hover:bg-gray-200 w-full"
+                <Link
+                  to="/signin"
+                  className="text-green-600 border-white bg-white hover:bg-green-50 px-4 py-2 rounded w-full text-center"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   Login
-                </Button>
+                </Link>
               )}
             </div>
           </div>
         </div>
       )}
-      </nav>
-
-      {/* Navigation Drawer */}
-      <NavigationDrawer 
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        isSignedIn={isSignedIn}
-        onLoginClick={onLoginClick}
-        onLogout={onLogout}
-      />
-    </>
+    </nav>
   );
 }
