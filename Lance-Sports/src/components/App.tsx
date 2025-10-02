@@ -6,7 +6,7 @@ import { FixturesSidebar } from './FixturesSidebar';
 import { SignIn } from './SignIn';
 import { MatchDetail } from './MatchDetail';
 import LiveUpcomingPastMatches from './LiveUpcomingPastMatches';
-import { useSession } from './hooks/useSession.ts';
+import { useSession } from './hooks/useSession';
 import { ChatbotButton } from './ChatbotButton';
 
 interface HomeProps {
