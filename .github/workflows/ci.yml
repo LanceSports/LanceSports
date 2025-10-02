@@ -33,11 +33,10 @@ jobs:
             npm ci
           else
             npm install
-          fi
-
-      - name: Build
-        run: npm run build
-
+          fi 
+          """
+      - name: Build 
+        run: npm run build  
       # Run tests but don't fail the job yet; we'll enforce our own threshold
       - name: Run tests (generate JSON report)
         run: |
@@ -57,7 +56,7 @@ jobs:
             acc.total = data.numTotalTests || 0;
             acc.passed = data.numPassedTests || 0;
             acc.failed = data.numFailedTests || 0;
-          } else {
+           } else {
             // Walk task tree as a fallback
             function accumulate(task, acc){
               if (!task) return acc;
@@ -104,6 +103,7 @@ jobs:
         with:
           name: vitest-report
           path: Lance-Sports/vitest-report.json
+
 
 
   # deploy_app:
