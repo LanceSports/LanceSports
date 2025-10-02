@@ -9,6 +9,7 @@ import {
 } from './ui/drawer';
 import { Button } from './ui/button';
 import { X, Home, Trophy, Calendar, User, Globe } from 'lucide-react';
+import { Link,useNavigate } from 'react-router-dom';
 
 interface NavigationDrawerProps {
   isOpen: boolean;
@@ -67,9 +68,9 @@ export function NavigationDrawer({
             {navItems.map((item) => {
               const IconComponent = item.icon;
               return (
-                <a
+                <Link
                   key={item.name}
-                  href={item.to}
+                  to={item.to}
                   onClick={handleItemClick}
                   className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/5 text-gray-300 hover:text-green-300 transition-all duration-200 group glass-hover"
                 >
@@ -78,7 +79,7 @@ export function NavigationDrawer({
                     className="text-green-400 group-hover:text-green-300" 
                   />
                   <span>{item.name}</span>
-                </a>
+                </Link>
               );
             })}
           </nav>
