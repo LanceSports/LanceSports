@@ -58,12 +58,17 @@ const LiveUpcomingPastMatches: React.FC = () => {
         const day = String(now.getDate()).padStart(2, '0');
         const currentDate = `${year}-${month}-${day}`;
         const url = `https://lancesports-fixtures-api.onrender.com/fixtures?date=${currentDate}`;
-        const { data } = await fetchWithCacheJSON<{ fixtures: Fixture[] }>(url, 5 * 60 * 1000);
+        const {data} = await fetchWithCacheJSON<Fixture[]>(url, 5 * 60 * 1000);
+
+// response is the array of fixtures
+        setFixtures(data || []);
+
         // Log size in KB
+        console.log(data);
         const jsonSize = new Blob([JSON.stringify(data)]).size / 1024;
         console.log(`API response size: ${jsonSize.toFixed(2)} KB`);
 
-        setFixtures(data.fixtures || []);
+        //setFixtures(data.fixtures || []);
       } catch (err) {
         console.error('Error fetching fixtures:', err);
       } finally {
