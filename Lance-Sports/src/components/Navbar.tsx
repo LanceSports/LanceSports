@@ -17,8 +17,8 @@ export function Navbar({ onLoginClick, isSignedIn = false, onLogout, userData }:
 const navigate = useNavigate();
   const navItems = [
     { name: 'All Leagues', to: '/football-leagues' },
-    { name: 'Premier League', to: '#rugby' },
-    { name: 'Champions League', to: '#cricket' },
+    { name: 'Premier League', to: '/premier-league' },
+    { name: 'Champions League', to: '/champions-league' },
   ];
 
   return (

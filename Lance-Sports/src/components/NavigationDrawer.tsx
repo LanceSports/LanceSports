@@ -26,10 +26,10 @@ export function NavigationDrawer({
   onLogout
 }: NavigationDrawerProps) {
   const navItems = [
-    { name: 'Home', href: '/', icon: Home },
-    { name: 'Premier League', href: '#premier-league', icon: Trophy },
-    {name: 'Champions League', href:'#champions-league', icon: Trophy },
-    { name: 'Fixtures', href: '/football-leagues', icon: Globe },
+    { name: 'Home', to: '/', icon: Home },
+    { name: 'Premier League', to: '/premier-league', icon: Trophy },
+    {name: 'Champions League', to:'/champions-league', icon: Trophy },
+    { name: 'Fixtures', to: '/football-leagues', icon: Globe },
   ];
 
   const handleItemClick = () => {
@@ -69,7 +69,7 @@ export function NavigationDrawer({
               return (
                 <a
                   key={item.name}
-                  href={item.href}
+                  href={item.to}
                   onClick={handleItemClick}
                   className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/5 text-gray-300 hover:text-green-300 transition-all duration-200 group glass-hover"
                 >

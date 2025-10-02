@@ -8,6 +8,8 @@ import { MatchDetail } from './MatchDetail';
 import LiveUpcomingPastMatches from './LiveUpcomingPastMatches';
 import { useSession } from './hooks/useSession';
 import { ChatbotButton } from './ChatbotButton';
+import { ChampionsLeague } from './ChampionsLeague';
+import { PremierLeague } from './PremierLeague';
 
 interface HomeProps {
   isSignedIn: boolean;
@@ -106,6 +108,9 @@ function AppContent() {
         <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
         <Route path="/match" element={<MatchDetail />} />
         <Route path="/football-leagues" element={<LiveUpcomingPastMatches />} />
+        <Route path="champions-league" element = {<ChampionsLeague/>}/>
+        <Route path = "premier-league" element={<PremierLeague/>}/>
+
         {/* fallback */}
         <Route path="*" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
       </Routes>
