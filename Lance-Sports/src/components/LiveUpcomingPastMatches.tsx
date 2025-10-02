@@ -64,7 +64,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
         setFixtures(data || []);
 
         // Log size in KB
-        console.log(data);
+        console.log(data)
         const jsonSize = new Blob([JSON.stringify(data)]).size / 1024;
         console.log(`API response size: ${jsonSize.toFixed(2)} KB`);
 
