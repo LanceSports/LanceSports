@@ -135,37 +135,6 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Username/password form (optional) */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-gray-700 dark:text-gray-200">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter your username"
-                  className="glass dark:glass-dark border-white/20 dark:border-white/10"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-700 dark:text-gray-200">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="glass dark:glass-dark border-white/20 dark:border-white/10"
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full glass-green dark:glass-green-dark text-white py-2.5 glass-glow"
-              >
-                Submit
-              </Button>
-            </form>
-
             {/* Divider */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -173,7 +142,7 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="glass dark:glass-dark px-3 py-1 rounded-full text-gray-500 dark:text-gray-400">
-                  Or continue with
+                  Continue with
                 </span>
               </div>
             </div>
