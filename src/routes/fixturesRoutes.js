@@ -2,6 +2,94 @@
 import express from "express";
 import { fetchFixturesByDate, fetchFixtureDetails } from "../services/apiService.js";
 import { saveFixtures } from "../services/dbService.js";
+import { delay } from "../utils/rateLimit.js";
+
+const router = express.Router();
+
+// Helper to safely stringify BigInts
+function convertBigInts(obj) {
+  if (typeof obj === "bigint") return obj.toString();
+  if (Array.isArray(obj)) return obj.map(convertBigInts);
+  if (obj !== null && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [k, convertBigInts(v)])
+    );
+  }
+  return obj;
+}
+
+router.get("/", async (req, res) => {
+  const { date } = req.query;
+
+  if (!date) {
+    return res.status(400).json({
+      error: "Date query parameter is required, e.g., ?date=2025-09-30",
+    });
+  }
+
+  try {
+    const apiFixtures = await fetchFixturesByDate(date);
+
+    if (!apiFixtures?.length) {
+      return res.status(200).json([]);
+    }
+
+    const detailedFixtures = [];
+    const RATE_LIMIT_DELAY = 200; // 5 calls per sec → ~300 rpm (safe under 450 rpm)
+
+    for (const fixture of apiFixtures) {
+      if (!fixture.fixture) continue;
+
+      const status = fixture.fixture.status?.short || "NS";
+
+      // Only fetch details for live or past games
+      const isPastOrLive =
+        status !== "NS" && status !== "TBD" && status !== "PST";
+
+      if (!isPastOrLive) {
+        continue; // skip future matches
+      }
+
+      try {
+        const details = await fetchFixtureDetails(fixture.fixture.id);
+        detailedFixtures.push({ ...fixture, ...details });
+
+        // Respect API rate limit
+        await delay(RATE_LIMIT_DELAY);
+      } catch (err) {
+        console.error(
+          `Error fetching details for fixture ${fixture.fixture.id}:`,
+          err.message
+        );
+      }
+    }
+
+    if (!detailedFixtures.length) {
+      return res.status(200).json([]);
+    }
+
+    // Save all detailed fixtures
+    for (const fixture of detailedFixtures) {
+      await saveFixtures([fixture]);
+    }
+
+    res.status(200).json(convertBigInts(detailedFixtures));
+  } catch (err) {
+    console.error("Error in /fixtures route:", err.message);
+    res.status(500).json({ error: "Failed to fetch fixtures" });
+  }
+});
+
+export default router;
+
+
+
+
+/*
+// src/routes/fixturesRoutes.js
+import express from "express";
+import { fetchFixturesByDate, fetchFixtureDetails } from "../services/apiService.js";
+import { saveFixtures } from "../services/dbService.js";
 import { transformFixture } from "../utils/transform.js";
 
 const router = express.Router();
@@ -64,6 +152,10 @@ router.get("/", async (req, res) => {
 });
 
 export default router;
+*/
+
+
+
 
 /*// src/routes/fixturesRoutes.js
 import express from "express";
