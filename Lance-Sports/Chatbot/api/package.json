@@ -1,5 +1,5 @@
 {
-  "name": "footy-api",
+  "name": "deepseek-chatbot-api",
   "private": true,
   "type": "commonjs",
   "scripts": {
@@ -11,7 +11,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.19.2",
-    "openai": "^4.57.0"
+    "axios": "^1.6.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
