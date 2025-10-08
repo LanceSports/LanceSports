@@ -145,6 +145,8 @@ const LiveUpcomingPastMatches: React.FC = () => {
 
   const hasActiveFilters = filters.league || filters.country || filters.status !== 'all';
 
+
+  //  WHAT WE DSISPLAY IN lIVEUPCOMING ETC  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-950 to-gray-900 p-5">
       {/* Header with Filter Button */}
@@ -366,22 +368,25 @@ const MatchCard: React.FC<{ match: Fixture; vertical?: boolean }> = ({
       `}
     >
       {/* League and Date */}
-      <div className="text-center mb-3">
-        <div className="flex items-center justify-center gap-2 mb-1">
-          <img 
+      <div className="text-center mb-4
+      ">
+        <div className="flex items-left justify-center gap-2 mb-1">
+           <div className="text-xs text-white-200">
+            {league.name}
+          </div>
+          <br/>
+          <img
+          style={{height:80, width:100}}
             src={league.logo} 
             alt={league.name}
-            className="w-4 h-4 rounded-full"
+            className="rounded"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
             }}
           />
-          <div className="text-xs text-gray-400 truncate">
-            {league.name}
-          </div>
         </div>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs-center text-gray-500">
           {date}
         </div>
       </div>
