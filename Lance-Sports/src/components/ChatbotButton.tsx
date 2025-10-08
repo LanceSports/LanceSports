@@ -1,85 +1,96 @@
-import React, { useState } from 'react';
-import { MessageCircle, X, Send } from 'lucide-react';
-import { gunzipSync } from 'zlib';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { MessageCircle, X, Send } from "lucide-react";
+import { askFootyBot } from "./lib/footyApi";
 
 interface ChatMessage {
   id: string;
   text: string;
-  isUser: boolean;
-  timestamp: Date;
+  role: "user" | "assistant" | "system";
+  timestamp: number; // epoch ms
 }
 
 export const ChatbotButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
-      id: '1',
-      text: 'Hello! I\'m your LanceSports assistant. Anything Football related, stats, scores, historical records, ask away! How can I help you today?',
-      isUser: false,
-      timestamp: new Date(),
+      id: "welcome-1",
+      text:
+        "Hello! I'm your LanceSports assistant. Ask me anything football-related — stats, scores, historical records, tactics — and I’ll help.",
+      role: "assistant",
+      timestamp: Date.now(),
     },
   ]);
-  const [inputMessage, setInputMessage] = useState('');
+  const [inputMessage, setInputMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
-  const handleSendMessage = () => {
-    if (!inputMessage.trim()) return;
+  // for smooth auto-scroll to the latest message
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages.length, isOpen]);
 
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      text: inputMessage,
-      isUser: true,
-      timestamp: new Date(),
+  const canSend = useMemo(
+    () => inputMessage.trim().length > 0 && !isSending,
+    [inputMessage, isSending]
+  );
+
+  async function handleSendMessage() {
+    const text = inputMessage.trim();
+    if (!text || isSending) return;
+
+    setInputMessage("");
+
+    // Push user message
+    const userMsg: ChatMessage = {
+      id: `u-${Date.now()}`,
+      text,
+      role: "user",
+      timestamp: Date.now(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
+    // Add a temporary “typing” message
+    const typingId = `t-${Date.now() + 1}`;
+    const typingMsg: ChatMessage = {
+      id: typingId,
+      text: "…", // simple typing indicator
+      role: "assistant",
+      timestamp: Date.now(),
+    };
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponse: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        text: getBotResponse(inputMessage),
-        isUser: false,
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, botResponse]);
-    }, 1000);
-  };
+    setMessages((prev) => [...prev, userMsg, typingMsg]);
+    setIsSending(true);
+    console.log("[chat] send", {text});
+    try {
+      const reply = await askFootyBot(text);
+      console.log(reply);
+      // Replace typing bubble with real reply
+      setMessages((prev) =>
+        prev.map((m) => (m.id === typingId ? { ...m, text: reply } : m))
+      );
+    } catch (err: any) {
+      const fallback =
+        "I couldn’t reach the LanceSports API. Please try again shortly.";
+      setMessages((prev) =>
+        prev.map((m) => (m.id === typingId ? { ...m, text: fallback } : m))
+      );
+      // Optional: console.error(err);
+    } finally {
+      setIsSending(false);
+    }
+  }
 
-  const getBotResponse = (message: string): string => {
-    const lowerMessage = message.toLowerCase();
-    
-    if (lowerMessage.includes('live') || lowerMessage.includes('score')) {
-      return 'You can check live scores and ongoing matches in the Live Matches section. All current games are updated in real-time!';
-    }
-    
-    if (lowerMessage.includes('fixture') || lowerMessage.includes('upcoming')) {
-      return 'Browse upcoming fixtures in the Upcoming Matches section. You can filter by league, date, or team to find exactly what you\'re looking for.';
-    }
-    
-    if (lowerMessage.includes('league') || lowerMessage.includes('premier') || lowerMessage.includes('cricket')) {
-      return 'LanceSports covers all major leagues including Premier League, Cricket, Rugby, and more. Use our filters to focus on your favorite competitions!';
-    }
-    
-    if (lowerMessage.includes('help') || lowerMessage.includes('how')) {
-      return 'I can help you navigate LanceSports! Ask me about live scores, fixtures, leagues, or any sports-related questions.';
-    }
-    
-    return 'Thanks for your message! For live scores, fixtures, and sports updates, explore the different sections of LanceSports. Is there anything specific you\'d like to know?';
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
-  };
+  }
 
   return (
     <>
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-20 right-4 w-80 h-96 glass-card-dark rounded-xl border border-green-800/30 glass-glow shadow-2xl z-50">
+        <div className="fixed bottom-20 right-4 w-80 h-96 glass-card-dark rounded-xl border border-green-800/30 glass-glow shadow-2xl z-50 flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-green-800/30">
             <div className="flex items-center space-x-2">
@@ -88,12 +99,15 @@ export const ChatbotButton: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-gray-100 text-sm">LanceSports Assistant</h3>
-                <p className="text-green-400 text-xs">Online</p>
+                <p className="text-green-400 text-xs">
+                  {isSending ? "Typing…" : "Online"}
+                </p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
               className="text-gray-400 hover:text-gray-200 transition-colors p-1"
+              aria-label="Close chat"
             >
               <X className="w-4 h-4" />
             </button>
@@ -101,24 +115,26 @@ export const ChatbotButton: React.FC = () => {
 
           {/* Messages */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3 h-64 scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track-transparent">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-              >
+            {messages.map((m) => {
+              const isUser = m.role === "user";
+              return (
                 <div
-                  className={`
-                    max-w-xs px-3 py-2 rounded-lg text-sm
-                    ${message.isUser
-                      ? 'bg-green-600/80 text-white glass-green-dark'
-                      : 'glass-dark text-gray-100 border border-green-800/20'
-                    }
-                  `}
+                  key={m.id}
+                  className={`flex ${isUser ? "justify-end" : "justify-start"}`}
                 >
-                  {message.text}
+                  <div
+                    className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                      isUser
+                        ? "bg-green-600/80 text-white glass-green-dark"
+                        : "glass-dark text-gray-100 border border-green-800/20"
+                    }`}
+                  >
+                    {m.text}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+            <div ref={scrollRef} />
           </div>
 
           {/* Input */}
@@ -128,14 +144,15 @@ export const ChatbotButton: React.FC = () => {
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
+                onKeyDown={handleKeyDown}
+                placeholder="Type your message…"
                 className="flex-1 glass-dark rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500 border border-green-800/30 focus:border-green-500/50 focus:outline-none focus:ring-1 focus:ring-green-500/30"
               />
               <button
                 onClick={handleSendMessage}
-                disabled={!inputMessage.trim()}
+                disabled={!canSend}
                 className="glass-green-dark p-2 rounded-lg hover:bg-green-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                aria-label="Send"
               >
                 <Send className="w-4 h-4 text-green-400" />
               </button>
@@ -146,22 +163,18 @@ export const ChatbotButton: React.FC = () => {
 
       {/* Floating Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`
-          fixed bottom-4 right-4 w-14 h-14 rounded-full
-          glass-green-dark glass-hover-dark glass-glow
-          flex items-center justify-center
-          transition-all duration-300 z-40
-          hover:scale-110 active:scale-95
-          ${isOpen ? 'ring-2 ring-green-500/50' : ''}
-        `}
+        onClick={() => setIsOpen((s) => !s)}
+        className={`fixed bottom-4 right-4 w-14 h-14 rounded-full glass-green-dark glass-hover-dark glass-glow flex items-center justify-center transition-all duration-300 z-40 hover:scale-110 active:scale-95 ${
+          isOpen ? "ring-2 ring-green-500/50" : ""
+        }`}
+        aria-label="Open chat"
       >
         {isOpen ? (
           <X className="w-6 h-6 text-green-400" />
         ) : (
           <>
             <MessageCircle className="w-6 h-6 text-green-400" />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
           </>
         )}
       </button>
