@@ -40,9 +40,11 @@ export class DeepSeekService {
       );
 
       return response.data.choices[0]?.message?.content ?? 'No response generated';
-    } catch (error) {
-      console.error('DeepSeek API Error:', error);
-      throw new Error('Failed to get response from DeepSeek');
+    } catch (error: any) {
+      console.error('DeepSeek API Error:', error.response?.data || error.message);
+      console.error('Status:', error.response?.status);
+      console.error('Headers:', error.response?.headers);
+      throw new Error(`Failed to get response from DeepSeek: ${error.response?.data?.error?.message || error.message}`);
     }
   }
 }
