@@ -59,10 +59,10 @@ export const ChatbotButton: React.FC = () => {
 
     setMessages((prev) => [...prev, userMsg, typingMsg]);
     setIsSending(true);
-    console.log("[chat] send", {text});
+    //console.log("[chat] send", {text});
     try {
       const reply = await askFootyBot(text);
-      console.log(reply);
+      //console.log(reply);
       // Replace typing bubble with real reply
       setMessages((prev) =>
         prev.map((m) => (m.id === typingId ? { ...m, text: reply } : m))
