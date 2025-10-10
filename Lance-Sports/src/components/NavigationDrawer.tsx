@@ -8,7 +8,7 @@ import {
   DrawerClose,
 } from './ui/drawer';
 import { Button } from './ui/button';
-import { X, Home, Trophy, Calendar, User, Globe } from 'lucide-react';
+import { X, Home, Trophy, Calendar, User, Globe, MessageCircle } from 'lucide-react';
 import { Link,useNavigate } from 'react-router-dom';
 
 interface NavigationDrawerProps {
@@ -29,8 +29,10 @@ export function NavigationDrawer({
   const navItems = [
     { name: 'Home', to: '/', icon: Home },
     { name: 'Premier League', to: '/premier-league', icon: Trophy },
+     {name: 'Lance AI Assistant', to: '/chatbot', icon: MessageCircle, highlight: true },
     {name: 'Champions League', to:'/champions-league', icon: Trophy },
     { name: 'Fixtures', to: '/football-leagues', icon: Globe },
+    
   ];
 
   const handleItemClick = () => {
