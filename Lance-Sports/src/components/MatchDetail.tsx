@@ -63,6 +63,7 @@ export function MatchDetail() {
   const [activeTab, setActiveTab] = useState<'events' | 'stats' | 'players'>('events');
 
   const match = location.state?.match;
+  console.log(match);
 
   useEffect(() => {
     const fetchMatchDetails = async () => {
@@ -82,7 +83,9 @@ export function MatchDetail() {
           setMatchDetails(data);
         } catch (err) {
           // Fallback to mock data if API fails
-          console.log('Using mock data for match details');
+          console.log('Using mock data for match details. Setting match details failed');
+          console.log(err);
+          //console.log(err);
           const mockData: MatchDetailData = generateMockMatchDetails(match);
           setMatchDetails(mockData);
         }

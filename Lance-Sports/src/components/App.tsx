@@ -10,6 +10,7 @@ import { useSession } from './hooks/useSession';
 import { ChatbotButton } from './ChatbotButton';
 import { ChampionsLeague } from './ChampionsLeague';
 import { PremierLeague } from './PremierLeague';
+import { ChatBot } from './ChatBot';
 
 interface HomeProps {
   isSignedIn: boolean;
@@ -110,7 +111,7 @@ function AppContent() {
         <Route path="/football-leagues" element={<LiveUpcomingPastMatches />} />
         <Route path="champions-league" element = {<ChampionsLeague/>}/>
         <Route path = "premier-league" element={<PremierLeague/>}/>
-
+        <Route path = "/chatbot" element={<ChatBot/>}/>
         {/* fallback */}
         <Route path="*" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
       </Routes>
