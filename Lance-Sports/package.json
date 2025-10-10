@@ -68,6 +68,7 @@
             "build": "vite build",
             "test": "vitest",
             "test:run": "vitest run",
+            "test:coverage": "vitest run --coverage --reporter=verbose",
             "coverage": "vitest run --coverage"
       }
 }
