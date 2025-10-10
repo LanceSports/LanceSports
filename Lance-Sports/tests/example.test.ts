@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 
 describe('smoke', () => {
   it('adds numbers', () => {
-    expect(1 + 1).toBe(2);
+    expect(1 + 1).toBe(3);
   });
 });
 
