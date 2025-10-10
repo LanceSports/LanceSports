@@ -78,6 +78,7 @@ jobs:
           cp -r ../coverage-backup/* coverage/ || echo "Failed to restore coverage files"
           ls -la coverage/
         fi
+      continue-on-error: true
 
     - name: Upload coverage to Codecov
       if: always()
