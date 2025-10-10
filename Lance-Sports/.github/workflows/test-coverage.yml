@@ -39,10 +39,10 @@ jobs:
       run: |
         echo "Checking vitest configuration..."
         npx vitest --version
-        echo "Running tests first without coverage..."
-        npm run test:run || echo "Some tests failed, but continuing..."
+        echo "Running basic tests first..."
+        npm run test:basic || echo "Basic tests failed, but continuing..."
 
-    - name: Run tests with coverage
+    - name: Run full test suite with coverage
       working-directory: ./Lance-Sports
       run: npm run test:coverage
       continue-on-error: true
