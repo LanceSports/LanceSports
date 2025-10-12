@@ -10,6 +10,8 @@ app.use(express.json());
 
 const openai = new OpenAI({ apiKey: ENV.OPENAI_API_KEY });
 
+app.get("/healthz", (_req, res) => res.status(200).send("ok"));
+
 app.post("/api/football-chat", async (req, res) => {
   const message: string = (req.body?.message ?? "").toString().trim();
   if (!message) return res.status(400).json({ error: "message is required" });
