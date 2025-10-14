@@ -295,3 +295,161 @@ html {
     left: 100%;
   }
 }
+
+/* Safe area for mobile devices */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* UEFA Champions League Theme */
+.glass-ucl {
+  background: linear-gradient(135deg, rgba(0, 47, 108, 0.3), rgba(88, 24, 139, 0.3));
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  box-shadow: 0 8px 32px rgba(88, 24, 139, 0.2);
+}
+
+.glass-ucl-dark {
+  background: linear-gradient(135deg, rgba(0, 47, 108, 0.4), rgba(88, 24, 139, 0.4));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(88, 24, 139, 0.3),
+    inset 0 1px 0 rgba(147, 51, 234, 0.2);
+}
+
+.glass-card-ucl {
+  background: linear-gradient(135deg, rgba(0, 47, 108, 0.2), rgba(88, 24, 139, 0.2));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(147, 51, 234, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(88, 24, 139, 0.3),
+    inset 0 1px 0 rgba(147, 51, 234, 0.15);
+}
+
+.glass-hover-ucl {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-hover-ucl:hover {
+  background: linear-gradient(135deg, rgba(0, 47, 108, 0.5), rgba(88, 24, 139, 0.5));
+  border-color: rgba(147, 51, 234, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(88, 24, 139, 0.4),
+    inset 0 1px 0 rgba(147, 51, 234, 0.25);
+}
+
+.bg-ucl-gradient {
+  background: linear-gradient(135deg, #002f6c 0%, #58188b 50%, #002f6c 100%);
+}
+
+.bg-ucl-gradient-dark {
+  background: linear-gradient(135deg, rgba(0, 47, 108, 0.95) 0%, rgba(88, 24, 139, 0.95) 50%, rgba(0, 47, 108, 0.95) 100%);
+}
+
+.text-ucl-blue {
+  color: #3b82f6;
+}
+
+.text-ucl-purple {
+  color: #a855f7;
+}
+
+/* Premier League Theme - Green Gradient */
+.glass-pl {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.3), rgba(5, 150, 105, 0.3));
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  box-shadow: 0 8px 32px rgba(22, 163, 74, 0.2);
+}
+
+.glass-pl-dark {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.4), rgba(5, 150, 105, 0.4));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(22, 163, 74, 0.3),
+    inset 0 1px 0 rgba(34, 197, 94, 0.2);
+}
+
+.glass-card-pl {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.2), rgba(5, 150, 105, 0.2));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(22, 163, 74, 0.3),
+    inset 0 1px 0 rgba(34, 197, 94, 0.15);
+}
+
+.glass-hover-pl {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-hover-pl:hover {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.5), rgba(5, 150, 105, 0.5));
+  border-color: rgba(34, 197, 94, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(22, 163, 74, 0.4),
+    inset 0 1px 0 rgba(34, 197, 94, 0.25);
+}
+
+.bg-pl-gradient {
+  background: linear-gradient(135deg, #16a34a 0%, #059669 50%, #10b981 100%);
+}
+
+.text-pl-green {
+  color: #22c55e;
+}
+
+/* PSL (Pakistan Super League) Theme - Green & Gold */
+.glass-psl {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.3), rgba(234, 179, 8, 0.3));
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  box-shadow: 0 8px 32px rgba(234, 179, 8, 0.2);
+}
+
+.glass-psl-dark {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.4), rgba(234, 179, 8, 0.4));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(234, 179, 8, 0.3),
+    inset 0 1px 0 rgba(234, 179, 8, 0.2);
+}
+
+.glass-card-psl {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.2), rgba(234, 179, 8, 0.2));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(234, 179, 8, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(234, 179, 8, 0.3),
+    inset 0 1px 0 rgba(234, 179, 8, 0.15);
+}
+
+.glass-hover-psl {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-hover-psl:hover {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.5), rgba(234, 179, 8, 0.5));
+  border-color: rgba(234, 179, 8, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(234, 179, 8, 0.4),
+    inset 0 1px 0 rgba(234, 179, 8, 0.25);
+}
+
+.bg-psl-gradient {
+  background: linear-gradient(135deg, #16a34a 0%, #eab308 50%, #16a34a 100%);
+}
+
+.text-psl-gold {
+  color: #eab308;
+}
+
+.text-psl-green {
+  color: #22c55e;
+}
