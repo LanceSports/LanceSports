@@ -26,7 +26,7 @@ function convertBigInts(obj) {
 
 router.get("/", async (req, res) => {
   const season = new Date().getFullYear(); // current year
-  const RATE_LIMIT_DELAY = 200; // 5 calls/s (≈300 rpm)
+  const RATE_LIMIT_DELAY = 400; // 5 calls/s (≈300 rpm)
 
   const results = [];
 

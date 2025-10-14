@@ -35,7 +35,7 @@ router.get("/", async (req, res) => {
     }
 
     const detailedFixtures = [];
-    const RATE_LIMIT_DELAY = 200; // 5 calls per sec → ~300 rpm (safe under 450 rpm)
+    const RATE_LIMIT_DELAY = 400; // 5 calls per sec → ~300 rpm (safe under 450 rpm)
 
     for (const fixture of apiFixtures) {
       if (!fixture.fixture) continue;
