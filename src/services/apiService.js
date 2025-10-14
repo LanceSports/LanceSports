@@ -64,6 +64,18 @@ export async function fetchFixtureDetails(fixtureId) {
 }
 
 
+export async function fetchFixturesByLeague(leagueId, season) {
+  try {
+    const res = await axios.get(`${API_BASE}/fixtures`, {
+      params: { league: leagueId, season },
+      headers: { "x-apisports-key": API_KEY },
+    });
+    return res.data.response;
+  } catch (err) {
+    console.error(`Error fetching fixtures for league ${leagueId}:`, err.message);
+    throw err;
+  }
+}
 
 
 
