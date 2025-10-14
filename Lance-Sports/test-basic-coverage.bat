@@ -1,5 +1,5 @@
 @echo off
-echo 🚀 Testing coverage setup on Windows...
+echo 🚀 Testing basic coverage on Windows...
 
 echo 📦 Installing dependencies...
 call npm install
@@ -7,10 +7,10 @@ call npm install
 echo 🔧 Installing coverage provider...
 call npm install --save-dev @vitest/coverage-v8
 
-echo 🧪 Running simple tests with coverage...
-call npm run test:simple
+echo 🧪 Running basic tests with coverage...
+call npm run test:basic
 
-echo 📁 Checking coverage files immediately...
+echo 📁 Checking coverage files...
 if exist "coverage" (
     echo ✅ Coverage directory found!
     dir coverage
@@ -29,11 +29,12 @@ if exist "coverage" (
     if not exist "coverage-backup" mkdir coverage-backup
     xcopy coverage\* coverage-backup\ /E /I /Y
     
-    echo ⏳ Waiting 10 seconds to see if files persist...
-    timeout /t 10 /nobreak >nul
+    echo ⏳ Waiting 15 seconds to see if files persist...
+    timeout /t 15 /nobreak >nul
     
     if exist "coverage\lcov.info" (
-        echo ✅ lcov.info still exists after 10 seconds!
+        echo ✅ lcov.info still exists after 15 seconds!
+        echo 📊 Coverage files are persisting correctly!
     ) else (
         echo ❌ lcov.info was deleted! Restoring from backup...
         if exist "coverage-backup\lcov.info" (
@@ -45,7 +46,5 @@ if exist "coverage" (
     echo ❌ Coverage directory not found!
 )
 
-echo 🏁 Test complete!
+echo 🏁 Basic coverage test complete!
 pause
-
-
