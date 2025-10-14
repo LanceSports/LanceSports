@@ -8,6 +8,6 @@ const app = express();
 
 app.use(express.json());
 app.use("/fixtures", fixturesRoutes);
-app.use("/fixtures/leagues", leagueFixturesRoutes);
+app.use("/leagueFixtures", leagueFixturesRoutes);
 
 export default app;
