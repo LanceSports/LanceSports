@@ -1,6 +1,8 @@
 // src/server.js
 import express from "express";
 import fixturesRouter from "./routes/fixturesRoutes.js";
+import leagueFixturesRouter from "./routes/leagueFixturesRoutes.js";
+
 import cors from "cors";
 
 
@@ -10,6 +12,7 @@ app.use(cors()); // allows all origins by default
 
 
 app.use("/fixtures", fixturesRouter);
+app.use("/leagueFixtures", leagueFixturesRouter);
 
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000");
