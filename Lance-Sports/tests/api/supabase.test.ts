@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { supabase } from '../../src/components/lib/supabase';
 
 // Mock Supabase client
 const mockSupabaseClient = {
@@ -29,6 +28,9 @@ vi.mock('import.meta.env', () => ({
   VITE_SUPABASE_URL: 'https://test-project.supabase.co',
   VITE_SUPABASE_ANON_KEY: 'test-anon-key'
 }));
+
+// Import supabase after mocking
+import { supabase } from '../../src/components/lib/supabase';
 
 describe('Supabase Integration Tests', () => {
   beforeEach(() => {

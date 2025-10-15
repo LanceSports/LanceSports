@@ -81,11 +81,22 @@ const LiveUpcomingPastMatches: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-950 to-gray-900 flex items-center justify-center">
-        <div className="glass-card-dark p-8 rounded-xl glass-glow glass-shimmer">
-          <div className="flex items-center space-x-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-400"></div>
-            <span className="text-gray-100">Loading matches...</span>
+        <div className="relative inline-block flex items-center justify-center">
+ 
+          <div className="absolute -top-8 left-[100%] transform -translate-x-1/2" style={{ marginLeft: '700px', marginTop:'500px' }}>
+            <span className="text-gray-100 text-lg font-medium glass-card-dark px-4 py-2 rounded-lg animate-pulse whitespace-nowrap l-3">
+              Loading matches...
+            </span>
+            
           </div>
+          <img 
+            src='/images/img2.png' 
+            alt="Loading"
+            className="h-6 w-6 rounded"
+            style={{
+              animation: 'opacityEase 4s ease-in-out infinite'
+            }}
+          />
         </div>
       </div>
     );

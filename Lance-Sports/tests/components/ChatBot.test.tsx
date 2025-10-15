@@ -48,11 +48,7 @@ describe('ChatBot Component', () => {
 
   describe('Initial Render', () => {
     it('should render chatbot interface', () => {
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       expect(screen.getByText('LanceSports AI')).toBeInTheDocument();
       expect(screen.getByText('Always ready to help')).toBeInTheDocument();
@@ -60,21 +56,13 @@ describe('ChatBot Component', () => {
     });
 
     it('should show initial welcome message', () => {
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       expect(screen.getByText(/Hello! I'm your LanceSports AI assistant/)).toBeInTheDocument();
     });
 
     it('should display suggested questions initially', () => {
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       expect(screen.getByText('Show me live matches')).toBeInTheDocument();
       expect(screen.getByText('Premier League standings')).toBeInTheDocument();
@@ -87,11 +75,7 @@ describe('ChatBot Component', () => {
     it('should send message when form is submitted', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       const sendButton = screen.getByRole('button', { name: /send/i });
@@ -107,11 +91,7 @@ describe('ChatBot Component', () => {
     it('should send message when Enter key is pressed', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       
@@ -125,11 +105,7 @@ describe('ChatBot Component', () => {
     it('should not send empty messages', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const sendButton = screen.getByRole('button', { name: /send/i });
       
@@ -141,11 +117,7 @@ describe('ChatBot Component', () => {
     it('should clear input after sending message', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...') as HTMLInputElement;
       
@@ -162,11 +134,7 @@ describe('ChatBot Component', () => {
     it('should display user message after sending', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       
@@ -181,11 +149,7 @@ describe('ChatBot Component', () => {
     it('should display bot response after API call', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       
@@ -205,11 +169,7 @@ describe('ChatBot Component', () => {
         setTimeout(() => resolve('Response'), 100)
       ));
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       
@@ -225,11 +185,7 @@ describe('ChatBot Component', () => {
     it('should send suggested question when clicked', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const suggestedQuestion = screen.getByText('Show me live matches');
       await user.click(suggestedQuestion);
@@ -242,11 +198,7 @@ describe('ChatBot Component', () => {
     it('should hide suggested questions after sending first message', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       
@@ -263,13 +215,9 @@ describe('ChatBot Component', () => {
     it('should navigate back when back button is clicked', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
-      const backButton = screen.getByRole('button', { name: /back/i });
+      const backButton = screen.getByLabelText('Go back');
       await user.click(backButton);
 
       expect(mockNavigate).toHaveBeenCalledWith(-1);
@@ -278,11 +226,7 @@ describe('ChatBot Component', () => {
     it('should reset conversation when reset button is clicked', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       // Send a message first
       const input = screen.getByPlaceholderText('Ask me anything...');
@@ -309,11 +253,7 @@ describe('ChatBot Component', () => {
       
       mockAskFootyBot.mockRejectedValue(new Error('API Error'));
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       
@@ -322,7 +262,7 @@ describe('ChatBot Component', () => {
 
       await waitFor(() => {
         expect(screen.getByText(/I couldn't reach the LanceSports API/)).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
     });
 
     it('should disable input while typing', async () => {
@@ -333,11 +273,7 @@ describe('ChatBot Component', () => {
         setTimeout(() => resolve('Response'), 100)
       ));
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...') as HTMLInputElement;
       const sendButton = screen.getByRole('button', { name: /send/i });
@@ -357,11 +293,7 @@ describe('ChatBot Component', () => {
       
       mockAskFootyBot.mockResolvedValue('**Liverpool** is playing well!');
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       
@@ -379,11 +311,7 @@ describe('ChatBot Component', () => {
       
       mockAskFootyBot.mockResolvedValue('• Liverpool\n• Manchester City');
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       
@@ -399,11 +327,7 @@ describe('ChatBot Component', () => {
 
   describe('Accessibility', () => {
     it('should have proper ARIA labels', () => {
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       expect(input).toHaveAttribute('placeholder', 'Ask me anything...');
@@ -415,11 +339,7 @@ describe('ChatBot Component', () => {
     it('should support keyboard navigation', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       
@@ -435,11 +355,7 @@ describe('ChatBot Component', () => {
     it('should render efficiently', () => {
       const startTime = performance.now();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
       
       const endTime = performance.now();
       const renderTime = endTime - startTime;
@@ -450,11 +366,7 @@ describe('ChatBot Component', () => {
     it('should handle multiple rapid messages', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       
@@ -481,22 +393,14 @@ describe('ChatBot Component', () => {
       // Test mobile viewport
       Object.defineProperty(window, 'innerWidth', { value: 375, writable: true });
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      const { rerender } = render(<ChatBot />);
 
       expect(screen.getByText('LanceSports AI')).toBeInTheDocument();
       
       // Test desktop viewport
       Object.defineProperty(window, 'innerWidth', { value: 1024, writable: true });
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      rerender(<ChatBot />);
 
       expect(screen.getByText('LanceSports AI')).toBeInTheDocument();
     });

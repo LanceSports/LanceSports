@@ -108,11 +108,7 @@ describe('User Flow Integration Tests', () => {
 
   describe('Anonymous User Flow', () => {
     it('should allow anonymous user to browse the application', async () => {
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Should see home page content
       expect(screen.getByText('The Future of Sports, all in one place.')).toBeInTheDocument();
@@ -127,11 +123,7 @@ describe('User Flow Integration Tests', () => {
     it('should navigate to sign in page when login is clicked', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       const loginButton = screen.getByText('Login');
       await user.click(loginButton);
@@ -142,11 +134,7 @@ describe('User Flow Integration Tests', () => {
     it('should navigate to different league pages', async () => {
       // This would require URL navigation simulation
       // For now, we'll test the component rendering
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByTestId('navbar')).toBeInTheDocument();
     });
@@ -156,11 +144,7 @@ describe('User Flow Integration Tests', () => {
     it('should complete sign in flow successfully', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Navigate to sign in
       const loginButton = screen.getByText('Login');
@@ -175,11 +159,7 @@ describe('User Flow Integration Tests', () => {
         writable: true
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Click sign in button
       const signInButton = screen.getByText('Sign In');
@@ -205,11 +185,7 @@ describe('User Flow Integration Tests', () => {
 
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Should see welcome message
       expect(screen.getByText('Welcome, Test User')).toBeInTheDocument();
@@ -229,11 +205,7 @@ describe('User Flow Integration Tests', () => {
     it('should navigate between different sections', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Start on home page
       expect(screen.getByText('The Future of Sports, all in one place.')).toBeInTheDocument();
@@ -247,11 +219,7 @@ describe('User Flow Integration Tests', () => {
     it('should handle back navigation', async () => {
       // This would require more complex routing simulation
       // For now, we'll test that navigation functions are called
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByTestId('navbar')).toBeInTheDocument();
     });
@@ -259,11 +227,7 @@ describe('User Flow Integration Tests', () => {
 
   describe('Content Access Flow', () => {
     it('should allow access to sports content without authentication', () => {
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Should see sports content
       expect(screen.getByTestId('sports-slideshow')).toBeInTheDocument();
@@ -283,11 +247,7 @@ describe('User Flow Integration Tests', () => {
         })
       }));
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Should see personalized welcome message
       expect(screen.getByText('Welcome back, John Doe!')).toBeInTheDocument();
@@ -304,11 +264,7 @@ describe('User Flow Integration Tests', () => {
         throw new Error('Navigation error');
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Should not crash when navigation fails
       expect(() => {
@@ -322,11 +278,7 @@ describe('User Flow Integration Tests', () => {
       // Mock sign in error
       mockSignIn.mockRejectedValue(new Error('Authentication failed'));
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Navigate to sign in
       const loginButton = screen.getByText('Login');
@@ -372,11 +324,7 @@ describe('User Flow Integration Tests', () => {
         })
       }));
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Should see user as signed in
       expect(screen.getByText('Welcome back, Test User!')).toBeInTheDocument();
@@ -417,11 +365,7 @@ describe('User Flow Integration Tests', () => {
         })
       }));
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Should see user as not signed in
       expect(screen.getByText('Login')).toBeInTheDocument();
@@ -433,11 +377,7 @@ describe('User Flow Integration Tests', () => {
     it('should handle rapid navigation efficiently', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       const startTime = performance.now();
 
@@ -458,11 +398,7 @@ describe('User Flow Integration Tests', () => {
     it('should handle concurrent user actions', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       const startTime = performance.now();
 
@@ -484,11 +420,7 @@ describe('User Flow Integration Tests', () => {
     it('should support keyboard navigation', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Tab through interactive elements
       await user.tab();
@@ -504,11 +436,7 @@ describe('User Flow Integration Tests', () => {
     it('should have proper focus management', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Should be able to navigate with keyboard
       await user.tab();
@@ -522,11 +450,7 @@ describe('User Flow Integration Tests', () => {
       Object.defineProperty(window, 'innerWidth', { value: 375 });
       Object.defineProperty(window, 'innerHeight', { value: 667 });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Should render without errors
       expect(screen.getByText('The Future of Sports, all in one place.')).toBeInTheDocument();
@@ -538,11 +462,7 @@ describe('User Flow Integration Tests', () => {
       Object.defineProperty(window, 'innerWidth', { value: 1920 });
       Object.defineProperty(window, 'innerHeight', { value: 1080 });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Should render without errors
       expect(screen.getByText('The Future of Sports, all in one place.')).toBeInTheDocument();

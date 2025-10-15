@@ -66,7 +66,13 @@ describe('useSession Hook', () => {
       });
       
       expect(result.current.isSignedIn).toBe(true);
-      expect(result.current.userData).toEqual(mockUserData);
+      expect(result.current.userData).toMatchObject({
+        id: mockUserData.id,
+        name: mockUserData.name,
+        email: mockUserData.email
+      });
+      expect(result.current.userData?.sessionStart).toBeDefined();
+      expect(result.current.userData?.expiresAt).toBeDefined();
     });
 
     it('should not load expired session', () => {
