@@ -84,18 +84,22 @@ const MatchCard: React.FC<MatchCardProps> = ({
         </div>
      
         {/* Top Section - League Info */}
-        <div className="flex items-center justify-center gap-3 mb-4">
+        <div className="flex items-center justify-center gap-3 mb-4 ">
           <img
             src={league.logo} 
             alt={league.name}
-            className="h-8 w-8 object-contain rounded-md"
+            style={{
+                width:"75px",
+                height:"75px"
+            }}
+            className="h-12 w-12 object-contain rounded-md"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
             }}
           />
           <div className="text-center">
-            <div className="text-sm font-medium text-gray-200">
+            <div className="text-sm font-medium text-gray-200 truncate max-w-[20px]">
               {league.name}
             </div>
             <div className="text-xs text-gray-400">
