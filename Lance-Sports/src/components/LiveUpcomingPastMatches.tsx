@@ -50,7 +50,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
 
   useEffect(() => {
     const load = async () => {
-      setLoading(false); // make it true when you want to actually fetch from api and not use mock
+      setLoading(true); // make it true when you want to actually fetch from api and not use mock
       try {
         console.log("in try catch");
         // Use local date to avoid timezone off-by-one issues
@@ -98,19 +98,19 @@ const LiveUpcomingPastMatches: React.FC = () => {
           }
         ];
         //uncommnet below when api is live
-        //const {data} = await fetchWithCacheJSON<Fixture[]>(url, 5 * 60 * 1000);
+        const {data} = await fetchWithCacheJSON<Fixture[]>(url, 5 * 60 * 1000);
 
 // response is the array of fixtures
 // For now, use mock data instead of API call
 
-        setFixtures(mockFixtures || []);/* coment out below when api is live */
+        //setFixtures(mockFixtures || []);/* coment out below when api is live */
 
         // Log size in KB
         //uncoment for when API is live {
-      //  console.log(data)
-       // const jsonSize = new Blob([JSON.stringify(data)]).size / 1024;
-       // console.log(`API response size: ${jsonSize.toFixed(2)} KB`);
-        //setFixtures(data.fixtures || []);
+        console.log(data)
+        const jsonSize = new Blob([JSON.stringify(data)]).size / 1024;
+        console.log(`API response size: ${jsonSize.toFixed(2)} KB`);
+        setFixtures(data.fixtures || []);
         // }
       } catch (err) {
         console.error('Error fetching fixtures:', err);
@@ -333,7 +333,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
         <h2 className="text-xl text-red-100 mb-4 text-center">🔴 Live Matches</h2>
         <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track">
           {liveMatches.length > 0 ? (
-            liveMatches.map((match) => <MatchCard key={match.fixture.id} match={match} />)
+            liveMatches.slice(0, 30).map((match) => <MatchCard key={match.fixture.id} match={match} />)
           ) : (
             <div className="w-full text-center text-gray-400 py-8">
               <div className="glass-dark rounded-lg p-4">
@@ -352,7 +352,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
           <h2 className="text-xl text-gray-100 mb-4 text-center">⏰ Upcoming Matches</h2>
           <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track-transparent">
             {upcomingMatches.length > 0 ? (
-              upcomingMatches.map((match) => (
+              upcomingMatches.slice(0,30).map((match) => (
                 <MatchCard key={match.fixture.id} match={match} vertical />
               ))
             ) : (
@@ -371,7 +371,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
           <h2 className="text-xl text-gray-100 mb-4 text-center">📊 Past Matches</h2>
           <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track-transparent">
             {pastMatches.length > 0 ? (
-              pastMatches.map((match) => (
+              pastMatches.slice(0,30).map((match) => (
                 <MatchCard key={match.fixture.id} match={match} vertical />
               ))
             ) : (
