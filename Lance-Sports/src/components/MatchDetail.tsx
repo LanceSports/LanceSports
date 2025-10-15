@@ -44,6 +44,7 @@ export function MatchDetail() {
       const base = fromMatchToDetails(match);
 
       // 2) If match lacks details, synthesize non-blocking mock data
+      // still mock timeline stats
       const needMockEvents = (base.events?.length ?? 0) === 0;
       const needMockStats = (base.stats?.length ?? 0) === 0;
       const needMockPlayers = (base.players?.length ?? 0) === 0;
