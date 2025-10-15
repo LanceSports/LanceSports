@@ -32,16 +32,10 @@ npm install --save-dev @vitest/coverage-v8
 
 ### 3. Update Your README.md
 
-Add the Codecov badge to your README.md file. Replace `YOUR_USERNAME` and `YOUR_REPO_NAME` with your actual GitHub username and repository name:
+Add the Codecov badge to your README.md file. Since your repository is at `https://github.com/LanceSports/LanceSports/`, use this exact badge:
 
 ```markdown
-[![codecov](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO_NAME/branch/main/graph/badge.svg)](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO_NAME)
-```
-
-For example, if your repository is at `https://github.com/johnsmith/LanceSports`, use:
-
-```markdown
-[![codecov](https://codecov.io/gh/johnsmith/LanceSports/branch/main/graph/badge.svg)](https://codecov.io/gh/johnsmith/LanceSports)
+[![codecov](https://codecov.io/gh/LanceSports/LanceSports/branch/main/graph/badge.svg)](https://codecov.io/gh/LanceSports/LanceSports/)
 ```
 
 ### 4. Test the Setup

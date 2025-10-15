@@ -105,11 +105,7 @@ describe('App Component', () => {
 
   describe('Routing', () => {
     it('should render home page by default', () => {
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByText('The Future of Sports, all in one place.')).toBeInTheDocument();
       expect(screen.getByTestId('sports-slideshow')).toBeInTheDocument();
@@ -123,11 +119,7 @@ describe('App Component', () => {
         writable: true
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByTestId('signin-page')).toBeInTheDocument();
     });
@@ -138,11 +130,7 @@ describe('App Component', () => {
         writable: true
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByTestId('match-detail')).toBeInTheDocument();
     });
@@ -153,11 +141,7 @@ describe('App Component', () => {
         writable: true
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByTestId('live-upcoming-past-matches')).toBeInTheDocument();
     });
@@ -168,11 +152,7 @@ describe('App Component', () => {
         writable: true
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByTestId('champions-league')).toBeInTheDocument();
     });
@@ -183,11 +163,7 @@ describe('App Component', () => {
         writable: true
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByTestId('premier-league')).toBeInTheDocument();
     });
@@ -198,11 +174,7 @@ describe('App Component', () => {
         writable: true
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByTestId('chatbot')).toBeInTheDocument();
     });
@@ -217,11 +189,7 @@ describe('App Component', () => {
         signOut: vi.fn()
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByText(/Welcome back, John Doe!/)).toBeInTheDocument();
     });
@@ -234,11 +202,7 @@ describe('App Component', () => {
         signOut: vi.fn()
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.queryByText(/Welcome back/)).not.toBeInTheDocument();
     });
@@ -251,11 +215,7 @@ describe('App Component', () => {
         signOut: vi.fn()
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByText(/Welcome back, johndoe!/)).toBeInTheDocument();
     });
@@ -268,11 +228,7 @@ describe('App Component', () => {
         signOut: vi.fn()
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByText(/Welcome back, User!/)).toBeInTheDocument();
     });
@@ -282,11 +238,7 @@ describe('App Component', () => {
     it('should navigate to sign in page when login is clicked', async () => {
       const user = userEvent.setup();
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       const loginButton = screen.getByText('Login');
       await user.click(loginButton);
@@ -310,11 +262,7 @@ describe('App Component', () => {
 
       const user = userEvent.setup();
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       const signInButton = screen.getByText('Sign In');
       await user.click(signInButton);
@@ -336,11 +284,7 @@ describe('App Component', () => {
 
       const user = userEvent.setup();
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       const logoutButton = screen.getByText('Logout');
       await user.click(logoutButton);
@@ -352,21 +296,13 @@ describe('App Component', () => {
 
   describe('Theme and Styling', () => {
     it('should apply dark mode class to document', () => {
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(document.documentElement.classList.contains('dark')).toBe(true);
     });
 
     it('should render with correct background gradient classes', () => {
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       const mainElement = screen.getByText('The Future of Sports, all in one place.').closest('div');
       expect(mainElement).toHaveClass('min-h-screen', 'bg-gradient-to-br');
@@ -375,11 +311,7 @@ describe('App Component', () => {
 
   describe('Component Integration', () => {
     it('should render all main components on home page', () => {
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByTestId('navbar')).toBeInTheDocument();
       expect(screen.getByTestId('sports-slideshow')).toBeInTheDocument();
@@ -393,11 +325,7 @@ describe('App Component', () => {
         writable: true
       });
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       expect(screen.getByTestId('navbar')).toBeInTheDocument();
       expect(screen.getByTestId('premier-league')).toBeInTheDocument();
@@ -412,11 +340,7 @@ describe('App Component', () => {
 
       const user = userEvent.setup();
 
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       // Should not crash when navigation fails
       expect(() => {
@@ -427,22 +351,14 @@ describe('App Component', () => {
 
   describe('Accessibility', () => {
     it('should have proper heading structure', () => {
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       const mainHeading = screen.getByRole('heading', { level: 1 });
       expect(mainHeading).toHaveTextContent('The Future of Sports, all in one place.');
     });
 
     it('should have accessible navigation', () => {
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
 
       const navbar = screen.getByTestId('navbar');
       expect(navbar).toBeInTheDocument();
@@ -456,11 +372,7 @@ describe('App Component', () => {
     it('should render efficiently', () => {
       const startTime = performance.now();
       
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
       
       const endTime = performance.now();
       const renderTime = endTime - startTime;

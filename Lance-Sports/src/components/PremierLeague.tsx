@@ -3,53 +3,37 @@ import { useNavigate } from 'react-router-dom';
 import { Trophy, Calendar, MapPin } from 'lucide-react';
 import { ChatbotButton } from './ChatbotButton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { fetchLeagueFixtures, ApiFixture } from './lib/footyApi';
 
-interface Match {
-  fixture: {
-    id: number;
-    date: string;
-    venue: {
-      name: string;
-      city: string;
-    };
-    status: {
-      short: string;
-      elapsed: number | null;
-    };
-  };
-  league: {
-    name: string;
-    country: string;
-    logo: string;
-    round: string;
-  };
-  teams: {
-    home: {
-      id: number;
-      name: string;
-      logo: string;
-    };
-    away: {
-      id: number;
-      name: string;
-      logo: string;
-    };
-  };
-  goals: {
-    home: number | null;
-    away: number | null;
-  };
-  score: {
-    halftime: {
-      home: number | null;
-      away: number | null;
-    };
-    fulltime: {
-      home: number | null;
-      away: number | null;
-    };
-  };
+// Loading timer component
+function LoadingTimer({ startTime }: { startTime: number | null }) {
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!startTime) return;
+
+    const interval = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  if (!startTime) return null;
+
+  const minutes = Math.floor(elapsed / 60);
+  const seconds = elapsed % 60;
+
+  return (
+    <div className="mt-2 text-center">
+      <span className="text-green-400 text-sm">
+        ⏱️ Loading time: {minutes}:{seconds.toString().padStart(2, '0')}
+      </span>
+    </div>
+  );
 }
+
+type Match = ApiFixture;
 
 interface StandingsTeam {
   position: number;
@@ -72,111 +56,73 @@ export function PremierLeague() {
   const navigate = useNavigate();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [loadingStartTime, setLoadingStartTime] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'matches' | 'standings'>('matches');
   const [matchTab, setMatchTab] = useState<'live' | 'upcoming' | 'past'>('upcoming');
 
   useEffect(() => {
-    const loadMatches = () => {
+    const loadMatches = async () => {
+      console.log('🔄 Starting to load matches...');
       setLoading(true);
+      setError(null);
+      setDataLoaded(false);
+      setLoadingStartTime(Date.now());
       
-      // Mock Premier League matches data
-      const mockMatches: Match[] = [
-        {
-          fixture: {
-            id: 3001,
-            date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Anfield', city: 'Liverpool' },
-            status: { short: 'NS', elapsed: null }
-          },
-          league: { name: 'Premier League', country: 'England', logo: '', round: 'Regular Season - 28' },
-          teams: {
-            home: { id: 40, name: 'Liverpool', logo: 'https://media.api-sports.io/football/teams/40.png' },
-            away: { id: 157, name: 'Manchester City', logo: 'https://media.api-sports.io/football/teams/157.png' }
-          },
-          goals: { home: null, away: null },
-          score: { halftime: { home: null, away: null }, fulltime: { home: null, away: null } }
-        },
-        {
-          fixture: {
-            id: 3002,
-            date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Old Trafford', city: 'Manchester' },
-            status: { short: 'NS', elapsed: null }
-          },
-          league: { name: 'Premier League', country: 'England', logo: '', round: 'Regular Season - 28' },
-          teams: {
-            home: { id: 33, name: 'Manchester United', logo: 'https://media.api-sports.io/football/teams/33.png' },
-            away: { id: 42, name: 'Arsenal', logo: 'https://media.api-sports.io/football/teams/42.png' }
-          },
-          goals: { home: null, away: null },
-          score: { halftime: { home: null, away: null }, fulltime: { home: null, away: null } }
-        },
-        {
-          fixture: {
-            id: 3003,
-            date: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Stamford Bridge', city: 'London' },
-            status: { short: 'NS', elapsed: null }
-          },
-          league: { name: 'Premier League', country: 'England', logo: '', round: 'Regular Season - 28' },
-          teams: {
-            home: { id: 50, name: 'Chelsea', logo: 'https://media.api-sports.io/football/teams/50.png' },
-            away: { id: 47, name: 'Tottenham', logo: 'https://media.api-sports.io/football/teams/47.png' }
-          },
-          goals: { home: null, away: null },
-          score: { halftime: { home: null, away: null }, fulltime: { home: null, away: null } }
-        },
-        {
-          fixture: {
-            id: 3004,
-            date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'St. James Park', city: 'Newcastle' },
-            status: { short: 'FT', elapsed: null }
-          },
-          league: { name: 'Premier League', country: 'England', logo: '', round: 'Regular Season - 27' },
-          teams: {
-            home: { id: 34, name: 'Newcastle', logo: 'https://media.api-sports.io/football/teams/34.png' },
-            away: { id: 35, name: 'Bournemouth', logo: 'https://media.api-sports.io/football/teams/35.png' }
-          },
-          goals: { home: 2, away: 1 },
-          score: { halftime: { home: 1, away: 0 }, fulltime: { home: 2, away: 1 } }
-        },
-        {
-          fixture: {
-            id: 3005,
-            date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Etihad Stadium', city: 'Manchester' },
-            status: { short: 'FT', elapsed: null }
-          },
-          league: { name: 'Premier League', country: 'England', logo: '', round: 'Regular Season - 27' },
-          teams: {
-            home: { id: 157, name: 'Manchester City', logo: 'https://media.api-sports.io/football/teams/157.png' },
-            away: { id: 45, name: 'Everton', logo: 'https://media.api-sports.io/football/teams/45.png' }
-          },
-          goals: { home: 3, away: 0 },
-          score: { halftime: { home: 2, away: 0 }, fulltime: { home: 3, away: 0 } }
-        },
-        {
-          fixture: {
-            id: 3006,
-            date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Emirates Stadium', city: 'London' },
-            status: { short: 'FT', elapsed: null }
-          },
-          league: { name: 'Premier League', country: 'England', logo: '', round: 'Regular Season - 27' },
-          teams: {
-            home: { id: 42, name: 'Arsenal', logo: 'https://media.api-sports.io/football/teams/42.png' },
-            away: { id: 55, name: 'Brentford', logo: 'https://media.api-sports.io/football/teams/55.png' }
-          },
-          goals: { home: 2, away: 2 },
-          score: { halftime: { home: 1, away: 1 }, fulltime: { home: 2, away: 2 } }
+      try {
+        console.log('📡 Fetching from API...');
+        const response = await fetchLeagueFixtures();
+        console.log('✅ API Response received:', response);
+        
+        // Find Premier League fixtures
+        const premierLeagueData = response.results.find(league => 
+          league.league === 'EPL' || 
+          league.league === 'Premier League' ||
+          league.league.toLowerCase().includes('premier')
+        );
+        
+        if (premierLeagueData) {
+          console.log('⚽ Premier League data found:', premierLeagueData.league, 'with', premierLeagueData.fixtures.length, 'fixtures');
+          setMatches(premierLeagueData.fixtures);
+          setDataLoaded(true);
+          
+          // Check if Premier League has no fixtures
+          if (premierLeagueData.fixtures.length === 0) {
+            console.log('⚠️ Premier League found but has no fixtures');
+            setError('Premier League data is currently unavailable - no fixtures found');
+          }
+        } else {
+          // Fallback: look for any English league
+          const englishLeagueData = response.results.find(league => 
+            league.league.toLowerCase().includes('england') ||
+            league.league.toLowerCase().includes('championship')
+          );
+          
+          if (englishLeagueData) {
+            console.log('🏴󠁧󠁢󠁥󠁮󠁧󠁿 English league data found:', englishLeagueData.league, 'with', englishLeagueData.fixtures.length, 'fixtures');
+            setMatches(englishLeagueData.fixtures);
+            setDataLoaded(true);
+            
+            // Check if English league has no fixtures
+            if (englishLeagueData.fixtures.length === 0) {
+              console.log('⚠️ English league found but has no fixtures');
+              setError('English league data is currently unavailable - no fixtures found');
+            }
+          } else {
+            console.log('❌ No Premier League or English league found. Available leagues:', response.results.map(r => r.league));
+            setError('No Premier League fixtures found');
+            setDataLoaded(true);
+          }
         }
-      ];
-
-      setTimeout(() => {
-        setMatches(mockMatches);
+      } catch (err) {
+        console.error('❌ Failed to load matches:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load matches');
+        setDataLoaded(true);
+      } finally {
+        console.log('🏁 Loading completed');
         setLoading(false);
-      }, 500);
+      }
     };
 
     loadMatches();
@@ -184,6 +130,49 @@ export function PremierLeague() {
 
   const handleMatchClick = (match: Match) => {
     navigate('/match', { state: { match } });
+  };
+
+  const retryLoading = async () => {
+    setLoading(true);
+    setError(null);
+    setDataLoaded(false);
+    setLoadingStartTime(Date.now());
+    
+    try {
+      const response = await fetchLeagueFixtures();
+      
+      // Find Premier League fixtures
+      const premierLeagueData = response.results.find(league => 
+        league.league === 'EPL' || 
+        league.league === 'Premier League' ||
+        league.league.toLowerCase().includes('premier')
+      );
+      
+      if (premierLeagueData) {
+        setMatches(premierLeagueData.fixtures);
+        setDataLoaded(true);
+      } else {
+        // Fallback: look for any English league
+        const englishLeagueData = response.results.find(league => 
+          league.league.toLowerCase().includes('england') ||
+          league.league.toLowerCase().includes('championship')
+        );
+        
+        if (englishLeagueData) {
+          setMatches(englishLeagueData.fixtures);
+          setDataLoaded(true);
+        } else {
+          setError('No Premier League fixtures found');
+          setDataLoaded(true);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load matches:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load matches');
+      setDataLoaded(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filterMatches = (matches: Match[]) => {
@@ -211,7 +200,7 @@ export function PremierLeague() {
   // Mock Premier League standings data
   const standings: StandingsTeam[] = [
     { position: 1, team: { id: 40, name: 'Liverpool', logo: 'https://media.api-sports.io/football/teams/40.png' }, played: 27, won: 20, drawn: 5, lost: 2, goalsFor: 65, goalsAgainst: 22, goalDifference: 43, points: 65 },
-    { position: 2, team: { id: 157, name: 'Manchester City', logo: 'https://media.api-sports.io/football/teams/157.png' }, played: 27, won: 19, drawn: 4, lost: 4, goalsFor: 62, goalsAgainst: 28, goalDifference: 34, points: 61 },
+    { position: 2, team: { id: 157, name: 'Manchester City', logo: 'https://media.api-sports.io/football/teams/50.png' }, played: 27, won: 19, drawn: 4, lost: 4, goalsFor: 62, goalsAgainst: 28, goalDifference: 34, points: 61 },
     { position: 3, team: { id: 42, name: 'Arsenal', logo: 'https://media.api-sports.io/football/teams/42.png' }, played: 27, won: 18, drawn: 6, lost: 3, goalsFor: 58, goalsAgainst: 25, goalDifference: 33, points: 60 },
     { position: 4, team: { id: 47, name: 'Tottenham', logo: 'https://media.api-sports.io/football/teams/47.png' }, played: 27, won: 16, drawn: 5, lost: 6, goalsFor: 52, goalsAgainst: 35, goalDifference: 17, points: 53 },
     { position: 5, team: { id: 50, name: 'Chelsea', logo: 'https://media.api-sports.io/football/teams/50.png' }, played: 27, won: 14, drawn: 7, lost: 6, goalsFor: 48, goalsAgainst: 32, goalDifference: 16, points: 49 },
@@ -285,40 +274,131 @@ export function PremierLeague() {
                   {tab === 'live' && (
                     <span className="ml-2 inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                   )}
+                  {loading && (
+                    <span className="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                  )}
                 </button>
               ))}
             </div>
+            {loading && (
+              <div className="mt-2 text-center">
+                <span className="text-blue-400 text-sm animate-pulse">🔄 Loading matches...</span>
+              </div>
+            )}
           </div>
         )}
+
+        {/* Debug Info - Remove this in production */}
+        <div className="mb-4 p-4 bg-blue-900/20 rounded-lg border border-blue-500/30">
+          <h4 className="text-blue-300 font-semibold mb-2">Debug Info:</h4>
+          <div className="text-sm text-blue-200 space-y-1">
+            <div>Loading: {loading ? '✅ TRUE' : '❌ FALSE'}</div>
+            <div>Data Loaded: {dataLoaded ? '✅ TRUE' : '❌ FALSE'}</div>
+            <div>Error: {error ? `❌ ${error}` : '✅ NONE'}</div>
+            <div>Matches Count: {matches.length}</div>
+            <div>Filtered Matches Count: {filteredMatches.length}</div>
+            <div>Current Tab: {matchTab}</div>
+            <div>API Status: {error && error.includes('no fixtures found') ? '🟡 WORKING BUT NO DATA' : error ? '🔴 API ERROR' : '🟢 WORKING'}</div>
+          </div>
+        </div>
 
         {/* Content */}
         {activeTab === 'matches' ? (
           // Matches Grid
           loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="glass-card-pl p-6 rounded-xl animate-pulse">
-                  <div className="h-24 bg-white/10 rounded-lg mb-4"></div>
-                  <div className="h-4 bg-white/10 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-white/10 rounded w-1/2"></div>
+            <div className="text-center">
+              <div className="glass-card-pl p-8 rounded-xl mb-6">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-400 mx-auto mb-4"></div>
+                <h3 className="text-xl text-green-300 mb-2">Loading Matches...</h3>
+                <p className="text-gray-400 mb-4">Fetching latest fixtures from the API</p>
+                <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-500/30">
+                  <p className="text-blue-300 text-sm">
+                    ⏰ <strong>Note:</strong> This API can take up to 10 minutes to respond on the first request as the server wakes up from sleep mode.
+                  </p>
+                  <p className="text-blue-200 text-xs mt-2">
+                    Please be patient - subsequent requests will be much faster!
+                  </p>
                 </div>
-              ))}
+                <LoadingTimer startTime={loadingStartTime} />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="glass-card-pl p-6 rounded-xl animate-pulse">
+                    <div className="h-24 bg-white/10 rounded-lg mb-4"></div>
+                    <div className="h-4 bg-white/10 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-white/10 rounded w-1/2"></div>
+                  </div>
+                ))}
+              </div>
             </div>
-          ) : filteredMatches.length === 0 ? (
+          ) : error && dataLoaded ? (
             <div className="glass-card-pl p-12 rounded-xl text-center">
-              <Trophy className="mx-auto mb-4 text-gray-500" size={48} />
-              <h3 className="text-xl text-gray-300 mb-2">No matches found</h3>
-              <p className="text-gray-400">
-                {matchTab === 'live' && 'No live matches at the moment'}
-                {matchTab === 'upcoming' && 'No upcoming matches scheduled'}
-                {matchTab === 'past' && 'No past matches available'}
+              <Trophy className="mx-auto mb-4 text-red-500" size={48} />
+              <h3 className="text-xl text-red-300 mb-2">
+                {error.includes('no fixtures found') ? 'No Data Available' : 
+                 error.includes('too long to respond') ? 'API Taking Too Long' : 'Error Loading Matches'}
+              </h3>
+              <p className="text-gray-400 mb-4">{error}</p>
+              {error.includes('no fixtures found') ? (
+                <div className="bg-blue-900/20 p-4 rounded-lg mb-4">
+                  <p className="text-blue-300 text-sm">
+                    ℹ️ The API is working but currently has no fixture data. This might be because:
+                  </p>
+                  <ul className="text-blue-200 text-sm mt-2 text-left">
+                    <li>• Season hasn't started yet</li>
+                    <li>• Data is being updated</li>
+                    <li>• API is temporarily out of sync</li>
+                  </ul>
+                </div>
+              ) : error.includes('too long to respond') ? (
+                <div className="bg-orange-900/20 p-4 rounded-lg mb-4">
+                  <p className="text-orange-300 text-sm">
+                    ⏰ <strong>Server Sleep Mode:</strong> Your API server is waking up from sleep mode.
+                  </p>
+                  <ul className="text-orange-200 text-sm mt-2 text-left">
+                    <li>• First request after server sleep can take 5-10 minutes</li>
+                    <li>• Subsequent requests will be much faster</li>
+                    <li>• This is normal for free hosting services like Render.com</li>
+                    <li>• Consider upgrading to a paid plan for faster wake-up times</li>
+                  </ul>
+                </div>
+              ) : null}
+              <button
+                onClick={retryLoading}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : dataLoaded && filteredMatches.length === 0 ? (
+            <div className="glass-card-pl p-12 rounded-xl text-center">
+              <div className="animate-bounce mb-4">
+                <Trophy className="mx-auto text-gray-500" size={64} />
+              </div>
+              <h3 className="text-2xl text-gray-300 mb-4 font-semibold">No matches found</h3>
+              <div className="bg-gray-800/50 p-4 rounded-lg mb-4">
+                <p className="text-lg text-gray-400">
+                  {matchTab === 'live' && '🔴 No live matches at the moment'}
+                  {matchTab === 'upcoming' && '⏰ No upcoming matches scheduled'}
+                  {matchTab === 'past' && '📅 No past matches available'}
+                </p>
+              </div>
+              <p className="text-sm text-gray-500">
+                Total matches loaded: {matches.length} | Filter: {matchTab}
               </p>
             </div>
-          ) : (
+          ) : dataLoaded && filteredMatches.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredMatches.map((match) => (
                 <MatchCard key={match.fixture.id} match={match} onClick={() => handleMatchClick(match)} />
               ))}
+            </div>
+          ) : (
+            // Fallback case - should not happen but just in case
+            <div className="glass-card-pl p-12 rounded-xl text-center">
+              <Trophy className="mx-auto mb-4 text-gray-500" size={48} />
+              <h3 className="text-xl text-gray-300 mb-2">Loading...</h3>
+              <p className="text-gray-400">Please wait while we fetch the latest matches</p>
             </div>
           )
         ) : (

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import App from '../../src/components/App';
@@ -16,19 +17,19 @@ vi.mock('../../src/components/hooks/useSession', () => ({
 }));
 
 vi.mock('../../src/components/ChatbotButton', () => ({
-  ChatbotButton: () => <div>Chatbot</div>
+  ChatbotButton: () => React.createElement('div', null, 'Chatbot')
 }));
 
 vi.mock('../../src/components/SportsSlideshow', () => ({
-  SportsSlideshow: () => <div>Sports Slideshow</div>
+  SportsSlideshow: () => React.createElement('div', null, 'Sports Slideshow')
 }));
 
 vi.mock('../../src/components/FixturesSidebar', () => ({
-  FixturesSidebar: () => <div>Fixtures</div>
+  FixturesSidebar: () => React.createElement('div', null, 'Fixtures')
 }));
 
 vi.mock('../../src/components/Navbar', () => ({
-  Navbar: () => <nav>Navbar</nav>
+  Navbar: () => React.createElement('nav', null, 'Navbar')
 }));
 
 vi.mock('../../src/components/lib/footyApi', () => ({
@@ -56,11 +57,7 @@ describe('Performance Tests', () => {
     it('should render App component efficiently', () => {
       const startTime = performance.now();
       
-      render(
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      );
+      render(<App />);
       
       const endTime = performance.now();
       const renderTime = endTime - startTime;
@@ -71,11 +68,7 @@ describe('Performance Tests', () => {
     it('should render PremierLeague component efficiently', () => {
       const startTime = performance.now();
       
-      render(
-        <BrowserRouter>
-          <PremierLeague />
-        </BrowserRouter>
-      );
+      render(<PremierLeague />);
       
       const endTime = performance.now();
       const renderTime = endTime - startTime;
@@ -86,11 +79,7 @@ describe('Performance Tests', () => {
     it('should render ChatBot component efficiently', () => {
       const startTime = performance.now();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
       
       const endTime = performance.now();
       const renderTime = endTime - startTime;

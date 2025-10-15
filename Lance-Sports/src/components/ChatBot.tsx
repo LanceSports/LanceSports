@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Send, User, Bot, ArrowLeft, RotateCcw, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { askFootyBot } from "./lib/footyApi";
 
 interface ChatMessage {
   id: string;
@@ -9,25 +10,6 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-// Use Vite env if set; otherwise fall back to your Render URL.
-// IMPORTANT: no trailing slash.
-const API_BASE =
-  (import.meta as any)?.env?.VITE_API_BASE?.replace(/\/+$/, "") ||
-  "https://lancesports-3kmd.onrender.com";
-
-async function askFootyBot(message: string): Promise<string> {
-  const resp = await fetch(`${API_BASE}/api/football-chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message }),
-  });
-  if (!resp.ok) {
-    const text = await resp.text().catch(() => "");
-    throw new Error(`API ${resp.status} ${resp.statusText} — ${text}`.trim());
-  }
-  const data = await resp.json().catch(() => ({}));
-  return data?.reply ?? "Sorry, I couldn’t generate a reply.";
-}
 
 export function ChatBot() {
   const navigate = useNavigate();
@@ -155,6 +137,7 @@ export function ChatBot() {
           <div className="flex items-center space-x-2 sm:space-x-4">
             <button
               onClick={() => navigate(-1)}
+              aria-label="Go back"
               className="glass-dark glass-hover-dark p-2 rounded-lg border border-green-800/30 hover:border-green-600/50 transition-all"
             >
               <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
@@ -320,6 +303,7 @@ export function ChatBot() {
             <button
               onClick={handleSendMessage}
               disabled={!canSend}
+              aria-label="Send message"
               className="glass-green-dark p-2 sm:p-3 rounded-xl hover:bg-green-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 group flex-shrink-0"
             >
               <Send className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 group-hover:text-green-300 group-disabled:text-gray-500" />

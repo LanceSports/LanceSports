@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWithCacheJSON } from './lib/cache';
 import { Filter, X } from 'lucide-react';
+import MatchCard from './MatchCard';
 
 interface Fixture {
   fixture: {
@@ -49,43 +50,97 @@ const LiveUpcomingPastMatches: React.FC = () => {
 
   useEffect(() => {
     const load = async () => {
-      setLoading(true);
+      setLoading(true); // make it true when you want to actually fetch from api and not use mock
       try {
+        console.log("in try catch");
         // Use local date to avoid timezone off-by-one issues
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const currentDate = `${year}-${month}-${day}`;
-        const url = `https://lancesports-fixtures-api.onrender.com/fixtures?date=${currentDate}`;
+        const url = `https://lancesports-fixtures-api.onrender.com/leagueFixtures`;
+        
+        // Mock data for testing UI look when API is offline
+        const mockFixtures: Fixture[] = [
+          {
+            fixture: {
+              id: 1,
+              referee: "John Smith",
+              timezone: "UTC",
+              date: new Date().toISOString(),
+              timestamp: Math.floor(Date.now() / 1000),
+              periods: { first: 45, second: null },
+              venue: { id: 1, name: "Old Trafford", city: "Manchester" },
+              status: { long: "First Half", short: "1H", elapsed: 23, extra: null }
+            },
+            league: {
+              id: 39,
+              name: "Premier League",
+              country: "England",
+              logo: "https://media.api-sports.io/football/leagues/39.png",
+              flag: "https://media.api-sports.io/flags/gb.svg",
+              season: 2024,
+              round: "Regular Season - 15",
+              standings: true
+            },
+            teams: {
+              home: { id: 33, name: "Manchester United", logo: "https://media.api-sports.io/football/teams/33.png", winner: null },
+              away: { id: 40, name: "Liverpool", logo: "https://media.api-sports.io/football/teams/40.png", winner: null }
+            },
+            goals: { home: 1, away: 0 },
+            score: {
+              halftime: { home: null, away: null },
+              fulltime: { home: null, away: null },
+              extratime: { home: null, away: null },
+              penalty: { home: null, away: null }
+            }
+          }
+        ];
+        //uncommnet below when api is live
         const {data} = await fetchWithCacheJSON<Fixture[]>(url, 5 * 60 * 1000);
 
 // response is the array of fixtures
-        setFixtures(data || []);
+// For now, use mock data instead of API call
+
+        //setFixtures(mockFixtures || []);/* coment out below when api is live */
 
         // Log size in KB
+        //uncoment for when API is live {
         console.log(data)
         const jsonSize = new Blob([JSON.stringify(data)]).size / 1024;
         console.log(`API response size: ${jsonSize.toFixed(2)} KB`);
-
-        //setFixtures(data.fixtures || []);
+        setFixtures(data.fixtures || []);
+        // }
       } catch (err) {
         console.error('Error fetching fixtures:', err);
       } finally {
         setLoading(false);
       }
     };
+    console.log("object");
     load();
   }, []);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-950 to-gray-900 flex items-center justify-center">
-        <div className="glass-card-dark p-8 rounded-xl glass-glow glass-shimmer">
-          <div className="flex items-center space-x-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-400"></div>
-            <span className="text-gray-100">Loading matches...</span>
+        <div className="relative inline-block flex items-center justify-center">
+ 
+          <div className="absolute -top-8 left-[100%] transform -translate-x-1/2" style={{ marginLeft: '700px', marginTop:'500px' }}>
+            <span className="text-gray-100 text-lg font-medium glass-card-dark px-4 py-2 rounded-lg animate-pulse whitespace-nowrap l-3">
+              Loading matches...
+            </span>
+            
           </div>
+          <img 
+            src='/images/img2.png' 
+            alt="Loading"
+            className="h-6 w-6 rounded"
+            style={{
+              animation: 'opacityEase 4s ease-in-out infinite'
+            }}
+          />
         </div>
       </div>
     );
@@ -275,10 +330,10 @@ const LiveUpcomingPastMatches: React.FC = () => {
 
       {/* Live Matches Section */}
       <div className="glass-card-dark rounded-xl p-4 mb-6 glass-glow">
-        <h2 className="text-xl text-gray-100 mb-4 text-center">🔴 Live Matches</h2>
-        <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track-transparent">
+        <h2 className="text-xl text-red-100 mb-4 text-center">🔴 Live Matches</h2>
+        <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track">
           {liveMatches.length > 0 ? (
-            liveMatches.map((match) => <MatchCard key={match.fixture.id} match={match} />)
+            liveMatches.slice(0, 30).map((match) => <MatchCard key={match.fixture.id} match={match} />)
           ) : (
             <div className="w-full text-center text-gray-400 py-8">
               <div className="glass-dark rounded-lg p-4">
@@ -297,7 +352,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
           <h2 className="text-xl text-gray-100 mb-4 text-center">⏰ Upcoming Matches</h2>
           <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track-transparent">
             {upcomingMatches.length > 0 ? (
-              upcomingMatches.map((match) => (
+              upcomingMatches.slice(0,30).map((match) => (
                 <MatchCard key={match.fixture.id} match={match} vertical />
               ))
             ) : (
@@ -316,7 +371,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
           <h2 className="text-xl text-gray-100 mb-4 text-center">📊 Past Matches</h2>
           <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track-transparent">
             {pastMatches.length > 0 ? (
-              pastMatches.map((match) => (
+              pastMatches.slice(0,30).map((match) => (
                 <MatchCard key={match.fixture.id} match={match} vertical />
               ))
             ) : (
@@ -331,156 +386,6 @@ const LiveUpcomingPastMatches: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
-
-const MatchCard: React.FC<{ match: Fixture; vertical?: boolean }> = ({ 
-  match, 
-  vertical = false 
-}) => {
-  const { fixture, league, teams, goals } = match;
-  const date = new Date(fixture.date).toLocaleString();
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate('/match', { state: { match } });
-  };
-
-  const isLive = ['1H', '2H', 'HT', 'ET', 'P'].includes(fixture.status.short);
-  const isFinished = ['FT', 'AET', 'PEN'].includes(fixture.status.short);
-  const isCancelled = ['CANC', 'ABD', 'AWD', 'WO'].includes(fixture.status.short);
-
-  return (
-    <button
-      onClick={handleClick}
-      className={`
-        glass-card-dark glass-hover-dark glass-glow
-        rounded-lg p-4 border border-green-800/30
-        transition-all duration-300 cursor-pointer
-        hover:border-green-600/50 hover:scale-[1.02]
-        active:scale-[0.98]
-        ${vertical 
-          ? 'w-full block' 
-          : 'min-w-[280px] flex-shrink-0'
-        }
-        ${isLive ? 'ring-2 ring-green-500/50 shadow-green-500/20' : ''}
-        ${isCancelled ? 'opacity-60' : ''}
-      `}
-    >
-      {/* League and Date */}
-      <div className="text-center mb-4
-      ">
-        <div className="flex items-left justify-center gap-2 mb-1">
-           <div className="text-xs text-white-200">
-            {league.name}
-          </div>
-          <br/>
-          <img
-          style={{height:80, width:100}}
-            src={league.logo} 
-            alt={league.name}
-            className="rounded"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
-          />
-        </div>
-        <div className="text-xs-center text-gray-500">
-          {date}
-        </div>
-      </div>
-
-      {/* Teams and Score */}
-      <div className="flex items-center justify-between">
-        {/* Home Team */}
-        <div className="flex-1 text-center">
-          <div className="w-10 h-10 mx-auto mb-2 rounded-full overflow-hidden glass-dark ring-1 ring-green-800/30">
-            <img 
-              src={teams.home.logo} 
-              alt={teams.home.name}
-              className="w-full h-full object-contain p-1"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iMjAiIGZpbGw9IiMzNzQxNTEiLz4KPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIxMCIgeT0iMTAiPgo8cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJTNi40OCAyMiAxMiAyMlMyMiAxNy41MiAyMiAxMlMxNy41MiAyIDEyIDJaTTEzIDE3SDExVjE1SDEzVjE3Wk0xMyAxM0gxMVY3SDEzVjEzWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4KPC9zdmc+';
-              }}
-            />
-          </div>
-          <p className="text-sm text-gray-200 truncate px-1">
-            {teams.home.name}
-          </p>
-          {teams.home.winner && (
-            <div className="text-xs text-green-400 mt-1">👑</div>
-          )}
-        </div>
-
-        {/* Score */}
-        <div className="px-4">
-          <div className={`
-            text-lg font-mono
-            ${isLive ? 'text-green-400 animate-pulse' : 'text-gray-100'}
-            ${isFinished ? 'text-blue-400' : ''}
-            ${isCancelled ? 'text-red-400' : ''}
-          `}>
-            {goals.home ?? '-'} : {goals.away ?? '-'}
-          </div>
-          {isLive && fixture.status.elapsed && (
-            <div className="text-xs text-green-400 mt-1">
-              {fixture.status.elapsed}'
-            </div>
-          )}
-        </div>
-
-        {/* Away Team */}
-        <div className="flex-1 text-center">
-          <div className="w-10 h-10 mx-auto mb-2 rounded-full overflow-hidden glass-dark ring-1 ring-green-800/30">
-            <img 
-              src={teams.away.logo} 
-              alt={teams.away.name}
-              className="w-full h-full object-contain p-1"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iMjAiIGZpbGw9IiMzNzQxNTEiLz4KPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIxMCIgeT0iMTAiPgo8cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJTNi40OCAyMiAxMiAyMlMyMiAxNy41MiAyMiAxMlMxNy41MiAyIDEyIDJaTTEzIDE3SDExVjE1SDEzVjE3Wk0xMyAxM0gxMVY3SDEzVjEzWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4KPC9zdmc+';
-              }}
-            />
-          </div>
-          <p className="text-sm text-gray-200 truncate px-1">
-            {teams.away.name}
-          </p>
-          {teams.away.winner && (
-            <div className="text-xs text-green-400 mt-1">👑</div>
-          )}
-        </div>
-      </div>
-
-      {/* Match Status */}
-      <div className="text-center mt-3">
-        <span className={`
-          text-xs px-3 py-1 rounded-full
-          ${isLive 
-            ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-            : isFinished
-            ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-            : isCancelled
-            ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-            : 'bg-gray-600/20 text-gray-400 border border-gray-600/30'
-          }
-        `}>
-          {isLive && '🔴 '}
-          {fixture.status.long}
-          {isLive && fixture.status.elapsed && ` (${fixture.status.elapsed}')`}
-        </span>
-      </div>
-
-      {/* Additional Info for Live Matches */}
-      {isLive && (
-        <div className="mt-2 text-center">
-          <div className="text-xs text-green-400/70">
-            {league.round}
-          </div>
-        </div>
-      )}
-    </button>
   );
 };
 

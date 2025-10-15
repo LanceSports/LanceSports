@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import React from 'react';
 
 // Test utilities and mocks
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -30,11 +31,8 @@ vi.mock('@supabase/supabase-js', () => ({
 // Mock Google OAuth
 vi.mock('@react-oauth/google', () => ({
   GoogleOAuthProvider: ({ children }: { children: React.ReactNode }) => children,
-  GoogleLogin: ({ onSuccess }: { onSuccess: (response: any) => void }) => (
-    <button onClick={() => onSuccess({ credential: 'mock-credential' })}>
-      Sign in with Google
-    </button>
-  )
+  GoogleLogin: ({ onSuccess }: { onSuccess: (response: any) => void }) => 
+    React.createElement('button', { onClick: () => onSuccess({ credential: 'mock-credential' }) }, 'Sign in with Google')
 }));
 
 // Mock fetch for API calls
