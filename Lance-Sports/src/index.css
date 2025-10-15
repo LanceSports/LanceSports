@@ -2108,6 +2108,14 @@
     opacity: 0.1;
   }
 }
+@keyframes opacityEase1 {
+  0%, 100% {
+    opacity: 0.01;
+  }
+  50% {
+    opacity: 1;
+  }
+}
 }
 
 :root {

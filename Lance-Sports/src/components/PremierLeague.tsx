@@ -200,7 +200,7 @@ export function PremierLeague() {
   // Mock Premier League standings data
   const standings: StandingsTeam[] = [
     { position: 1, team: { id: 40, name: 'Liverpool', logo: 'https://media.api-sports.io/football/teams/40.png' }, played: 27, won: 20, drawn: 5, lost: 2, goalsFor: 65, goalsAgainst: 22, goalDifference: 43, points: 65 },
-    { position: 2, team: { id: 157, name: 'Manchester City', logo: 'https://media.api-sports.io/football/teams/157.png' }, played: 27, won: 19, drawn: 4, lost: 4, goalsFor: 62, goalsAgainst: 28, goalDifference: 34, points: 61 },
+    { position: 2, team: { id: 157, name: 'Manchester City', logo: 'https://media.api-sports.io/football/teams/50.png' }, played: 27, won: 19, drawn: 4, lost: 4, goalsFor: 62, goalsAgainst: 28, goalDifference: 34, points: 61 },
     { position: 3, team: { id: 42, name: 'Arsenal', logo: 'https://media.api-sports.io/football/teams/42.png' }, played: 27, won: 18, drawn: 6, lost: 3, goalsFor: 58, goalsAgainst: 25, goalDifference: 33, points: 60 },
     { position: 4, team: { id: 47, name: 'Tottenham', logo: 'https://media.api-sports.io/football/teams/47.png' }, played: 27, won: 16, drawn: 5, lost: 6, goalsFor: 52, goalsAgainst: 35, goalDifference: 17, points: 53 },
     { position: 5, team: { id: 50, name: 'Chelsea', logo: 'https://media.api-sports.io/football/teams/50.png' }, played: 27, won: 14, drawn: 7, lost: 6, goalsFor: 48, goalsAgainst: 32, goalDifference: 16, points: 49 },
