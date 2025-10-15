@@ -56,11 +56,10 @@
             "@types/react": "^19.1.14",
             "@types/react-dom": "^19.1.9",
             "@vitejs/plugin-react-swc": "^3.10.2",
-            "@vitest/coverage-v8": "^2.1.9",
             "autoprefixer": "^10.4.21",
             "jsdom": "^25.0.1",
             "postcss": "^8.5.6",
-            "tailwindcss": "^4.1.13",
+            "tailwindcss": "^4.1.14",
             "vite": "6.3.5",
             "vitest": "^2.1.8"
       },
@@ -70,6 +69,8 @@
             "test": "vitest",
             "test:run": "vitest run",
             "test:coverage": "vitest run --coverage --reporter=verbose",
+            "test:simple": "vitest run tests/simple.test.ts --coverage",
+            "test:basic": "vitest run tests/simple.test.ts tests/basic-coverage.test.tsx --coverage",
             "coverage": "vitest run --coverage"
       }
 }

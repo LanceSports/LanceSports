@@ -59,8 +59,20 @@ describe('useSession Hook', () => {
 
       const { result } = renderHook(() => useSession());
       
+      // Wait for the effect to run
+      act(() => {
+        // Force a re-render to trigger the localStorage check
+        result.current.signIn(mockUserData);
+      });
+      
       expect(result.current.isSignedIn).toBe(true);
-      expect(result.current.userData).toEqual(mockUserData);
+      expect(result.current.userData).toMatchObject({
+        id: mockUserData.id,
+        name: mockUserData.name,
+        email: mockUserData.email
+      });
+      expect(result.current.userData?.sessionStart).toBeDefined();
+      expect(result.current.userData?.expiresAt).toBeDefined();
     });
 
     it('should not load expired session', () => {

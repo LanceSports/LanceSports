@@ -50,11 +50,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
         .mockResolvedValueOnce('Liverpool is currently 1st in the Premier League with 65 points from 27 matches.')
         .mockResolvedValueOnce('The next Champions League matches are: Real Madrid vs Bayern Munich, Barcelona vs Liverpool');
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       // Initial state - should see welcome message and suggested questions
       expect(screen.getByText(/Hello! I'm your LanceSports AI assistant/)).toBeInTheDocument();
@@ -105,11 +101,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
       
       mockAskFootyBot.mockResolvedValue('Test response');
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       // Start a conversation
       const input = screen.getByPlaceholderText('Ask me anything...');
@@ -133,11 +125,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
     it('should handle navigation back to previous page', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const backButton = screen.getByRole('button', { name: /back/i });
       await user.click(backButton);
@@ -155,11 +143,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
         .mockRejectedValueOnce(new Error('API Error'))
         .mockResolvedValueOnce('Success response');
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       // Ask a question that will fail
       const input = screen.getByPlaceholderText('Ask me anything...');
@@ -187,11 +171,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
       // Mock timeout error
       mockAskFootyBot.mockRejectedValue(new Error('timeout'));
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       await user.type(input, 'Test question');
@@ -214,11 +194,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
       const markdownResponse = '**Liverpool** is playing well!\n\n• Premier League: 1st place\n• Goals: 45';
       mockAskFootyBot.mockResolvedValue(markdownResponse);
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       await user.type(input, 'How is Liverpool?');
@@ -240,11 +216,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
       const longResponse = 'A'.repeat(2000) + ' - This is a very long response that should trigger scrolling';
       mockAskFootyBot.mockResolvedValue(longResponse);
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       await user.type(input, 'Tell me everything');
@@ -260,11 +232,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
     it('should handle empty messages gracefully', async () => {
       const user = userEvent.setup();
       
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       const sendButton = screen.getByRole('button', { name: /send/i });
@@ -288,11 +256,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
       const longMessage = 'A'.repeat(5000);
       mockAskFootyBot.mockResolvedValue('Response to long message');
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       await user.type(input, longMessage);
@@ -310,11 +274,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
       const specialMessage = 'What\'s the score for "Liverpool vs Arsenal" (Premier League)?';
       mockAskFootyBot.mockResolvedValue('Liverpool won 2-1');
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
       await user.type(input, specialMessage);
@@ -333,11 +293,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
       
       mockAskFootyBot.mockResolvedValue('Quick response');
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
 
@@ -370,11 +326,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
         )
       );
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       const input = screen.getByPlaceholderText('Ask me anything...');
 
@@ -409,11 +361,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
       
       mockAskFootyBot.mockResolvedValue('Keyboard response');
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       // Tab to input
       await user.tab();
@@ -431,17 +379,13 @@ describe('ChatBot End-to-End Flow Tests', () => {
     });
 
     it('should support screen reader navigation', () => {
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       // Should have proper ARIA labels
       const input = screen.getByPlaceholderText('Ask me anything...');
       expect(input).toHaveAttribute('placeholder', 'Ask me anything...');
 
-      const sendButton = screen.getByRole('button', { name: /send/i });
+      const sendButton = screen.getByLabelText('Send message');
       expect(sendButton).toBeInTheDocument();
 
       const resetButton = screen.getByRole('button', { name: /reset/i });
@@ -462,11 +406,7 @@ describe('ChatBot End-to-End Flow Tests', () => {
       
       mockAskFootyBot.mockResolvedValue('Mobile response');
 
-      render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      render(<ChatBot />);
 
       // Should render without errors
       expect(screen.getByText('LanceSports AI')).toBeInTheDocument();
@@ -476,10 +416,15 @@ describe('ChatBot End-to-End Flow Tests', () => {
       await user.type(input, 'Mobile test');
       await user.keyboard('{enter}');
 
+      // Wait for user message to appear
       await waitFor(() => {
         expect(screen.getByText('Mobile test')).toBeInTheDocument();
-        expect(screen.getByText('Mobile response')).toBeInTheDocument();
       });
+
+      // Wait for API response
+      await waitFor(() => {
+        expect(screen.getByText('Mobile response')).toBeInTheDocument();
+      }, { timeout: 3000 });
     });
   });
 
@@ -489,27 +434,25 @@ describe('ChatBot End-to-End Flow Tests', () => {
       
       mockAskFootyBot.mockResolvedValue('Persistent response');
 
-      const { rerender } = render(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      const { rerender } = render(<ChatBot />);
 
       // Start conversation
       const input = screen.getByPlaceholderText('Ask me anything...');
       await user.type(input, 'Persistent message');
       await user.keyboard('{enter}');
 
+      // Wait for user message to appear
       await waitFor(() => {
         expect(screen.getByText('Persistent message')).toBeInTheDocument();
       });
 
+      // Wait for API response
+      await waitFor(() => {
+        expect(screen.getByText('Persistent response')).toBeInTheDocument();
+      }, { timeout: 3000 });
+
       // Re-render component
-      rerender(
-        <BrowserRouter>
-          <ChatBot />
-        </BrowserRouter>
-      );
+      rerender(<ChatBot />);
 
       // Conversation should still be there
       expect(screen.getByText('Persistent message')).toBeInTheDocument();

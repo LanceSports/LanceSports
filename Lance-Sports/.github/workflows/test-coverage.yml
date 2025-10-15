@@ -31,19 +31,64 @@ jobs:
         else
           npm install
         fi
+        echo "Installing coverage provider..."
+        npm install --save-dev @vitest/coverage-v8
 
-    - name: Run tests with coverage
+    - name: Verify test setup
+      working-directory: ./Lance-Sports
+      run: |
+        echo "Checking vitest configuration..."
+        npx vitest --version
+        echo "Running basic tests first..."
+        npm run test:basic || echo "Basic tests failed, but continuing..."
+
+    - name: Run full test suite with coverage
       working-directory: ./Lance-Sports
       run: npm run test:coverage
       continue-on-error: true
+
+    - name: Preserve coverage files
+      working-directory: ./Lance-Sports
+      run: |
+        echo "Checking for coverage files..."
+        if [ -d "coverage" ]; then
+          echo "✅ Coverage directory found!"
+          ls -la coverage/
+          
+          # Copy coverage files to a safe location
+          mkdir -p ../coverage-backup
+          cp -r coverage/* ../coverage-backup/ || echo "Failed to copy coverage files"
+          
+          # Check if lcov.info exists
+          if [ -f "coverage/lcov.info" ]; then
+            echo "✅ lcov.info found!"
+            cp coverage/lcov.info ../coverage-backup/lcov.info
+          else
+            echo "❌ lcov.info not found!"
+          fi
+        else
+          echo "❌ No coverage directory found!"
+        fi
+
+    - name: Restore coverage files
+      working-directory: ./Lance-Sports
+      run: |
+        if [ -d "../coverage-backup" ]; then
+          echo "Restoring coverage files..."
+          cp -r ../coverage-backup/* coverage/ || echo "Failed to restore coverage files"
+          ls -la coverage/
+        fi
 
     - name: Upload coverage to Codecov
       if: always()
       uses: codecov/codecov-action@v4
       with:
-        file: ./Lance-Sports/coverage/lcov.info
+        directory: ./Lance-Sports/coverage
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
         verbose: true
         token: ${{ secrets.CODECOV_TOKEN }}
+        search_paths: |
+          ./Lance-Sports/coverage
+          ./Lance-Sports

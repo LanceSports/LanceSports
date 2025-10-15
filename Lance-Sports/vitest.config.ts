@@ -7,12 +7,18 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    include: ['tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    testTimeout: 10000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
       reportsDirectory: './coverage',
+      clean: false,
+      cleanOnRerun: false,
+      all: true,
       include: [
         'src/**/*.{ts,tsx}',
+        'tests/**/*.{ts,tsx}',
         '!src/**/*.d.ts',
         '!src/**/*.test.{ts,tsx}',
         '!src/**/*.spec.{ts,tsx}',

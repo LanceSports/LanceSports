@@ -49,6 +49,9 @@ Object.defineProperty(window, 'scrollTo', {
   value: vi.fn()
 })
 
+// Mock scrollIntoView
+Element.prototype.scrollIntoView = vi.fn()
+
 // Mock performance
 Object.defineProperty(window, 'performance', {
   writable: true,
