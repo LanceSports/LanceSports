@@ -57,7 +57,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const currentDate = `${year}-${month}-${day}`;
-        const url = `https://lancesports-fixtures-api.onrender.com/fixtures?date=${currentDate}`;
+        const url = `https://lancesports-fixtures-api.onrender.com/leagueFixtures`;
         const {data} = await fetchWithCacheJSON<Fixture[]>(url, 5 * 60 * 1000);
 
 // response is the array of fixtures
