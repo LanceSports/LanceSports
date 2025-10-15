@@ -40,7 +40,6 @@ function Home({ isSignedIn, userData }: HomeProps) {
           {/* Slideshow Section */}
           <div className="lg:col-span-3">
             <SportsSlideshow />
-
             <div className="mt-8 space-y-6">
               <div className="glass-card-dark p-6 rounded-xl glass-hover-dark glass-glow">
                 <h3 className="text-lg mb-3 text-gray-100">Latest Sports News</h3>

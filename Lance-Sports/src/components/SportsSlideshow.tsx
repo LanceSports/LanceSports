@@ -17,38 +17,56 @@ const sportsEvents: SportEvent[] = [
   {
     id: 1,
     title: "Premier League Championship Final",
-    description: "Experience the ultimate football showdown as top teams battle for the championship title.",
-    image: "https://images.unsplash.com/photo-1551390415-0de411440ca3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHNvY2NlciUyMGNlbGVicmF0aW9uJTIwc3RhZGl1bXxlbnwxfHx8fDE3NTU2ODEyMjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    category: "Football",
+    description: "Experience the ultimate football showdown as top teams battle for the championship title at the iconic Wembley Stadium.",
+    image: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcmVtaWVyJTIwbGVhZ3VlJTIwc3RhZGl1bSUyMGZvb3RiYWxsfGVufDF8fHx8MTc1NTY4MTIyN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+    category: "Premier League",
     date: "Sun, 25 Aug 15:00",
     link: "#premier-league-final"
   },
   {
     id: 2,
-    title: "Rugby World Cup Semi-Final",
-    description: "Witness the intensity and passion as rugby's finest compete for a spot in the world cup final.",
-    image: "https://images.unsplash.com/photo-1574602904316-f84f62477265?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxydWdieSUyMHdvcmxkJTIwY3VwJTIwY2VsZWJyYXRpb258ZW58MXx8fHwxNzU1NjgxMjI2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    category: "Rugby",
+    title: "FIFA World Cup 2026",
+    description: "The world's greatest football tournament returns with unprecedented excitement and global unity.",
+    image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaWZhJTIwd29ybGQlMjBjdXAlMjBmb290YmFsbCUyMGNlbGVicmF0aW9ufGVufDF8fHx8MTc1NTY4MTIyN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+    category: "World Cup",
     date: "Sat, 24 Aug 14:30",
-    link: "#rugby-world-cup"
+    link: "#world-cup-2026"
   },
   {
     id: 3,
-    title: "Cricket Championship Match",
-    description: "Don't miss this thrilling cricket encounter between international powerhouses.",
-    image: "https://images.unsplash.com/photo-1730739463889-34c7279277a9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcmlja2V0JTIwc3RhZGl1bSUyMG1hdGNofGVufDF8fHx8MTc1NTYxNTc0OXww&ixlib=rb-4.1.0&q=80&w=1080",
-    category: "Cricket",
+    title: "Manchester Derby",
+    description: "The most intense rivalry in English football as Manchester City and Manchester United clash for supremacy.",
+    image: "https://images.unsplash.com/photo-1553778263-73a83bab9b0c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYW5jaGVzdGVyJTIwZGVyYnk%3D&ixlib=rb-4.1.0&q=80&w=1080",
+    category: "Premier League",
     date: "Mon, 26 Aug 10:00",
-    link: "#cricket-championship"
+    link: "#manchester-derby"
   },
   {
     id: 4,
-    title: "Premier League Derby",
-    description: "A classic rivalry renewed as two historic clubs face off in this highly anticipated match.",
-    image: "https://images.unsplash.com/photo-1616124619460-ff4ed8f4683c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcmVtaWVyJTIwbGVhZ3VlJTIwZm9vdGJhbGx8ZW58MXx8fHwxNzU1NjgxMjI3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    category: "Football",
+    title: "Champions League Final",
+    description: "The pinnacle of European club football where legends are made and dreams come true.",
+    image: "https://images2.minutemediacdn.com/image/upload/c_crop,w_4532,h_2549,x_0,y_91/c_fill,w_1080,ar_16:9,f_auto,q_auto,g_auto/images%2FGettyImages%2Fmmsport%2F90min_en_international_web%2F01hdrsnnakg7hdfkqrqp.jpg",
+    category: "Champions League",
     date: "Tue, 27 Aug 19:45",
-    link: "#premier-league-derby"
+    link: "#champions-league-final"
+  },
+  {
+    id: 5,
+    title: "North London Derby",
+    description: "Arsenal vs Tottenham - one of football's fiercest rivalries in the heart of London.",
+    image: "https://static.independent.co.uk/2023/09/22/13/c7da3eaa8c75efe44fb95d16859cffcfY29udGVudHNlYXJjaGFwaSwxNjk1NDcwNTM3-2.70581969.jpg",
+    category: "Premier League",
+    date: "Wed, 28 Aug 17:30",
+    link: "#north-london-derby"
+  },
+  {
+    id: 6,
+    title: "World Cup Final 2022",
+    description: "Relive the magic of Qatar 2022 where Argentina lifted the trophy in dramatic fashion.",
+    image: "https://dims.apnews.com/dims4/default/2c9290c/2147483647/strip/true/crop/2857x1905+0+0/resize/599x399!/quality/90/?url=https%3A%2F%2Fstorage.googleapis.com%2Fafs-prod%2Fmedia%2F3952413afee74fd48ecba8ba26733f66%2F2857.jpeg",
+    category: "World Cup",
+    date: "Thu, 29 Aug 20:00",
+    link: "#world-cup-2022"
   }
 ];
 
@@ -143,7 +161,7 @@ export function SportsSlideshow() {
           <button
             key={index}
             className={`w-3 h-3 rounded-full transition-all duration-200 ${
-              index === currentSlide ? 'bg-white glass-glow' : 'bg-white/40 hover:bg-white/60'
+              index === currentSlide ? 'bg-white' : 'bg-white/40 hover:bg-white/60'
             }`}
             onClick={() => goToSlide(index)}
           />
