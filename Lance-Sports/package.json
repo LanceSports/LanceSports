@@ -50,6 +50,7 @@
             "vaul": "^1.1.2"
       },
       "devDependencies": {
+            "@tailwindcss/postcss": "^4.1.14",
             "@testing-library/jest-dom": "^6.6.3",
             "@testing-library/react": "^16.0.0",
             "@types/node": "^20.10.0",
