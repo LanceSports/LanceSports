@@ -42,6 +42,7 @@ router.get("/", async (req, res) => {
 
       const status = fixture.fixture.status?.short || "NS";
 
+      /*
       // Only fetch details for live or past games
       const isPastOrLive =
         status !== "NS" && status !== "TBD" && status !== "PST";
@@ -49,7 +50,7 @@ router.get("/", async (req, res) => {
       if (!isPastOrLive) {
         continue; // skip future matches
       }
-
+      */
       try {
         const details = await fetchFixtureDetails(fixture.fixture.id);
         detailedFixtures.push({ ...fixture, ...details });
