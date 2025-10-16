@@ -40,7 +40,7 @@ export async function fetchFixtureDetails(fixtureId) {
     });
 
     // 3. Fixture players
-    const playersPromise = axios.get(`${API_BASE}/players`, {
+    const playersPromise = axios.get(`${API_BASE}/fixtures/players`, {
       params: { fixture: fixtureId },
       headers: { "x-apisports-key": API_KEY },
     });
