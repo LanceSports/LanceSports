@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { MessageCircle, X, Send } from "lucide-react";
 import { askFootyBot } from "./lib/footyApi";
 
@@ -23,7 +24,7 @@ export const ChatbotButton: React.FC = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
 
-  // for smooth auto-scroll to the latest message
+  // smooth auto-scroll
   const scrollRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -40,40 +41,29 @@ export const ChatbotButton: React.FC = () => {
 
     setInputMessage("");
 
-    // Push user message
     const userMsg: ChatMessage = {
       id: `u-${Date.now()}`,
       text,
       role: "user",
       timestamp: Date.now(),
     };
-
-    // Add a temporary “typing” message
     const typingId = `t-${Date.now() + 1}`;
     const typingMsg: ChatMessage = {
       id: typingId,
-      text: "…", // simple typing indicator
+      text: "…",
       role: "assistant",
       timestamp: Date.now(),
     };
 
     setMessages((prev) => [...prev, userMsg, typingMsg]);
     setIsSending(true);
-    //console.log("[chat] send", {text});
     try {
       const reply = await askFootyBot(text);
-      //console.log(reply);
-      // Replace typing bubble with real reply
+      setMessages((prev) => prev.map((m) => (m.id === typingId ? { ...m, text: reply } : m)));
+    } catch {
       setMessages((prev) =>
-        prev.map((m) => (m.id === typingId ? { ...m, text: reply } : m))
+        prev.map((m) => (m.id === typingId ? { ...m, text: "I couldn’t reach the LanceSports API. Please try again shortly." } : m))
       );
-    } catch (err: any) {
-      const fallback =
-        "I couldn’t reach the LanceSports API. Please try again shortly.";
-      setMessages((prev) =>
-        prev.map((m) => (m.id === typingId ? { ...m, text: fallback } : m))
-      );
-      // Optional: console.error(err);
     } finally {
       setIsSending(false);
     }
@@ -86,11 +76,20 @@ export const ChatbotButton: React.FC = () => {
     }
   }
 
-  return (
+  // --- Everything below is rendered in a portal to avoid clipping/positioning issues ---
+  return createPortal(
     <>
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-20 right-4 w-80 h-96 glass-card-dark rounded-xl border border-green-800/30 glass-glow shadow-2xl z-50 flex flex-col">
+        <div
+          className="
+            fixed z-[999]
+            bottom-[calc(env(safe-area-inset-bottom)+6rem)] right-[calc(env(safe-area-inset-right)+1rem)]
+            sm:bottom-[calc(env(safe-area-inset-bottom)+6.5rem)] sm:right-[calc(env(safe-area-inset-right)+1.5rem)]
+            w-80 h-96 glass-card-dark rounded-xl border border-green-800/30 glass-glow shadow-2xl
+            flex flex-col
+          "
+        >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-green-800/30">
             <div className="flex items-center space-x-2">
@@ -99,15 +98,14 @@ export const ChatbotButton: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-gray-100 text-sm">LanceSports Assistant</h3>
-                <p className="text-green-400 text-xs">
-                  {isSending ? "Typing…" : "Online"}
-                </p>
+                <p className="text-green-400 text-xs">{isSending ? "Typing…" : "Online"}</p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
               className="text-gray-400 hover:text-gray-200 transition-colors p-1"
               aria-label="Close chat"
+              type="button"
             >
               <X className="w-4 h-4" />
             </button>
@@ -118,10 +116,7 @@ export const ChatbotButton: React.FC = () => {
             {messages.map((m) => {
               const isUser = m.role === "user";
               return (
-                <div
-                  key={m.id}
-                  className={`flex ${isUser ? "justify-end" : "justify-start"}`}
-                >
+                <div key={m.id} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
                   <div
                     className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
                       isUser
@@ -153,6 +148,7 @@ export const ChatbotButton: React.FC = () => {
                 disabled={!canSend}
                 className="glass-green-dark p-2 rounded-lg hover:bg-green-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 aria-label="Send"
+                type="button"
               >
                 <Send className="w-4 h-4 text-green-400" />
               </button>
@@ -164,10 +160,17 @@ export const ChatbotButton: React.FC = () => {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen((s) => !s)}
-        className={`fixed bottom-4 right-4 w-14 h-14 rounded-full glass-green-dark glass-hover-dark glass-glow flex items-center justify-center transition-all duration-300 z-40 hover:scale-110 active:scale-95 ${
-          isOpen ? "ring-2 ring-green-500/50" : ""
-        }`}
-        aria-label="Open chat"
+        className={`
+          fixed z-[1000]
+          bottom-[calc(env(safe-area-inset-bottom)+1rem)] right-[calc(env(safe-area-inset-right)+1rem)]
+          sm:bottom-[calc(env(safe-area-inset-bottom)+1.5rem)] sm:right-[calc(env(safe-area-inset-right)+1.5rem)]
+          w-14 h-14 rounded-full glass-green-dark glass-hover-dark glass-glow
+          flex items-center justify-center transition-all duration-300
+          hover:scale-110 active:scale-95
+          ${isOpen ? "ring-2 ring-green-500/50" : ""}
+        `}
+        aria-label={isOpen ? "Close chat" : "Open chat"}
+        type="button"
       >
         {isOpen ? (
           <X className="w-6 h-6 text-green-400" />
@@ -178,6 +181,7 @@ export const ChatbotButton: React.FC = () => {
           </>
         )}
       </button>
-    </>
+    </>,
+    document.body
   );
 };
