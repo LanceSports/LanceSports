@@ -60,8 +60,6 @@ const LiveUpcomingPastMatches: React.FC = () => {
         const day = String(now.getDate()).padStart(2, '0');
         const currentDate = `${year}-${month}-${day}`;
         const url = `https://lancesports-fixtures-api.onrender.com/leagueFixtures`;
-<<<<<<< HEAD
-=======
         
         // Mock data for testing UI look when API is offline
         const mockFixtures: Fixture[] = [
@@ -100,7 +98,6 @@ const LiveUpcomingPastMatches: React.FC = () => {
           }
         ];
         //uncommnet below when api is live
->>>>>>> 972825867a5f9866f6a0defcb0a236511bd19357
         const {data} = await fetchWithCacheJSON<Fixture[]>(url, 5 * 60 * 1000);
 
 // response is the array of fixtures
