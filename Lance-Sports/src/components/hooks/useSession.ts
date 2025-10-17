@@ -16,7 +16,7 @@ interface UserData {
 interface SessionHook {
   isSignedIn: boolean;
   userData: UserData | null;
-  signIn: (userData: UserData) => void;
+  signIn: (userData: UserData) => Promise<void>;
   signOut: () => void;
   refreshSession: () => void;
 }
@@ -82,7 +82,7 @@ export function useSession(): SessionHook {
     }
   }, []);
 
-  const signIn = useCallback((userData: UserData) => {
+  const signIn = useCallback(async (userData: UserData): Promise<void> => {
     try {
       // Add session metadata
       const sessionData: UserData = {
@@ -101,8 +101,12 @@ export function useSession(): SessionHook {
 
       console.log('✅ User signed in:', sessionData.name);
       console.log('✅ Session saved to localStorage');
+      
+      // Return a resolved promise to indicate completion
+      return Promise.resolve();
     } catch (error) {
       console.error('❌ Error saving session:', error);
+      return Promise.reject(error);
     }
   }, []);
 
