@@ -11,6 +11,7 @@ import { ChatbotButton } from './ChatbotButton';
 import { ChampionsLeague } from './ChampionsLeague';
 import { PremierLeague } from './PremierLeague';
 import { ChatBot } from './ChatBot';
+import { ProtectedRoute } from './ProtectedRoute';
 
 interface HomeProps {
   isSignedIn: boolean;
@@ -26,10 +27,16 @@ function Home({ isSignedIn, userData }: HomeProps) {
           <h1 className="text-3xl md:text-4xl mb-8 text-center text-gray-100">
             The Future of Sports, all in one place.
           </h1>
-          {isSignedIn && (
+          {isSignedIn ? (
             <div className="text-center mb-4">
               <p className="text-green-400 glass-green-dark inline-block px-6 py-3 rounded-full glass-glow">
                 ✓ Welcome back, {userData?.name || userData?.username || 'User'}!
+              </p>
+            </div>
+          ) : (
+            <div className="text-center mb-4">
+              <p className="text-blue-400 glass-card-dark inline-block px-6 py-3 rounded-full border border-blue-500/30">
+                🔐 Sign in to access live scores, match details, and league standings
               </p>
             </div>
           )}
@@ -78,11 +85,23 @@ function AppContent() {
     document.documentElement.classList.add('dark'); // Force dark mode
   }, []);
 
-  const handleSignIn = (userData?: any, redirectTo?: string) => {
+  const handleSignIn = async (userData?: any, redirectTo?: string) => {
+    console.log('🚀 handleSignIn called:', { userData: !!userData, redirectTo });
+    
     if (userData) {
-      signIn(userData);
+      try {
+        console.log('📝 Calling signIn with userData:', userData.name);
+        await signIn(userData);
+        console.log('✅ signIn completed, navigating to:', redirectTo);
+        // Wait for state to update, then navigate
+        if (redirectTo) navigate(redirectTo);
+      } catch (error) {
+        console.error('❌ Failed to sign in:', error);
+      }
+    } else if (redirectTo) {
+      console.log('🔄 No userData, navigating directly to:', redirectTo);
+      navigate(redirectTo);
     }
-    if (redirectTo) navigate(redirectTo);
   };
 
   const handleLogout = () => {
@@ -106,11 +125,31 @@ function AppContent() {
         <Route path="/" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
         <Route path="/preview_page.html" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
         <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
-        <Route path="/match" element={<MatchDetail />} />
-        <Route path="/football-leagues" element={<LiveUpcomingPastMatches />} />
-        <Route path="champions-league" element = {<ChampionsLeague/>}/>
-        <Route path = "premier-league" element={<PremierLeague/>}/>
-        <Route path = "/chatbot" element={<ChatBot/>}/>
+        <Route path="/match" element={
+          <ProtectedRoute>
+            <MatchDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/football-leagues" element={
+          <ProtectedRoute>
+            <LiveUpcomingPastMatches />
+          </ProtectedRoute>
+        } />
+        <Route path="/champions-league" element={
+          <ProtectedRoute>
+            <ChampionsLeague />
+          </ProtectedRoute>
+        } />
+        <Route path="/premier-league" element={
+          <ProtectedRoute>
+            <PremierLeague />
+          </ProtectedRoute>
+        } />
+        <Route path="/chatbot" element={
+          <ProtectedRoute>
+            <ChatBot />
+          </ProtectedRoute>
+        } />
         {/* fallback */}
         <Route path="*" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
       </Routes>
