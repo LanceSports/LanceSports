@@ -1,55 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, Calendar, MapPin, Clock } from 'lucide-react';
+import { Trophy, Calendar, MapPin } from 'lucide-react';
 import { ChatbotButton } from './ChatbotButton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { fetchLeagueFixtures, ApiFixture } from './lib/footyApi';
 
-interface Match {
-  fixture: {
-    id: number;
-    date: string;
-    venue: {
-      name: string;
-      city: string;
-    };
-    status: {
-      short: string;
-      elapsed: number | null;
-    };
-  };
-  league: {
-    name: string;
-    country: string;
-    logo: string;
-    round: string;
-  };
-  teams: {
-    home: {
-      id: number;
-      name: string;
-      logo: string;
-    };
-    away: {
-      id: number;
-      name: string;
-      logo: string;
-    };
-  };
-  goals: {
-    home: number | null;
-    away: number | null;
-  };
-  score: {
-    halftime: {
-      home: number | null;
-      away: number | null;
-    };
-    fulltime: {
-      home: number | null;
-      away: number | null;
-    };
-  };
-}
+
+type Match = ApiFixture;
 
 interface StandingsTeam {
   position: number;
@@ -72,96 +29,72 @@ export function ChampionsLeague() {
   const navigate = useNavigate();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<'matches' | 'standings'>('matches');
   const [matchTab, setMatchTab] = useState<'live' | 'upcoming' | 'past'>('upcoming');
 
   useEffect(() => {
-    const loadMatches = () => {
+    const loadMatches = async () => {
+      console.log('🔄 Starting to load Champions League matches...');
       setLoading(true);
+      setError(null);
+      setDataLoaded(false);
       
-      // Mock Champions League matches data
-      const mockMatches: Match[] = [
-        {
-          fixture: {
-            id: 2001,
-            date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Santiago Bernabéu', city: 'Madrid' },
-            status: { short: 'NS', elapsed: null }
-          },
-          league: { name: 'UEFA Champions League', country: 'Europe', logo: '', round: 'Round of 16' },
-          teams: {
-            home: { id: 541, name: 'Real Madrid', logo: 'https://media.api-sports.io/football/teams/541.png' },
-            away: { id: 529, name: 'Bayern Munich', logo: 'https://media.api-sports.io/football/teams/529.png' }
-          },
-          goals: { home: null, away: null },
-          score: { halftime: { home: null, away: null }, fulltime: { home: null, away: null } }
-        },
-        {
-          fixture: {
-            id: 2002,
-            date: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Allianz Arena', city: 'Munich' },
-            status: { short: 'NS', elapsed: null }
-          },
-          league: { name: 'UEFA Champions League', country: 'Europe', logo: '', round: 'Round of 16' },
-          teams: {
-            home: { id: 157, name: 'Manchester City', logo: 'https://media.api-sports.io/football/teams/157.png' },
-            away: { id: 85, name: 'Paris Saint Germain', logo: 'https://media.api-sports.io/football/teams/85.png' }
-          },
-          goals: { home: null, away: null },
-          score: { halftime: { home: null, away: null }, fulltime: { home: null, away: null } }
-        },
-        {
-          fixture: {
-            id: 2003,
-            date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Camp Nou', city: 'Barcelona' },
-            status: { short: 'NS', elapsed: null }
-          },
-          league: { name: 'UEFA Champions League', country: 'Europe', logo: '', round: 'Round of 16' },
-          teams: {
-            home: { id: 529, name: 'Barcelona', logo: 'https://media.api-sports.io/football/teams/529.png' },
-            away: { id: 40, name: 'Liverpool', logo: 'https://media.api-sports.io/football/teams/40.png' }
-          },
-          goals: { home: null, away: null },
-          score: { halftime: { home: null, away: null }, fulltime: { home: null, away: null } }
-        },
-        {
-          fixture: {
-            id: 2004,
-            date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'San Siro', city: 'Milan' },
-            status: { short: 'FT', elapsed: null }
-          },
-          league: { name: 'UEFA Champions League', country: 'Europe', logo: '', round: 'Group Stage - Matchday 6' },
-          teams: {
-            home: { id: 505, name: 'Inter Milan', logo: 'https://media.api-sports.io/football/teams/505.png' },
-            away: { id: 492, name: 'Napoli', logo: 'https://media.api-sports.io/football/teams/492.png' }
-          },
-          goals: { home: 3, away: 2 },
-          score: { halftime: { home: 2, away: 1 }, fulltime: { home: 3, away: 2 } }
-        },
-        {
-          fixture: {
-            id: 2005,
-            date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Old Trafford', city: 'Manchester' },
-            status: { short: 'FT', elapsed: null }
-          },
-          league: { name: 'UEFA Champions League', country: 'Europe', logo: '', round: 'Group Stage - Matchday 6' },
-          teams: {
-            home: { id: 33, name: 'Manchester United', logo: 'https://media.api-sports.io/football/teams/33.png' },
-            away: { id: 50, name: 'Chelsea', logo: 'https://media.api-sports.io/football/teams/50.png' }
-          },
-          goals: { home: 1, away: 1 },
-          score: { halftime: { home: 0, away: 1 }, fulltime: { home: 1, away: 1 } }
+      try {
+        console.log('📡 Fetching from API...');
+        const response = await fetchLeagueFixtures();
+        console.log('✅ API Response received:', response);
+        
+        // Find Champions League fixtures
+        const championsLeagueData = response.results.find(league => 
+          league.league === 'UCL' || 
+          league.league === 'Champions League' ||
+          league.league.toLowerCase().includes('champions') ||
+          league.league.toLowerCase().includes('uefa')
+        );
+        
+        if (championsLeagueData) {
+          console.log('⚽ Champions League data found:', championsLeagueData.league, 'with', championsLeagueData.fixtures.length, 'fixtures');
+          setMatches(championsLeagueData.fixtures);
+          setDataLoaded(true);
+          
+          // Check if Champions League has no fixtures
+          if (championsLeagueData.fixtures.length === 0) {
+            console.log('⚠️ Champions League found but has no fixtures');
+            setError('Champions League data is currently unavailable - no fixtures found');
+          }
+        } else {
+          // Fallback: look for any European competition
+          const europeanLeagueData = response.results.find(league => 
+            league.league.toLowerCase().includes('europa') ||
+            league.league.toLowerCase().includes('europe')
+          );
+          
+          if (europeanLeagueData) {
+            console.log('🏆 European competition data found:', europeanLeagueData.league, 'with', europeanLeagueData.fixtures.length, 'fixtures');
+            setMatches(europeanLeagueData.fixtures);
+            setDataLoaded(true);
+            
+            // Check if European league has no fixtures
+            if (europeanLeagueData.fixtures.length === 0) {
+              console.log('⚠️ European competition found but has no fixtures');
+              setError('European competition data is currently unavailable - no fixtures found');
+            }
+          } else {
+            console.log('❌ No Champions League or European competition found. Available leagues:', response.results.map(r => r.league));
+            setError('No Champions League fixtures found');
+            setDataLoaded(true);
+          }
         }
-      ];
-
-      setTimeout(() => {
-        setMatches(mockMatches);
+      } catch (err) {
+        console.error('❌ Failed to load matches:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load matches');
+        setDataLoaded(true);
+      } finally {
+        console.log('🏁 Loading completed');
         setLoading(false);
-      }, 500);
+      }
     };
 
     loadMatches();
@@ -169,6 +102,49 @@ export function ChampionsLeague() {
 
   const handleMatchClick = (match: Match) => {
     navigate('/match', { state: { match } });
+  };
+
+  const retryLoading = async () => {
+    setLoading(true);
+    setError(null);
+    setDataLoaded(false);
+    
+    try {
+      const response = await fetchLeagueFixtures();
+      
+      // Find Champions League fixtures
+      const championsLeagueData = response.results.find(league => 
+        league.league === 'UCL' || 
+        league.league === 'Champions League' ||
+        league.league.toLowerCase().includes('champions') ||
+        league.league.toLowerCase().includes('uefa')
+      );
+      
+      if (championsLeagueData) {
+        setMatches(championsLeagueData.fixtures);
+        setDataLoaded(true);
+      } else {
+        // Fallback: look for any European competition
+        const europeanLeagueData = response.results.find(league => 
+          league.league.toLowerCase().includes('europa') ||
+          league.league.toLowerCase().includes('europe')
+        );
+        
+        if (europeanLeagueData) {
+          setMatches(europeanLeagueData.fixtures);
+          setDataLoaded(true);
+        } else {
+          setError('No Champions League fixtures found');
+          setDataLoaded(true);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load matches:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load matches');
+      setDataLoaded(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filterMatches = (matches: Match[]) => {
@@ -262,40 +238,93 @@ export function ChampionsLeague() {
                   {tab === 'live' && (
                     <span className="ml-2 inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                   )}
+                  {loading && (
+                    <span className="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                  )}
                 </button>
               ))}
             </div>
           </div>
         )}
 
+
         {/* Content */}
         {activeTab === 'matches' ? (
           // Matches Grid
           loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="glass-card-ucl p-6 rounded-xl animate-pulse">
-                  <div className="h-24 bg-white/10 rounded-lg mb-4"></div>
-                  <div className="h-4 bg-white/10 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-white/10 rounded w-1/2"></div>
-                </div>
-              ))}
-            </div>
-          ) : filteredMatches.length === 0 ? (
             <div className="glass-card-ucl p-12 rounded-xl text-center">
-              <Trophy className="mx-auto mb-4 text-gray-500" size={48} />
-              <h3 className="text-xl text-gray-300 mb-2">No matches found</h3>
-              <p className="text-gray-400">
-                {matchTab === 'live' && 'No live matches at the moment'}
-                {matchTab === 'upcoming' && 'No upcoming matches scheduled'}
-                {matchTab === 'past' && 'No past matches available'}
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-400 mx-auto mb-4"></div>
+              <h3 className="text-xl text-blue-300 mb-2">Loading...</h3>
+              <p className="text-gray-400">Fetching latest fixtures from the API</p>
+            </div>
+          ) : error && dataLoaded ? (
+            <div className="glass-card-ucl p-12 rounded-xl text-center">
+              <Trophy className="mx-auto mb-4 text-red-500" size={48} />
+              <h3 className="text-xl text-red-300 mb-2">
+                {error.includes('no fixtures found') ? 'No Data Available' : 
+                 error.includes('too long to respond') ? 'API Taking Too Long' : 'Error Loading Matches'}
+              </h3>
+              <p className="text-gray-400 mb-4">{error}</p>
+              {error.includes('no fixtures found') ? (
+                <div className="bg-blue-900/20 p-4 rounded-lg mb-4">
+                  <p className="text-blue-300 text-sm">
+                    ℹ️ The API is working but currently has no fixture data. This might be because:
+                  </p>
+                  <ul className="text-blue-200 text-sm mt-2 text-left">
+                    <li>• Season hasn't started yet</li>
+                    <li>• Data is being updated</li>
+                    <li>• API is temporarily out of sync</li>
+                  </ul>
+                </div>
+              ) : error.includes('too long to respond') ? (
+                <div className="bg-orange-900/20 p-4 rounded-lg mb-4">
+                  <p className="text-orange-300 text-sm">
+                    ⏰ <strong>Server Sleep Mode:</strong> Your API server is waking up from sleep mode.
+                  </p>
+                  <ul className="text-orange-200 text-sm mt-2 text-left">
+                    <li>• First request after server sleep can take 5-10 minutes</li>
+                    <li>• Subsequent requests will be much faster</li>
+                    <li>• This is normal for free hosting services like Render.com</li>
+                    <li>• Consider upgrading to a paid plan for faster wake-up times</li>
+                  </ul>
+                </div>
+              ) : null}
+              <button
+                onClick={retryLoading}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : dataLoaded && filteredMatches.length === 0 ? (
+            <div className="glass-card-ucl p-12 rounded-xl text-center">
+              <div className="animate-bounce mb-4">
+                <Trophy className="mx-auto text-gray-500" size={64} />
+              </div>
+              <h3 className="text-2xl text-gray-300 mb-4 font-semibold">No matches found</h3>
+              <div className="bg-gray-800/50 p-4 rounded-lg mb-4">
+                <p className="text-lg text-gray-400">
+                  {matchTab === 'live' && '🔴 No live matches at the moment'}
+                  {matchTab === 'upcoming' && '⏰ No upcoming matches scheduled'}
+                  {matchTab === 'past' && '📅 No past matches available'}
+                </p>
+              </div>
+              <p className="text-sm text-gray-500">
+                Total matches loaded: {matches.length} | Filter: {matchTab}
               </p>
             </div>
-          ) : (
+          ) : dataLoaded && filteredMatches.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredMatches.map((match) => (
                 <MatchCard key={match.fixture.id} match={match} onClick={() => handleMatchClick(match)} />
               ))}
+            </div>
+          ) : (
+            // Fallback case - should not happen but just in case
+            <div className="glass-card-ucl p-12 rounded-xl text-center">
+              <Trophy className="mx-auto mb-4 text-gray-500" size={48} />
+              <h3 className="text-xl text-gray-300 mb-2">Loading...</h3>
+              <p className="text-gray-400">Please wait while we fetch the latest matches</p>
             </div>
           )
         ) : (
