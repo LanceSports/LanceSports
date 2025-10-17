@@ -280,56 +280,18 @@ export function PremierLeague() {
                 </button>
               ))}
             </div>
-            {loading && (
-              <div className="mt-2 text-center">
-                <span className="text-blue-400 text-sm animate-pulse">🔄 Loading matches...</span>
-              </div>
-            )}
           </div>
         )}
 
-        {/* Debug Info - Remove this in production */}
-        <div className="mb-4 p-4 bg-blue-900/20 rounded-lg border border-blue-500/30">
-          <h4 className="text-blue-300 font-semibold mb-2">Debug Info:</h4>
-          <div className="text-sm text-blue-200 space-y-1">
-            <div>Loading: {loading ? '✅ TRUE' : '❌ FALSE'}</div>
-            <div>Data Loaded: {dataLoaded ? '✅ TRUE' : '❌ FALSE'}</div>
-            <div>Error: {error ? `❌ ${error}` : '✅ NONE'}</div>
-            <div>Matches Count: {matches.length}</div>
-            <div>Filtered Matches Count: {filteredMatches.length}</div>
-            <div>Current Tab: {matchTab}</div>
-            <div>API Status: {error && error.includes('no fixtures found') ? '🟡 WORKING BUT NO DATA' : error ? '🔴 API ERROR' : '🟢 WORKING'}</div>
-          </div>
-        </div>
 
         {/* Content */}
         {activeTab === 'matches' ? (
           // Matches Grid
           loading ? (
-            <div className="text-center">
-              <div className="glass-card-pl p-8 rounded-xl mb-6">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-400 mx-auto mb-4"></div>
-                <h3 className="text-xl text-green-300 mb-2">Loading Matches...</h3>
-                <p className="text-gray-400 mb-4">Fetching latest fixtures from the API</p>
-                <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-500/30">
-                  <p className="text-blue-300 text-sm">
-                    ⏰ <strong>Note:</strong> This API can take up to 10 minutes to respond on the first request as the server wakes up from sleep mode.
-                  </p>
-                  <p className="text-blue-200 text-xs mt-2">
-                    Please be patient - subsequent requests will be much faster!
-                  </p>
-                </div>
-                <LoadingTimer startTime={loadingStartTime} />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="glass-card-pl p-6 rounded-xl animate-pulse">
-                    <div className="h-24 bg-white/10 rounded-lg mb-4"></div>
-                    <div className="h-4 bg-white/10 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-white/10 rounded w-1/2"></div>
-                  </div>
-                ))}
-              </div>
+            <div className="glass-card-pl p-12 rounded-xl text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-400 mx-auto mb-4"></div>
+              <h3 className="text-xl text-green-300 mb-2">Loading...</h3>
+              <p className="text-gray-400">Fetching latest fixtures from the API</p>
             </div>
           ) : error && dataLoaded ? (
             <div className="glass-card-pl p-12 rounded-xl text-center">
