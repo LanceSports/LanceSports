@@ -6,7 +6,7 @@ import { fetchLeagueFixtures, ApiFixture } from './lib/footyApi';
 
 type Match = ApiFixture;
 
-export function ChampionsLeague() {
+export function Afcon() {
   const navigate = useNavigate();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,12 +14,12 @@ export function ChampionsLeague() {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [matchTab, setMatchTab] = useState<'live' | 'upcoming' | 'past'>('upcoming');
 
-  // 🔽 NEW: team filter state
+  // Team filter
   const [teamFilter, setTeamFilter] = useState<number | 'all'>('all');
 
   useEffect(() => {
     const loadMatches = async () => {
-      console.log('🔄 Starting to load Champions League matches...');
+      console.log('🔄 Starting to load AFCON matches...');
       setLoading(true);
       setError(null);
       setDataLoaded(false);
@@ -29,62 +29,41 @@ export function ChampionsLeague() {
         const response = await fetchLeagueFixtures();
         console.log('✅ API Response received:', response);
 
-        // Prefer UCL; fallback to another European competition if needed
-        const championsLeagueData =
-          response.results.find(
-            (league) =>
-              league.league === 'UCL' ||
-              league.league === 'Champions League' ||
-              league.league.toLowerCase().includes('champions') ||
-              league.league.toLowerCase().includes('uefa')
-          ) ?? null;
+        // Find AFCON fixtures (Africa Cup of Nations)
+        const afconData =
+          response.results.find((league) => {
+            const name = String(league.league || '').toLowerCase();
+            return (
+              name === 'AFCON' ||
+              name.includes('afcon') ||
+              name.includes('africa cup') ||
+              name.includes('african cup of nations') ||
+              name.includes('africa cup of nations')
+            );
+          }) ?? null;
 
-        if (championsLeagueData) {
+        if (afconData) {
           console.log(
-            '⚽ Champions League data found:',
-            championsLeagueData.league,
+            '⚽ AFCON data found:',
+            afconData.league,
             'with',
-            championsLeagueData.fixtures.length,
+            afconData.fixtures.length,
             'fixtures'
           );
-          setMatches(championsLeagueData.fixtures);
+          setMatches(afconData.fixtures);
           setDataLoaded(true);
 
-          if (championsLeagueData.fixtures.length === 0) {
-            console.log('⚠️ Champions League found but has no fixtures');
-            setError('Champions League data is currently unavailable - no fixtures found');
+          if (afconData.fixtures.length === 0) {
+            console.log('⚠️ AFCON found but has no fixtures');
+            setError('AFCON data is currently unavailable — no fixtures found');
           }
         } else {
-          const europeanLeagueData =
-            response.results.find(
-              (league) =>
-                league.league.toLowerCase().includes('europa') ||
-                league.league.toLowerCase().includes('europe')
-            ) ?? null;
-
-          if (europeanLeagueData) {
-            console.log(
-              '🏆 European competition data found:',
-              europeanLeagueData.league,
-              'with',
-              europeanLeagueData.fixtures.length,
-              'fixtures'
-            );
-            setMatches(europeanLeagueData.fixtures);
-            setDataLoaded(true);
-
-            if (europeanLeagueData.fixtures.length === 0) {
-              console.log('⚠️ European competition found but has no fixtures');
-              setError('European competition data is currently unavailable - no fixtures found');
-            }
-          } else {
-            console.log(
-              '❌ No Champions League or European competition found. Available leagues:',
-              response.results.map((r) => r.league)
-            );
-            setError('No Champions League fixtures found');
-            setDataLoaded(true);
-          }
+          console.log(
+            '❌ No AFCON competition found. Available leagues:',
+            response.results.map((r) => r.league)
+          );
+          setError('No AFCON fixtures found');
+          setDataLoaded(true);
         }
       } catch (err) {
         console.error('❌ Failed to load matches:', err);
@@ -111,33 +90,24 @@ export function ChampionsLeague() {
     try {
       const response = await fetchLeagueFixtures();
 
-      const championsLeagueData =
-        response.results.find(
-          (league) =>
-            league.league === 'UCL' ||
-            league.league === 'Champions League' ||
-            league.league.toLowerCase().includes('champions') ||
-            league.league.toLowerCase().includes('uefa')
-        ) ?? null;
+      const afconData =
+        response.results.find((league) => {
+          const name = String(league.league || '').toLowerCase();
+          return (
+            name === 'afcon' ||
+            name.includes('afcon') ||
+            name.includes('africa cup') ||
+            name.includes('african cup of nations') ||
+            name.includes('africa cup of nations')
+          );
+        }) ?? null;
 
-      if (championsLeagueData) {
-        setMatches(championsLeagueData.fixtures);
+      if (afconData) {
+        setMatches(afconData.fixtures);
         setDataLoaded(true);
       } else {
-        const europeanLeagueData =
-          response.results.find(
-            (league) =>
-              league.league.toLowerCase().includes('europa') ||
-              league.league.toLowerCase().includes('europe')
-          ) ?? null;
-
-        if (europeanLeagueData) {
-          setMatches(europeanLeagueData.fixtures);
-          setDataLoaded(true);
-        } else {
-          setError('No Champions League fixtures found');
-          setDataLoaded(true);
-        }
+        setError('No AFCON fixtures found');
+        setDataLoaded(true);
       }
     } catch (err) {
       console.error('Failed to load matches:', err);
@@ -167,18 +137,17 @@ export function ChampionsLeague() {
     }
   };
 
-  // 🔽 NEW: compute unique teams for the dropdown (memoized)
+  // Unique teams for the dropdown
   const uniqueTeams = useMemo(() => {
     const map = new Map<number, { id: number; name: string; logo: string }>();
     for (const m of matches) {
       map.set(m.teams.home.id, { id: m.teams.home.id, name: m.teams.home.name, logo: m.teams.home.logo });
       map.set(m.teams.away.id, { id: m.teams.away.id, name: m.teams.away.name, logo: m.teams.away.logo });
     }
-    // sort alphabetically by name for nicer UX
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
   }, [matches]);
 
-  // 🔽 Apply existing time-status filter, then team filter (logic unchanged otherwise)
+  // Apply time-status filter, then team filter
   const filteredMatches = filterMatches(matches).filter(
     (m) =>
       teamFilter === 'all' ||
@@ -194,15 +163,15 @@ export function ChampionsLeague() {
           <div className="flex items-center justify-center gap-3 mb-4">
             <Trophy className="text-green-400" size={40} />
             <h1 className="text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-green-500 to-green-400">
-              UEFA Champions League
+              Africa Cup of Nations (AFCON)
             </h1>
           </div>
           <p className="text-gray-300 max-w-2xl mx-auto">
-            The most prestigious club competition in European football
+            The premier international tournament in African football
           </p>
         </div>
 
-        {/* 🔽 NEW: Team filter (kept minimal to not change existing UI; uses same styling language) */}
+        {/* Team filter */}
         <div className="mb-4 flex justify-center">
           <div className="glass-card-dark rounded-xl px-3 py-2 flex items-center gap-3">
             <span className="text-sm text-gray-300">Team:</span>
@@ -225,7 +194,7 @@ export function ChampionsLeague() {
           </div>
         </div>
 
-        {/* Match Sub-Tabs (old styling) */}
+        {/* Match Sub-Tabs */}
         <div className="mb-6 flex justify-center">
           <div className="flex gap-2 glass-card-dark p-2 rounded-xl inline-flex">
             {(['live', 'upcoming', 'past'] as const).map((tab) => (
@@ -252,7 +221,6 @@ export function ChampionsLeague() {
 
         {/* Content */}
         {loading ? (
-          // Old UI’s skeleton loaders
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="glass-card-dark p-6 rounded-xl animate-pulse">
@@ -273,19 +241,6 @@ export function ChampionsLeague() {
                 : 'Error Loading Matches'}
             </h3>
             <p className="text-gray-400 mb-4">{error}</p>
-
-            {error.includes('no fixtures found') ? (
-              <div className="bg-blue-900/20 p-4 rounded-lg mb-4">
-                <p className="text-blue-300 text-sm">
-                  ℹ️ The API is working but currently has no fixture data. This might be because:
-                </p>
-                <ul className="text-blue-200 text-sm mt-2 text-left">
-                  <li>• Season hasn&apos;t started yet</li>
-                  <li>• Data is being updated</li>
-                  <li>• API is temporarily out of sync</li>
-                </ul>
-              </div>
-            ) : null}
 
             <button
               onClick={retryLoading}
