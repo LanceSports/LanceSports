@@ -213,3 +213,34 @@ export async function saveFixtures(apiFixtures) {
     }
   }
 }
+
+export async function saveStandings(standings) {
+  const { error } = await supabase
+    .from("league_standings")
+    .upsert(standings, { onConflict: ["league_id", "season", "team_id"] });
+  if (error) throw error;
+}
+
+export async function saveOdds(odds) {
+  // odds is an array of objects with fixture_id, league_id, season, fixture_date, home_team, away_team, bookmakers, updated_at
+  const { error } = await supabase
+    .from("odds")
+    .upsert(
+      odds.map((o) => ({
+        fixture_id: o.fixture_id,
+        league_id: o.league_id,
+        season: o.season,
+        fixture_date: o.fixture_date,
+        home_team: o.home_team,
+        away_team: o.away_team,
+        bookmakers: o.bookmakers, // stored as JSONB
+        updated_at: o.updated_at,
+      })),
+      { onConflict: ["fixture_id"] } // we only care about fixture uniqueness
+    );
+
+  if (error) throw error;
+}
+
+
+
