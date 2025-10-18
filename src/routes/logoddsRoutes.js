@@ -1,4 +1,3 @@
-import { convertBigInts } from "../fixturesRoutes.js";
 import express from "express";
 import { fetchStandings, fetchOdds, fetchFixturesByLeague } from "../services/apiService.js";
 import { saveStandings, saveOdds } from "../services/dbService.js";
@@ -15,6 +14,16 @@ const LEAGUES = {
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+function convertBigInts(obj) {
+  if (typeof obj === "bigint") return obj.toString();
+  if (Array.isArray(obj)) return obj.map(convertBigInts);
+  if (obj !== null && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [k, convertBigInts(v)])
+    );
+  }
+  return obj;
+}
 
 router.get("/standings", async (req, res) => {
   try {
