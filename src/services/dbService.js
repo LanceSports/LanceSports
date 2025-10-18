@@ -107,6 +107,8 @@ function sanitizeBigInt(obj) {
   );
 }
 
+/*
+//Sequential DB Operations per fixture
 export async function saveFixtures(apiFixtures) {
   for (const apiFixture of apiFixtures) {
     const transformed = transformFixture(apiFixture);
@@ -211,6 +213,108 @@ export async function saveFixtures(apiFixtures) {
         .upsert(sanitizedPlayerStats, { onConflict: ["fixture_id","team_id","player_id","type"] });
       if (error) throw error;
     }
+  }
+}
+*/
+// Batch DB Operations for multiple fixtures
+export async function saveFixturesBatch(apiFixtures = []) {
+  // Collect all entities in arrays
+  const leagues = [];
+  const venues = [];
+  const fixtures = [];
+  const teams = [];
+  const fixtureTeams = [];
+  const fixtureGoals = [];
+  const fixtureScores = [];
+  const fixturePeriods = [];
+  const fixtureEvents = [];
+  const fixtureStats = [];
+  const fixturePlayers = [];
+  const fixturePlayerStats = [];
+
+  for (const apiFixture of apiFixtures) {
+    const t = transformFixture(apiFixture);
+
+    // transformFixture should return arrays (consistent shapes)
+    if (t.leagues) leagues.push(...(Array.isArray(t.leagues) ? t.leagues : [t.leagues]));
+    if (t.venues) venues.push(...(Array.isArray(t.venues) ? t.venues : [t.venues]));
+    if (t.fixtures) fixtures.push(...(Array.isArray(t.fixtures) ? t.fixtures : [t.fixtures]));
+    if (t.teams) teams.push(...(Array.isArray(t.teams) ? t.teams : [t.teams]));
+    if (t.fixture_teams) fixtureTeams.push(...t.fixture_teams);
+    if (t.fixture_goals) fixtureGoals.push(...(Array.isArray(t.fixture_goals) ? t.fixture_goals : [t.fixture_goals]));
+    if (t.fixture_scores) fixtureScores.push(...(Array.isArray(t.fixture_scores) ? t.fixture_scores : [t.fixture_scores]));
+    if (t.fixture_periods) fixturePeriods.push(...(Array.isArray(t.fixture_periods) ? t.fixture_periods : [t.fixture_periods]));
+    if (t.fixture_events) fixtureEvents.push(...t.fixture_events);
+    if (t.fixture_stats) fixtureStats.push(...t.fixture_stats);
+
+    // players/stats might be returned by separate helper
+    const { players = [], playerStats = [] } = (t.fixture_players_payload || {});
+    if (players.length) fixturePlayers.push(...players);
+    if (playerStats.length) fixturePlayerStats.push(...playerStats);
+  }
+
+  // sanitize BigInt -> string
+  const sLeagues = sanitizeBigInt(leagues);
+  const sVenues = sanitizeBigInt(venues);
+  const sFixtures = sanitizeBigInt(fixtures);
+  const sTeams = sanitizeBigInt(teams);
+  const sFixtureTeams = sanitizeBigInt(fixtureTeams);
+  const sFixtureGoals = sanitizeBigInt(fixtureGoals);
+  const sFixtureScores = sanitizeBigInt(fixtureScores);
+  const sFixturePeriods = sanitizeBigInt(fixturePeriods);
+  const sFixtureEvents = sanitizeBigInt(fixtureEvents);
+  const sFixtureStats = sanitizeBigInt(fixtureStats);
+  const sFixturePlayers = sanitizeBigInt(fixturePlayers);
+  const sFixturePlayerStats = sanitizeBigInt(fixturePlayerStats);
+
+  // Do fewer DB calls: one per table
+  if (sLeagues.length) {
+    const { error } = await supabase.from("leagues").upsert(sLeagues, { onConflict: "league_id" });
+    if (error) throw error;
+  }
+  if (sVenues.length) {
+    const { error } = await supabase.from("venues").upsert(sVenues, { onConflict: "venue_id" });
+    if (error) throw error;
+  }
+  if (sFixtures.length) {
+    const { error } = await supabase.from("fixtures").upsert(sFixtures, { onConflict: "fixture_id" });
+    if (error) throw error;
+  }
+  if (sTeams.length) {
+    const { error } = await supabase.from("teams").upsert(sTeams, { onConflict: "team_id" });
+    if (error) throw error;
+  }
+  if (sFixtureTeams.length) {
+    const { error } = await supabase.from("fixture_teams").upsert(sFixtureTeams, { onConflict: ["fixture_id", "team_id"] });
+    if (error) throw error;
+  }
+  if (sFixtureGoals.length) {
+    const { error } = await supabase.from("fixture_goals").upsert(sFixtureGoals, { onConflict: "fixture_id" });
+    if (error) throw error;
+  }
+  if (sFixtureScores.length) {
+    const { error } = await supabase.from("fixture_scores").upsert(sFixtureScores, { onConflict: "fixture_id" });
+    if (error) throw error;
+  }
+  if (sFixturePeriods.length) {
+    const { error } = await supabase.from("fixture_periods").upsert(sFixturePeriods, { onConflict: "fixture_id" });
+    if (error) throw error;
+  }
+  if (sFixtureEvents.length) {
+    const { error } = await supabase.from("fixture_events").upsert(sFixtureEvents, { onConflict: "event_id" });
+    if (error) throw error;
+  }
+  if (sFixtureStats.length) {
+    const { error } = await supabase.from("fixture_stats").upsert(sFixtureStats, { onConflict: ["fixture_id", "team_id", "type"] });
+    if (error) throw error;
+  }
+  if (sFixturePlayers.length) {
+    const { error } = await supabase.from("fixture_players").upsert(sFixturePlayers, { onConflict: ["fixture_id", "team_id", "player_id"] });
+    if (error) throw error;
+  }
+  if (sFixturePlayerStats.length) {
+    const { error } = await supabase.from("fixture_player_stats").upsert(sFixturePlayerStats, { onConflict: ["fixture_id", "team_id", "player_id", "type"] });
+    if (error) throw error;
   }
 }
 

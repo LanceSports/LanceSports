@@ -1,7 +1,8 @@
 import express from "express";
 import { fetchFixturesByLeague, fetchFixtureDetails } from "../services/apiService.js";
-import { saveFixtures } from "../services/dbService.js";
+import { saveFixturesBatch } from "../services/dbService.js";
 import { delay } from "../utils/rateLimit.js";
+import { asyncPool } from "../utils/asyncPool.js";
 
 const router = express.Router();
 
@@ -22,17 +23,18 @@ function convertBigInts(obj) {
   return obj;
 }
 
+const RATE_LIMIT_RPM = 450;
+const RPS = Math.floor(RATE_LIMIT_RPM / 60); // requests per second allowed
+const CONCURRENCY = Math.max(1, Math.floor(RPS * 0.8)); // be conservative (e.g., ~6)
+const FAST_RESPONSE = true; // if true: return DB/fixtures quickly, update DB in background
+
 router.get("/", async (req, res) => {
-  const season = new Date().getFullYear(); // current year
-  const RATE_LIMIT_DELAY = 200; // 5 calls/s (≈300 rpm)
-
-  const results = [];
-
+  const season = new Date().getFullYear();
   try {
+    const results = [];
+
     for (const { name, id } of LEAGUES) {
       console.log(`Fetching fixtures for ${name} (${season})`);
-
-      // 1️⃣ Fetch fixtures for this league & year
       const fixtures = await fetchFixturesByLeague(id, season);
 
       if (!fixtures?.length) {
@@ -40,51 +42,76 @@ router.get("/", async (req, res) => {
         continue;
       }
 
-      const detailedFixtures = [];
-      let processed = 0;
-
-      // 2️⃣ Fetch details (live + past + upcoming)
-      for (const fixture of fixtures) {
-        if (!fixture.fixture) continue;
-        const fixtureId = fixture.fixture.id;
-
-        try {
-          const details = await fetchFixtureDetails(fixtureId);
-          detailedFixtures.push({ ...fixture, ...details });
-          processed++;
-        } catch (err) {
-          console.error(`❌ ${name}: failed fetching fixture ${fixtureId}`, err.message);
-        }
-
-        await delay(RATE_LIMIT_DELAY);
+      // separate upcoming vs past/live
+      const upcoming = [];
+      const pastOrLive = [];
+      for (const f of fixtures) {
+        const status = f.fixture?.status?.short || "NS";
+        const isPastOrLive = status !== "NS" && status !== "TBD" && status !== "PST";
+        if (isPastOrLive) pastOrLive.push(f);
+        else upcoming.push(f);
       }
 
-      // 3️⃣ Save to DB
-      await saveFixtures(detailedFixtures);
+      // If no past/live fixtures, return quickly
+      if (!pastOrLive.length) {
+        results.push({
+          league: name,
+          totalFixtures: fixtures.length,
+          detailed: 0,
+          fixtures: upcoming,
+        });
+        continue;
+      }
 
-      // 4️⃣ Collect for response
+      // Option A: FAST_RESPONSE -> return upcoming + any existing DB entries quickly
+      // Option B: FRESH_RESPONSE -> await details and return them
+      // We'll do: fetch details concurrently (limited), then batch-save
+
+      // fetch details concurrently, limited by CONCURRENCY
+      const fetchDetail = async (apiFixture) => {
+        const fixtureId = apiFixture.fixture?.id;
+        try {
+          const details = await fetchFixtureDetails(fixtureId);
+          return { ...apiFixture, ...details };
+        } catch (err) {
+          console.error(`Failed fetching details for ${fixtureId}:`, err.message);
+          return { ...apiFixture, events: [], statistics: [], players: [] };
+        }
+      };
+
+      // concurrency-limited fetch
+      const detailedFixtures = await asyncPool(CONCURRENCY, pastOrLive, fetchDetail);
+
+      // Batch save (one set of upserts per table)
+      // If you want FAST_RESPONSE you can call this without `await` (fire-and-forget).
+      if (FAST_RESPONSE) {
+        // fire-and-forget: do not block response
+        saveFixturesBatch(detailedFixtures).catch(e => console.error("Background saveFixturesBatch error:", e));
+      } else {
+        // wait until DB is updated before returning
+        await saveFixturesBatch(detailedFixtures);
+      }
+
+      // Compose response: upcoming fixtures + detailedFixtures
+      const returned = [...detailedFixtures, ...upcoming];
       results.push({
         league: name,
         totalFixtures: fixtures.length,
-        detailed: processed,
-        fixtures: detailedFixtures,
+        detailed: detailedFixtures.length,
+        fixtures: returned,
       });
-    }
+    } // end leagues loop
 
-    // 5️⃣ Flatten all fixtures and send full payload
     const allFixtures = results.flatMap(r => r.fixtures || []);
-
-    res.status(200).json(
-      convertBigInts({
-        message: "✅ Successfully fetched, saved, and returned league fixtures.",
-        totalLeagues: results.length,
-        totalFixtures: allFixtures.length,
-        results,
-        fixtures: allFixtures,
-      })
-    );
+    res.status(200).json(convertBigInts({
+      message: "Fetched (and saved) league fixtures.",
+      totalLeagues: results.length,
+      totalFixtures: allFixtures.length,
+      results,
+      fixtures: allFixtures,
+    }));
   } catch (err) {
-    console.error("Error in /fixtures/leagues route:", err.message);
+    console.error("Error in /fixtures/leagues route:", err);
     res.status(500).json({ error: "Failed to fetch league fixtures" });
   }
 });
