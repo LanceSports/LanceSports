@@ -86,13 +86,13 @@ router.get("/odds", async (req, res) => {
             season: entry.league.season,
             home_team: teams.home,
             away_team: teams.away,
-            bookmakers: { Betway: {}, "10Bet": {} },
+            bookmakers: { Marathonbet: {}, "Bet365": {} },
             updated_at: new Date().toISOString(),
           };
         }
 
         for (const bookmaker of entry.bookmakers || []) {
-          if (["Betway", "10Bet"].includes(bookmaker.name)) {
+          if (["Marathonbet", "Bet365"].includes(bookmaker.name)) {
             bookmaker.bets.forEach(b => {
               groupedByFixture[fixtureId].bookmakers[bookmaker.name][b.name] = b.values;
             });
@@ -144,13 +144,13 @@ router.get("/odds/:leagueId", async (req, res) => {
           season: entry.league.season,
           home_team: teams.home,
           away_team: teams.away,
-          bookmakers: { Betway: [], "10Bet": [] },
+          bookmakers: { Marathonbet: [], "Bet365": [] },
           updated_at: new Date().toISOString(),
         };
       }
 
       for (const bookmaker of entry.bookmakers || []) {
-        if (["Betway", "10Bet"].includes(bookmaker.name)) {
+        if (["Marathonbet", "Bet365"].includes(bookmaker.name)) {
           groupedByFixture[fixtureId].bookmakers[bookmaker.name].push({
             bets: bookmaker.bets.map(b => ({ market: b.name, values: b.values })),
           });
