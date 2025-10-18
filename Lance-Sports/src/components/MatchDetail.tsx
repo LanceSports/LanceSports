@@ -26,7 +26,7 @@ export function MatchDetail() {
 
   type LocationState = { match: Match };
   const state = location.state as LocationState | null;
-  const match = state?.match;
+  const match = state?.match; // the match info was passed into teh card Matchdetails as {match}
 
   const [matchDetails, setMatchDetails] = useState<MatchDetailData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,22 +42,24 @@ export function MatchDetail() {
     try {
       // 1) Normalize directly from the passed-in match object
       const base = fromMatchToDetails(match);
+      console.log(base);
 
       // 2) If match lacks details, synthesize non-blocking mock data
       // still mock timeline stats
-      const needMockEvents = (base.events?.length ?? 0) === 0;
-      const needMockStats = (base.stats?.length ?? 0) === 0;
+      
+      const needMockEvents = (base ?? 0) === 0;
+      console.log(base.events)
+     /*to:do*/ const needMockStats = (base.stats?.length ?? 0) === 0;
       const needMockPlayers = (base.players?.length ?? 0) === 0;
 
       const elapsed = match.fixture.status.elapsed || 90;
       const enriched: MatchDetailData = {
         ...base,
-        events: needMockEvents
-          ? generateMockEvents(match, elapsed)
-          : base.events,
+        events: base.events,
         stats: needMockStats ? generateMockStats(match) : base.stats,
         players: needMockPlayers ? generateMockPlayers(match) : base.players,
       };
+      console.log("enriched",enriched)
 
       setMatchDetails(enriched);
     } finally {
@@ -197,6 +199,7 @@ export function MatchDetail() {
               },
             }}
           />
+    
         )}
         {activeTab === "stats" && (
           <StatsTab
@@ -362,7 +365,7 @@ function EventsTab({
                     <span className="text-gray-400 text-sm">{teamName}</span>
                   </div>
                   <p className="text-gray-200">
-                    {event.player_name || `Player #${event.player_id}`}
+                    {event.player.name || `Player #${event.player.id}`}
                   </p>
                 </div>
               </div>
