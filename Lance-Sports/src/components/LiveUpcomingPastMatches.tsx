@@ -59,8 +59,8 @@ const LiveUpcomingPastMatches: React.FC = () => {
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const currentDate = `${year}-${month}-${day}`;
-        const url = "/public/mocks/fixtures-mock.json"// uncomment if you wnat to use live api`https://lancesports-fixtures-api.onrender.com/leagueFixtures`;
-        
+        const url = `https://lancesports-fixtures-api.onrender.com/leagueFixtures`// uncomment if you wnat to use live api;
+        //"/public/mocks/fixtures-mock.json"
         // Mock data for testing UI look when API is offline
         const mockFixtures: Fixture[] = [
           {
