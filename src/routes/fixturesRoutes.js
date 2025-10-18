@@ -7,7 +7,7 @@ import { delay } from "../utils/rateLimit.js";
 const router = express.Router();
 
 // Helper to safely stringify BigInts
-function convertBigInts(obj) {
+export async function convertBigInts(obj) {
   if (typeof obj === "bigint") return obj.toString();
   if (Array.isArray(obj)) return obj.map(convertBigInts);
   if (obj !== null && typeof obj === "object") {
