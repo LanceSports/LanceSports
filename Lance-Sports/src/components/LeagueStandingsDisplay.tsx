@@ -28,6 +28,8 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedLeague, setSelectedLeague] = useState<number | null>(null);
+
+  // existing sort state
   const [sortField, setSortField] = useState<keyof TeamStanding>('rank');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
@@ -41,7 +43,6 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
         }
         const data = await response.json();
         setStandingsData(data);
-        // Set default league to the first one found
         if (data.length > 0) {
           setSelectedLeague(data[0].league_id);
         }
@@ -86,16 +87,8 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
     }
   };
 
-  const formatForm = (form: string): string => {
-    return form.split('').map(char => {
-      switch (char) {
-        case 'W': return 'W';
-        case 'D': return 'D';
-        case 'L': return 'L';
-        default: return char;
-      }
-    }).join(' ');
-  };
+  const formatForm = (form: string): string =>
+    form.split('').map(c => (c === 'W' || c === 'D' || c === 'L' ? c : c)).join(' ');
 
   const handleSort = (field: keyof TeamStanding) => {
     if (sortField === field) {
@@ -106,26 +99,33 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
     }
   };
 
-  const sortedData = [...standingsData].filter(team => 
-    selectedLeague === null || team.league_id === selectedLeague
-  ).sort((a, b) => {
-    const aVal = a[sortField];
-    const bVal = b[sortField];
-    
-    if (typeof aVal === 'string' && typeof bVal === 'string') {
-      return sortDirection === 'asc' 
-        ? aVal.localeCompare(bVal)
-        : bVal.localeCompare(aVal);
-    }
-    
-    if (typeof aVal === 'number' && typeof bVal === 'number') {
-      return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
-    }
-    
-    return 0;
-  });
+  const sortedData = [...standingsData]
+    .filter(team => selectedLeague === null || team.league_id === selectedLeague)
+    .sort((a, b) => {
+      const aVal = a[sortField];
+      const bVal = b[sortField];
+
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+      return 0;
+    });
 
   const availableLeagues = Array.from(new Set(standingsData.map(team => team.league_id)));
+
+  // --- NEW: Sort-by options for the button group ---
+  const sortOptions: Array<{ key: keyof TeamStanding; label: string }> = [
+    { key: 'played', label: 'P' },
+    { key: 'win', label: 'W' },
+    { key: 'draw', label: 'D' },
+    { key: 'lose', label: 'L' },
+    { key: 'goals_for', label: 'GF' },
+    { key: 'goals_against', label: 'GA' },
+    { key: 'goals_diff', label: 'GD' },
+  ];
 
   if (loading) {
     return (
@@ -215,47 +215,106 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
           </div>
         </div>
 
+        {/* NEW: Sort-By Controls (same theme) */}
+        <div className="mb-6">
+          <div className="glass-card-dark p-4 rounded-xl glass-glow">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="text-gray-300">Sort by:</span>
+                <div className="flex flex-wrap gap-2">
+                  {sortOptions.map(opt => (
+                    <button
+                      key={opt.key as string}
+                      onClick={() => handleSort(opt.key)}
+                      className={`px-3 py-1.5 rounded-lg text-sm transition-colors border
+                        ${
+                          sortField === opt.key
+                            ? 'bg-green-500/20 text-green-400 border-green-500/40'
+                            : 'bg-gray-700/40 text-gray-300 border-white/10 hover:bg-gray-600/40'
+                        }`}
+                      title={`Sort by ${opt.label}`}
+                    >
+                      {opt.label}
+                      {sortField === opt.key && (
+                        <span className="ml-1 opacity-80">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSortDirection(d => (d === 'asc' ? 'desc' : 'asc'))}
+                className="px-3 py-1.5 rounded-lg text-sm transition-colors border bg-gray-700/40 text-gray-200 border-white/10 hover:bg-gray-600/40"
+                aria-label="Toggle sort direction"
+              >
+                Direction: <span className="ml-1 font-semibold">{sortDirection === 'asc' ? 'Asc ↑' : 'Desc ↓'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Standings Table */}
         <div className="glass-card-dark p-6 rounded-xl glass-hover-dark glass-glow">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-700/50">
-                  <th 
+                  <th
                     className="text-left py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('rank')}
                   >
                     Rank {sortField === 'rank' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
-                  <th 
+                  <th
                     className="text-left py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('team_name')}
                   >
                     Team {sortField === 'team_name' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
-                  <th 
+                  <th
                     className="text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('points')}
                   >
                     Pts {sortField === 'points' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
-                  <th className="text-center py-3 px-4 text-gray-300 font-medium">P</th>
-                  <th className="text-center py-3 px-4 text-gray-300 font-medium">W</th>
-                  <th className="text-center py-3 px-4 text-gray-300 font-medium">D</th>
-                  <th className="text-center py-3 px-4 text-gray-300 font-medium">L</th>
-                  <th 
+                  <th
+                    className="text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    onClick={() => handleSort('played')}
+                  >
+                    P {sortField === 'played' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th
+                    className="text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    onClick={() => handleSort('win')}
+                  >
+                    W {sortField === 'win' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th
+                    className="text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    onClick={() => handleSort('draw')}
+                  >
+                    D {sortField === 'draw' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th
+                    className="text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    onClick={() => handleSort('lose')}
+                  >
+                    L {sortField === 'lose' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th
                     className="text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('goals_for')}
                   >
                     GF {sortField === 'goals_for' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
-                  <th 
+                  <th
                     className="text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('goals_against')}
                   >
                     GA {sortField === 'goals_against' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
-                  <th 
+                  <th
                     className="text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('goals_diff')}
                   >
@@ -267,8 +326,8 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
               </thead>
               <tbody>
                 {sortedData.map((team) => (
-                  <tr 
-                    key={`${team.league_id}-${team.team_id}`} 
+                  <tr
+                    key={`${team.league_id}-${team.team_id}`}
                     className="border-b border-gray-700/30 hover:bg-gray-700/20 transition-colors"
                   >
                     <td className="py-3 px-4">
@@ -314,7 +373,7 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
             const leagueTeams = standingsData.filter(team => team.league_id === leagueId);
             const totalGoals = leagueTeams.reduce((sum, team) => sum + team.goals_for, 0);
             const avgGoals = totalGoals / leagueTeams.length;
-            
+
             return (
               <div key={leagueId} className="glass-card-dark p-6 rounded-xl glass-glow">
                 <h3 className="text-lg font-semibold text-gray-100 mb-4 text-center">

@@ -22,7 +22,7 @@ const finals: Final[] = [
     winner: "Real Madrid",
     score: "1-0",
     color: "text-blue-600 dark:text-blue-400",
-    link: "#champions-league-2022"
+    link: "https://youtu.be/K-pvc1zoTeU?si=-ElWCMDonKo9aLsN"
   },   
   {
     id: 2,
@@ -34,7 +34,7 @@ const finals: Final[] = [
     winner: "Argentina",
     score: "4-2 (pen)",
     color: "text-green-600 dark:text-green-400",
-    link: "#world-cup-2022"
+    link: "https://youtu.be/zhEWqfP6V_w?si=vA8Hfgfb56LOTQg9"
   },
   {
     id: 3,
@@ -46,7 +46,7 @@ const finals: Final[] = [
     winner: "Manchester City",
     score: "1-0",
     color: "text-purple-600 dark:text-purple-400",
-    link: "#champions-league-2023"
+    link: "https://youtu.be/2QOsQCZjlsQ?si=lZu7cdX7lm3A3eS6"
   },
   {
     id: 4,
@@ -64,14 +64,13 @@ const finals: Final[] = [
 
 export function FixturesSidebar() {
   const handleFinalClick = (link: string, competition: string, year: string) => {
-    console.log(`Navigating to ${competition} ${year}`);
-    alert(`Redirecting to ${competition} ${year} - Final Details`);
+    window.open(link, "_blank", "noopener,noreferrer");
     // In a real app, this would navigate to the final details page
   };
 
   return (
     <div className="glass-green dark:glass-green-dark p-6 rounded-xl glass-glow">
-      <h3 className="text-lg mb-4 text-green-800 dark:text-green-300">Football Finals</h3>
+      <h3 className="text-lg mb-4 text-green-800 dark:text-green-300">Historic Football Finals</h3>
       
       <div className="space-y-4">
         {finals.map((final) => (

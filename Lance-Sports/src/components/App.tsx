@@ -9,6 +9,7 @@ import LiveUpcomingPastMatches from './LiveUpcomingPastMatches';
 import { useSession } from './hooks/useSession';
 import { ChatbotButton } from './ChatbotButton';
 import { ChampionsLeague } from './ChampionsLeague';
+import { Afcon } from './Afcon';
 import { PremierLeague } from './PremierLeague';
 import { ChatBot } from './ChatBot';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -211,6 +212,9 @@ function AppContent() {
             <LeagueStandingsDisplay />
           </ProtectedRoute>
         } />
+        <Route path = '/afcon' element={<ProtectedRoute> 
+          <Afcon/>
+        </ProtectedRoute>}/>
         {/* fallback */}
         <Route path="*" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
       </Routes>
