@@ -28,14 +28,17 @@ const RPS = Math.floor(RATE_LIMIT_RPM / 60); // requests per second allowed
 const CONCURRENCY = Math.max(1, Math.floor(RPS * 0.8)); // be conservative (e.g., ~6)
 const FAST_RESPONSE = true; // if true: return DB/fixtures quickly, update DB in background
 
+
 router.get("/", async (req, res) => {
   const season = new Date().getFullYear();
   try {
+    console.log("Route hit: /leagueFixtures");
     const results = [];
 
     for (const { name, id } of LEAGUES) {
       console.log(`Fetching fixtures for ${name} (${season})`);
       const fixtures = await fetchFixturesByLeague(id, season);
+      console.log(`→ ${fixtures?.length || 0} fixtures received`);
 
       if (!fixtures?.length) {
         results.push({ league: name, totalFixtures: 0, detailed: 0, fixtures: [] });
