@@ -151,7 +151,10 @@ export async function fetchLeagueFixtures(): Promise<LeagueFixturesResponse> {
   });
 
   // Create the fetch promise
-  const fetchPromise = fetch(`${BASE}/leagueFixtures`, {
+
+  /* LIVE API CALL : fetch(`${BASE}/leagueFixtures`....)*/
+  
+  const fetchPromise = fetch(`/public/mocks/fixtures-mock.json`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
