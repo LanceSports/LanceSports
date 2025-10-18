@@ -7,49 +7,50 @@ dotenv.config();
 const API_BASE = "https://v3.football.api-sports.io";
 const API_KEY = process.env.API_SPORTS_KEY;
 
-// Fetch basic fixtures by date (you already have this)
-export async function fetchFixturesByDate(date) {
+// Helper: retry on 429
+async function fetchWithRetry(fetchFn, retries = 3) {
   try {
-    const res = await axios.get(`${API_BASE}/fixtures`, {
-      params: { date },
-      headers: { "x-apisports-key": API_KEY },
-    });
-    //console.log("Raw API response:", JSON.stringify(res.data, null, 2));
-    return res.data.response;
-    
-
+    return await fetchFn();
   } catch (err) {
-    console.error("Error fetching fixtures:", err.message);
+    if (err.response?.status === 429 && retries > 0) {
+      const retryAfter = parseInt(err.response.headers["retry-after"] || "1", 10);
+      const waitMs = retryAfter * 1000;
+      console.warn(`429 Too Many Requests. Retrying after ${waitMs}ms...`);
+      await new Promise((r) => setTimeout(r, waitMs));
+      return fetchWithRetry(fetchFn, retries - 1);
+    }
     throw err;
   }
 }
 
-// ✅ New: Fetch detailed info for a single fixture
+// Fetch fixtures by date
+export async function fetchFixturesByDate(date) {
+  return fetchWithRetry(() =>
+    axios
+      .get(`${API_BASE}/fixtures`, {
+        params: { date },
+        headers: { "x-apisports-key": API_KEY },
+      })
+      .then((res) => res.data.response)
+  );
+}
+
+// Fetch detailed info for a single fixture
 export async function fetchFixtureDetails(fixtureId) {
-  try {
-    // 1. Fixture events
-    const eventsPromise = axios.get(`${API_BASE}/fixtures/events`, {
-      params: { fixture: fixtureId },
-      headers: { "x-apisports-key": API_KEY },
-    });
-
-    // 2. Fixture statistics
-    const statsPromise = axios.get(`${API_BASE}/fixtures/statistics`, {
-      params: { fixture: fixtureId },
-      headers: { "x-apisports-key": API_KEY },
-    });
-
-    // 3. Fixture players
-    const playersPromise = axios.get(`${API_BASE}/fixtures/players`, {
-      params: { fixture: fixtureId },
-      headers: { "x-apisports-key": API_KEY },
-    });
-
-    // Wait for all to complete
+  return fetchWithRetry(async () => {
     const [eventsRes, statsRes, playersRes] = await Promise.all([
-      eventsPromise,
-      statsPromise,
-      playersPromise,
+      axios.get(`${API_BASE}/fixtures/events`, {
+        params: { fixture: fixtureId },
+        headers: { "x-apisports-key": API_KEY },
+      }),
+      axios.get(`${API_BASE}/fixtures/statistics`, {
+        params: { fixture: fixtureId },
+        headers: { "x-apisports-key": API_KEY },
+      }),
+      axios.get(`${API_BASE}/fixtures/players`, {
+        params: { fixture: fixtureId },
+        headers: { "x-apisports-key": API_KEY },
+      }),
     ]);
 
     return {
@@ -57,26 +58,20 @@ export async function fetchFixtureDetails(fixtureId) {
       statistics: statsRes.data.response || [],
       players: playersRes.data.response || [],
     };
-  } catch (err) {
-    console.error(`Error fetching details for fixture ${fixtureId}:`, err.message);
-    return { events: [], statistics: [], players: [] }; // return empty arrays on failure
-  }
+  });
 }
 
-
+// Fetch fixtures by league
 export async function fetchFixturesByLeague(leagueId, season) {
-  try {
-    const res = await axios.get(`${API_BASE}/fixtures`, {
-      params: { league: leagueId, season },
-      headers: { "x-apisports-key": API_KEY },
-    });
-    return res.data.response;
-  } catch (err) {
-    console.error(`Error fetching fixtures for league ${leagueId}:`, err.message);
-    throw err;
-  }
+  return fetchWithRetry(() =>
+    axios
+      .get(`${API_BASE}/fixtures`, {
+        params: { league: leagueId, season },
+        headers: { "x-apisports-key": API_KEY },
+      })
+      .then((res) => res.data.response)
+  );
 }
-
 export async function fetchStandings(leagueId, season) {
   try {
     const res = await axios.get(`${API_BASE}/standings`, {
