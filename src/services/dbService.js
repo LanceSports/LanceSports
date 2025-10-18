@@ -107,7 +107,7 @@ function sanitizeBigInt(obj) {
   );
 }
 
-/*
+
 //Sequential DB Operations per fixture
 export async function saveFixtures(apiFixtures) {
   for (const apiFixture of apiFixtures) {
@@ -215,7 +215,8 @@ export async function saveFixtures(apiFixtures) {
     }
   }
 }
-*/
+
+
 // Batch DB Operations for multiple fixtures
 export async function saveFixturesBatch(apiFixtures = []) {
   // Collect all entities in arrays
