@@ -78,51 +78,51 @@ export async function fetchFixturesByLeague(leagueId, season) {
 }
 
 export async function fetchStandings(leagueId, season) {
-  const res = await fetch(
-    `https://v3.football.api-sports.io/standings?league=${leagueId}&season=${season}`,
-    {
-      headers: {
-        "x-apisports-key": process.env.FOOTBALL_API_KEY,
-      },
-    }
-  );
+  try {
+    const res = await axios.get(`${API_BASE}/standings`, {
+      params: { league: leagueId, season },
+      headers: { "x-apisports-key": API_KEY },
+    });
 
-  const json = await res.json();
-  return json.response.flatMap((entry) =>
-    entry.league.standings.flatMap((group) =>
-      group.map((t) => ({
-        league_id: entry.league.id,
-        season: entry.league.season,
-        team_id: t.team.id,
-        team_name: t.team.name,
-        rank: t.rank,
-        points: t.points,
-        goals_diff: t.goalsDiff,
-        form: t.form,
-        played: t.all.played,
-        win: t.all.win,
-        draw: t.all.draw,
-        lose: t.all.lose,
-        goals_for: t.all.goals.for,
-        goals_against: t.all.goals.against,
-        updated_at: new Date().toISOString(),
-      }))
-    )
-  );
+    return res.data.response.flatMap((entry) =>
+      entry.league.standings.flatMap((group) =>
+        group.map((t) => ({
+          league_id: entry.league.id,
+          season: entry.league.season,
+          team_id: t.team.id,
+          team_name: t.team.name,
+          rank: t.rank,
+          points: t.points,
+          goals_diff: t.goalsDiff,
+          form: t.form,
+          played: t.all.played,
+          win: t.all.win,
+          draw: t.all.draw,
+          lose: t.all.lose,
+          goals_for: t.all.goals.for,
+          goals_against: t.all.goals.against,
+          updated_at: new Date().toISOString(),
+        }))
+      )
+    );
+  } catch (err) {
+    console.error(`Error fetching standings for league ${leagueId}:`, err.message);
+    return [];
+  }
 }
 
-export async function fetchOdds(leagueId, season) {
-  const res = await fetch(
-    `https://v3.football.api-sports.io/odds?league=${leagueId}&season=${season}`,
-    {
-      headers: {
-        "x-apisports-key": process.env.FOOTBALL_API_KEY,
-      },
-    }
-  );
 
-  const json = await res.json();
-  return json.response || [];
+export async function fetchOdds(leagueId, season) {
+  try {
+    const res = await axios.get(`${API_BASE}/odds`, {
+      params: { league: leagueId, season },
+      headers: { "x-apisports-key": API_KEY },
+    });
+    return res.data.response || [];
+  } catch (err) {
+    console.error(`Error fetching odds for league ${leagueId}:`, err.message);
+    return [];
+  }
 }
 
 
