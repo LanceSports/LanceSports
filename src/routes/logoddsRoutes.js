@@ -8,8 +8,7 @@ const router = express.Router();
 const LEAGUES = {
   EPL: 39,
   UCL: 2,
-  WC: 1,
-  AFCON: 6,
+  PSL: 288,
 };
 
 const CURRENT_YEAR = new Date().getFullYear();

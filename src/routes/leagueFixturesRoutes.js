@@ -10,8 +10,6 @@ const LEAGUES = [
   { name: "EPL", id: 39 },
   { name: "UCL", id: 2 },
   { name: "Premier Soccer League", id: 288 },
-  { name: "World Cup", id: 1 },
-  { name: "AFCON", id: 6 },
 ];
 
 // Helper — safely stringify BigInts before sending JSON
