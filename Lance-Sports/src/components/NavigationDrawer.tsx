@@ -8,7 +8,7 @@ import {
   DrawerClose,
 } from './ui/drawer';
 import { Button } from './ui/button';
-import { X, Home, Trophy, Calendar, User, Globe, MessageCircle } from 'lucide-react';
+import { X, Home, Trophy, Calendar, User, Globe, MessageCircle, BarChart3, Target, TrendingUp } from 'lucide-react';
 import { Link,useNavigate } from 'react-router-dom';
 
 interface NavigationDrawerProps {
@@ -32,7 +32,9 @@ export function NavigationDrawer({
      {name: 'Lance AI Assistant', to: '/chatbot', icon: MessageCircle, highlight: true },
     {name: 'Champions League', to:'/champions-league', icon: Trophy },
     { name: 'Fixtures', to: '/football-leagues', icon: Globe },
-    
+    { name: 'League Standings', to: '/league-standings', icon: TrendingUp },
+    { name: 'Betting Odds', to: '/odds-general', icon: BarChart3 },
+    { name: 'Detailed Odds', to: '/odds-specific', icon: Target },
   ];
 
   const handleItemClick = () => {
@@ -143,13 +145,27 @@ export function NavigationDrawer({
               >
                 Sports News
               </a>
-              <a 
-                href="#standings" 
+              <Link 
+                to="/league-standings" 
                 onClick={handleItemClick}
                 className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
               >
                 League Standings
-              </a>
+              </Link>
+              <Link 
+                to="/odds-general" 
+                onClick={handleItemClick}
+                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
+              >
+                Betting Odds
+              </Link>
+              <Link 
+                to="/odds-specific" 
+                onClick={handleItemClick}
+                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
+              >
+                Detailed Odds
+              </Link>
               <a 
                 href="#highlights" 
                 onClick={handleItemClick}

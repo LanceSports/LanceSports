@@ -19,6 +19,8 @@ const navigate = useNavigate();
     { name: 'All Leagues', to: '/football-leagues' },
     { name: 'Premier League', to: '/premier-league' },
     { name: 'Champions League', to: '/champions-league' },
+    { name: 'League Standings', to: '/league-standings' },
+    { name: 'Betting Odds', to: '/odds-general' },
   ];
 
   return (

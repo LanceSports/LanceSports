@@ -12,6 +12,9 @@ import { ChampionsLeague } from './ChampionsLeague';
 import { PremierLeague } from './PremierLeague';
 import { ChatBot } from './ChatBot';
 import { ProtectedRoute } from './ProtectedRoute';
+import OddsGeneralDisplay from './OddsGeneralDisplay';
+import OddsSpecificDisplay from './OddsSpecificDisplay';
+import LeagueStandingsDisplay from './LeagueStandingsDisplay';
 
 interface HomeProps {
   isSignedIn: boolean;
@@ -19,6 +22,8 @@ interface HomeProps {
 }
 
 function Home({ isSignedIn, userData }: HomeProps) {
+  const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-950 to-gray-900 transition-colors duration-200">
       <main className="max-w-7xl mx-auto px-4 py-8">
@@ -63,6 +68,47 @@ function Home({ isSignedIn, userData }: HomeProps) {
                   during matches across Premier League, Rugby, Cricket, and more.
                 </p>
               </div>
+
+              {/* New Features Section */}
+              {isSignedIn && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                  <div className="glass-card-dark p-4 rounded-xl glass-hover-dark glass-glow cursor-pointer" onClick={() => navigate('/odds-general')}>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <span className="text-green-400 text-lg">📊</span>
+                      </div>
+                      <h4 className="text-gray-100 font-semibold">Betting Odds</h4>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      View comprehensive betting odds from multiple bookmakers
+                    </p>
+                  </div>
+
+                  <div className="glass-card-dark p-4 rounded-xl glass-hover-dark glass-glow cursor-pointer" onClick={() => navigate('/odds-specific')}>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                        <span className="text-blue-400 text-lg">🎯</span>
+                      </div>
+                      <h4 className="text-gray-100 font-semibold">Detailed Odds</h4>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      Explore detailed market-specific betting information
+                    </p>
+                  </div>
+
+                  <div className="glass-card-dark p-4 rounded-xl glass-hover-dark glass-glow cursor-pointer" onClick={() => navigate('/league-standings')}>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                        <span className="text-purple-400 text-lg">🏆</span>
+                      </div>
+                      <h4 className="text-gray-100 font-semibold">League Standings</h4>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      Check current standings across all major leagues
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -148,6 +194,21 @@ function AppContent() {
         <Route path="/chatbot" element={
           <ProtectedRoute>
             <ChatBot />
+          </ProtectedRoute>
+        } />
+        <Route path="/odds-general" element={
+          <ProtectedRoute>
+            <OddsGeneralDisplay />
+          </ProtectedRoute>
+        } />
+        <Route path="/odds-specific" element={
+          <ProtectedRoute>
+            <OddsSpecificDisplay />
+          </ProtectedRoute>
+        } />
+        <Route path="/league-standings" element={
+          <ProtectedRoute>
+            <LeagueStandingsDisplay />
           </ProtectedRoute>
         } />
         {/* fallback */}
