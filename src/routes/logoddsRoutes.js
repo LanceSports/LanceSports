@@ -1,7 +1,8 @@
-
+import { convertBigInts } from "../utils.js";
 import express from "express";
-import { fetchStandings, fetchOdds } from "../services/apiService.js";
+import { fetchStandings, fetchOdds, fetchFixturesByLeague } from "../services/apiService.js";
 import { saveStandings, saveOdds } from "../services/dbService.js";
+
 
 const router = express.Router();
 
@@ -63,17 +64,21 @@ router.get("/odds", async (req, res) => {
     const allOdds = [];
 
     for (const leagueId of Object.values(LEAGUES)) {
-      const data = await fetchOdds(leagueId, CURRENT_YEAR);
+      // 1️⃣ Fetch odds
+      const oddsData = await fetchOdds(leagueId, CURRENT_YEAR);
 
+      // 2️⃣ Fetch fixtures to get team names
+      const fixtures = await fetchFixturesByLeague(leagueId, CURRENT_YEAR);
+      const fixtureMap = Object.fromEntries(
+        fixtures.map(f => [f.fixture.id, { home: f.teams.home.name, away: f.teams.away.name }])
+      );
+
+      // 3️⃣ Group by fixture
       const groupedByFixture = {};
-
-      for (const entry of data) {
+      for (const entry of oddsData) {
         const fixtureId = entry.fixture.id;
         const fixtureDate = entry.fixture.date;
-
-        // Extract home and away team names
-        const homeTeam = entry.teams?.home?.name || "Home Team";
-        const awayTeam = entry.teams?.away?.name || "Away Team";
+        const teams = fixtureMap[fixtureId] || { home: "Home Team", away: "Away Team" };
 
         if (!groupedByFixture[fixtureId]) {
           groupedByFixture[fixtureId] = {
@@ -81,22 +86,17 @@ router.get("/odds", async (req, res) => {
             fixture_date: fixtureDate,
             league_id: entry.league.id,
             season: entry.league.season,
-            home_team: homeTeam,
-            away_team: awayTeam,
-            bookmakers: {
-              Betway: {},
-              "10Bet": {},
-            },
+            home_team: teams.home,
+            away_team: teams.away,
+            bookmakers: { Betway: {}, "10Bet": {} },
             updated_at: new Date().toISOString(),
           };
         }
 
         for (const bookmaker of entry.bookmakers || []) {
           if (["Betway", "10Bet"].includes(bookmaker.name)) {
-            // Flatten bets into market_name → values mapping
-            bookmaker.bets.forEach((b) => {
-              groupedByFixture[fixtureId].bookmakers[bookmaker.name][b.name] =
-                b.values;
+            bookmaker.bets.forEach(b => {
+              groupedByFixture[fixtureId].bookmakers[bookmaker.name][b.name] = b.values;
             });
           }
         }
@@ -104,7 +104,7 @@ router.get("/odds", async (req, res) => {
 
       const groupedArray = Object.values(groupedByFixture);
 
-      // Save to DB
+      // 4️⃣ Save to DB
       await saveOdds(groupedArray);
 
       allOdds.push(...groupedArray);
@@ -117,49 +117,44 @@ router.get("/odds", async (req, res) => {
   }
 });
 
-
-
-// Specific league
+// ✅ /odds/:leagueId (specific league)
 router.get("/odds/:leagueId", async (req, res) => {
   try {
     const leagueId = req.params.leagueId;
-    const data = await fetchOdds(leagueId, CURRENT_YEAR);
 
-    // Group by fixture
+    // 1️⃣ Fetch odds
+    const oddsData = await fetchOdds(leagueId, CURRENT_YEAR);
+
+    // 2️⃣ Fetch fixtures to get team names
+    const fixtures = await fetchFixturesByLeague(leagueId, CURRENT_YEAR);
+    const fixtureMap = Object.fromEntries(
+      fixtures.map(f => [f.fixture.id, { home: f.teams.home.name, away: f.teams.away.name }])
+    );
+
+    // 3️⃣ Group by fixture
     const groupedByFixture = {};
-
-    for (const entry of data) {
+    for (const entry of oddsData) {
       const fixtureId = entry.fixture.id;
       const fixtureDate = entry.fixture.date;
-      const homeTeam = entry.teams.home.name;
-      const awayTeam = entry.teams.away.name;
+      const teams = fixtureMap[fixtureId] || { home: "Home Team", away: "Away Team" };
 
-      // Initialize fixture if not in map
       if (!groupedByFixture[fixtureId]) {
         groupedByFixture[fixtureId] = {
           fixture_id: fixtureId,
           fixture_date: fixtureDate,
           league_id: entry.league.id,
           season: entry.league.season,
-          home_team: homeTeam,
-          away_team: awayTeam,
-          bookmakers: {
-            Betway: [],
-            "10Bet": [],
-          },
+          home_team: teams.home,
+          away_team: teams.away,
+          bookmakers: { Betway: [], "10Bet": [] },
           updated_at: new Date().toISOString(),
         };
       }
 
-      // Iterate through bookmakers for this fixture
       for (const bookmaker of entry.bookmakers || []) {
         if (["Betway", "10Bet"].includes(bookmaker.name)) {
           groupedByFixture[fixtureId].bookmakers[bookmaker.name].push({
-            // No need to store market_name separately, just store bets
-            bets: bookmaker.bets.map((b) => ({
-              market: b.name,
-              values: b.values,
-            })),
+            bets: bookmaker.bets.map(b => ({ market: b.name, values: b.values })),
           });
         }
       }
@@ -167,16 +162,13 @@ router.get("/odds/:leagueId", async (req, res) => {
 
     const groupedArray = Object.values(groupedByFixture);
 
-    // Save to DB
+    // 4️⃣ Save to DB
     await saveOdds(groupedArray);
 
-    // Return the grouped array to frontend
     res.status(200).json(convertBigInts(groupedArray));
   } catch (err) {
     console.error("Error fetching odds:", err);
     res.status(500).json({ error: "Failed to fetch betting odds" });
   }
 });
-
-
 export default router;
