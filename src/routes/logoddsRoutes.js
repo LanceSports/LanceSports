@@ -1,4 +1,4 @@
-import { convertBigInts } from "../utils.js";
+import { convertBigInts } from "../fixturesRoutes.js";
 import express from "express";
 import { fetchStandings, fetchOdds, fetchFixturesByLeague } from "../services/apiService.js";
 import { saveStandings, saveOdds } from "../services/dbService.js";
