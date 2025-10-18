@@ -9,7 +9,7 @@ const router = express.Router();
 const LEAGUES = [
   { name: "EPL", id: 39 },
   { name: "UCL", id: 2 },
-  { name: "Euro Championship", id: 4 },
+  { name: "Premier Soccer League", id: 288 },
   { name: "World Cup", id: 1 },
   { name: "AFCON", id: 6 },
 ];
