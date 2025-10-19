@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 
 // Mock the components to avoid complex dependencies
-vi.mock('../../src/components/hooks/useSession', () => ({
+vi.mock('../src/components/hooks/useSession', () => ({
   useSession: () => ({
     isSignedIn: false,
     userData: null,
@@ -12,24 +12,24 @@ vi.mock('../../src/components/hooks/useSession', () => ({
   })
 }));
 
-vi.mock('../../src/components/ChatbotButton', () => ({
+vi.mock('../src/components/ChatbotButton', () => ({
   ChatbotButton: () => <div>Chatbot Button</div>
 }));
 
-vi.mock('../../src/components/SportsSlideshow', () => ({
+vi.mock('../src/components/SportsSlideshow', () => ({
   SportsSlideshow: () => <div>Sports Slideshow</div>
 }));
 
-vi.mock('../../src/components/FixturesSidebar', () => ({
+vi.mock('../src/components/FixturesSidebar', () => ({
   FixturesSidebar: () => <div>Fixtures Sidebar</div>
 }));
 
-vi.mock('../../src/components/Navbar', () => ({
+vi.mock('../src/components/Navbar', () => ({
   Navbar: () => <nav>Navigation</nav>
 }));
 
 // Import App component
-import App from '../../src/components/App';
+import App from '../src/components/App';
 
 describe('Basic Coverage Tests', () => {
   describe('App Component', () => {

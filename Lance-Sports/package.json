@@ -51,24 +51,26 @@
       },
       "devDependencies": {
             "@testing-library/jest-dom": "^6.6.3",
-            "@testing-library/react": "^16.0.0",
+            "@testing-library/react": "^16.3.0",
+            "@testing-library/user-event": "^14.6.1",
             "@types/node": "^20.10.0",
             "@types/react": "^19.1.14",
             "@types/react-dom": "^19.1.9",
             "@vitejs/plugin-react-swc": "^3.10.2",
+            "@vitest/coverage-v8": "^3.2.4",
             "autoprefixer": "^10.4.21",
             "jsdom": "^25.0.1",
             "postcss": "^8.5.6",
             "tailwindcss": "^4.1.14",
             "vite": "6.3.5",
-            "vitest": "^2.1.8"
+            "vitest": "^3.2.4"
       },
       "scripts": {
             "dev": "vite",
             "build": "vite build",
             "test": "vitest",
             "test:run": "vitest run",
-            "test:coverage": "vitest run --coverage --reporter=verbose",
+            "test:coverage": "vitest run --coverage --reporter=verbose --coverage.reporter=text --coverage.reporter=lcov",
             "test:simple": "vitest run tests/simple.test.ts --coverage",
             "test:basic": "vitest run tests/simple.test.ts tests/basic-coverage.test.tsx --coverage",
             "coverage": "vitest run --coverage"
