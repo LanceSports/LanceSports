@@ -453,3 +453,73 @@ html {
 .text-psl-green {
   color: #22c55e;
 }
+
+/* Mobile-first responsive helpers */
+/* Make images, svgs and media scale to their container */
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Central container used by many components */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  box-sizing: border-box;
+}
+
+/* Improve touch targets and interaction on small screens */
+button,
+.btn,
+input[type="button"],
+input[type="submit"],
+a.button {
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  touch-action: manipulation;
+}
+
+/* Ensure root fills viewport and avoid horizontal scroll */
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Small-screen typography tweaks */
+@media (max-width: 640px) {
+  html {
+    font-size: 13px; /* slightly smaller for mobile */
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  h2 {
+    font-size: 1.0625rem;
+  }
+
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+/* Prevent accidental tap highlighting on mobile */
+a,
+button {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Safe area helpers (top) */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}

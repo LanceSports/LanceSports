@@ -146,7 +146,7 @@ const OddsGeneralDisplay: React.FC<OddsGeneralDisplayProps> = ({ className = '' 
         </div>
 
         <div className="space-y-8">
-          {oddsData.slice(0, 3).map((fixture) => (
+          {oddsData.map((fixture) => (
             <div key={fixture.fixture_id} className="glass-card-dark p-6 rounded-xl glass-hover-dark glass-glow">
               {/* Fixture Header */}
               <div className="mb-6">
