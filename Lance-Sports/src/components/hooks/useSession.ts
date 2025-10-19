@@ -16,14 +16,14 @@ interface UserData {
 interface SessionHook {
   isSignedIn: boolean;
   userData: UserData | null;
-  signIn: (userData: UserData) => void;
+  signIn: (userData: UserData) => Promise<void>;
   signOut: () => void;
   refreshSession: () => void;
 }
 
 const SESSION_KEY = 'lancesports_user';
 const SIGNED_IN_KEY = 'lancesports_signed_in';
-const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+const SESSION_DURATION = 0.5* 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
 export function useSession(): SessionHook {
   const [isSignedIn, setIsSignedIn] = useState(false);
@@ -56,7 +56,6 @@ export function useSession(): SessionHook {
 
         // Check if session has expired
         if (userData.expiresAt && new Date(userData.expiresAt) < new Date()) {
-          console.log('❌ Session expired, clearing...');
           signOut();
           return;
         }
@@ -64,13 +63,7 @@ export function useSession(): SessionHook {
         // Session is valid
         setIsSignedIn(true);
         setUserData(userData);
-        console.log('✅ Session restored:', userData.name);
         
-        // Log session info
-        if (userData.sessionStart) {
-          const sessionAge = Math.round((Date.now() - new Date(userData.sessionStart).getTime()) / (1000 * 60 * 60));
-          console.log(`📅 Session age: ${sessionAge} hours`);
-        }
       } else {
         // No valid session
         setIsSignedIn(false);
@@ -82,7 +75,7 @@ export function useSession(): SessionHook {
     }
   }, []);
 
-  const signIn = useCallback((userData: UserData) => {
+  const signIn = useCallback(async (userData: UserData): Promise<void> => {
     try {
       // Add session metadata
       const sessionData: UserData = {
@@ -98,11 +91,12 @@ export function useSession(): SessionHook {
       // Update state
       setIsSignedIn(true);
       setUserData(sessionData);
-
-      console.log('✅ User signed in:', sessionData.name);
-      console.log('✅ Session saved to localStorage');
+      
+      // Return a resolved promise to indicate completion
+      return Promise.resolve();
     } catch (error) {
       console.error('❌ Error saving session:', error);
+      return Promise.reject(error);
     }
   }, []);
 
@@ -114,9 +108,6 @@ export function useSession(): SessionHook {
     // Update state
     setIsSignedIn(false);
     setUserData(null);
-
-    console.log('✅ User signed out');
-    console.log('✅ Session cleared from localStorage');
   }, []);
 
   const refreshSession = useCallback(() => {
@@ -129,7 +120,6 @@ export function useSession(): SessionHook {
 
       localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUserData));
       setUserData(updatedUserData);
-      console.log('✅ Session refreshed');
     }
   }, [userData]);
 

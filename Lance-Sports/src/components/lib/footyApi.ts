@@ -5,8 +5,10 @@ const BASE =
   (import.meta as any)?.env?.VITE_API_BASE?.replace(/\/+$/, "") ||
   "https://lancesports-fixtures-api.onrender.com";
 
+const CHATBOT = "https://lancesports-3kmd.onrender.com"
+
 export async function askFootyBot(message: string): Promise<string> {
-  const resp = await fetch(`${BASE}/api/football-chat`, {
+  const resp = await fetch(`${CHATBOT}/api/football-chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message }),
@@ -19,7 +21,6 @@ export async function askFootyBot(message: string): Promise<string> {
   }
 
   const data = await resp.json().catch(() => ({}));
-  //console.log(data);
   return data?.reply ?? "Sorry, I couldn't generate a reply.";
 }
 
@@ -149,7 +150,10 @@ export async function fetchLeagueFixtures(): Promise<LeagueFixturesResponse> {
   });
 
   // Create the fetch promise
-  const fetchPromise = fetch(`${BASE}/leagueFixtures`, {
+
+  /* LIVE API CALL : fetch(`${BASE}/leagueFixtures`....)*/
+  
+  const fetchPromise =fetch(`${BASE}/leagueFixtures`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });

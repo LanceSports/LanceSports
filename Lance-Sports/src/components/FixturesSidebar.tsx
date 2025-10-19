@@ -22,7 +22,7 @@ const finals: Final[] = [
     winner: "Real Madrid",
     score: "1-0",
     color: "text-blue-600 dark:text-blue-400",
-    link: "#champions-league-2022"
+    link: "https://youtu.be/K-pvc1zoTeU?si=-ElWCMDonKo9aLsN"
   },   
   {
     id: 2,
@@ -34,7 +34,7 @@ const finals: Final[] = [
     winner: "Argentina",
     score: "4-2 (pen)",
     color: "text-green-600 dark:text-green-400",
-    link: "#world-cup-2022"
+    link: "https://youtu.be/zhEWqfP6V_w?si=vA8Hfgfb56LOTQg9"
   },
   {
     id: 3,
@@ -46,7 +46,7 @@ const finals: Final[] = [
     winner: "Manchester City",
     score: "1-0",
     color: "text-purple-600 dark:text-purple-400",
-    link: "#champions-league-2023"
+    link: "https://www.youtube.com/watch?v=EmBH8AGVBB4&pp=ygUYbWFuYyBjaXR5IHZzIGludGVyIG1pbGFu"
   },
   {
     id: 4,
@@ -58,20 +58,19 @@ const finals: Final[] = [
     winner: "Chelsea",
     score: "1-0",
     color: "text-red-600 dark:text-red-400",
-    link: "#champions-league-2021"
+    link: "https://www.youtube.com/watch?v=2QOsQCZjlsQ&t=1s&pp=ygUTbWFuIGNpdHkgdnMgY2hlbHNlYQ%3D%3D"
   }
 ];
 
 export function FixturesSidebar() {
   const handleFinalClick = (link: string, competition: string, year: string) => {
-    console.log(`Navigating to ${competition} ${year}`);
-    alert(`Redirecting to ${competition} ${year} - Final Details`);
+    window.open(link, "_blank", "noopener,noreferrer");
     // In a real app, this would navigate to the final details page
   };
 
   return (
     <div className="glass-green dark:glass-green-dark p-6 rounded-xl glass-glow">
-      <h3 className="text-lg mb-4 text-green-800 dark:text-green-300">Football Finals</h3>
+      <h3 className="text-lg mb-4 text-green-800 dark:text-green-300">Historic Football Finals</h3>
       
       <div className="space-y-4">
         {finals.map((final) => (

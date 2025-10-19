@@ -5,6 +5,7 @@ import { Label } from './ui/label';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { ThemeToggle } from './ThemeToggle';
 import { useGoogleLogin } from '@react-oauth/google';
+import { useLocation } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 
 interface SignInProps {
@@ -16,6 +17,10 @@ interface SignInProps {
 export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignInProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const location = useLocation();
+  
+  // Get the intended destination from the location state
+  const from = location.state?.from?.pathname || '/';
 
   // Optional: basic username/password form (placeholder only)
   const [username, setUsername] = useState('');
@@ -27,7 +32,6 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
       try {
         const { error } = await supabase.from('users').select('count').limit(1);
         if (error) console.error('❌ Supabase connection test failed:', error);
-        else console.log('✅ Supabase connection test successful');
       } catch (err) {
         console.error('❌ Supabase connection error:', err);
       }
@@ -40,7 +44,6 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
     onSuccess: async (response) => {
       setIsLoading(true);
       try {
-        console.log('Google OAuth successful:', response);
 
         const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
           headers: { Authorization: `Bearer ${response.access_token}` },
@@ -75,7 +78,7 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
 
         setIsSuccess(true);
         setTimeout(() => {
-          onSignIn(userData, '/');
+          onSignIn(userData, from);
         }, 1500);
       } catch (error) {
         console.error('Failed to authenticate:', error);
@@ -85,7 +88,7 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
           email: 'user@example.com',
           avatar_url: null,
         };
-        onSignIn(fallbackUserData, '/premier-league');
+        onSignIn(fallbackUserData, from);
       } finally {
         setIsLoading(false);
       }
@@ -100,7 +103,6 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Username/password login (placeholder):', { username, password });
     onSignIn({ username }, '/');
   };
 

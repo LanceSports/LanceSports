@@ -1,222 +1,181 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, Calendar, MapPin, Clock } from 'lucide-react';
+import { Trophy, Calendar, MapPin } from 'lucide-react';
 import { ChatbotButton } from './ChatbotButton';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { fetchLeagueFixtures, ApiFixture } from './lib/footyApi';
+import { getLeagueFixtures, onFixturesReady } from './lib/globalFixtures';
 
-interface Match {
-  fixture: {
-    id: number;
-    date: string;
-    venue: {
-      name: string;
-      city: string;
-    };
-    status: {
-      short: string;
-      elapsed: number | null;
-    };
-  };
-  league: {
-    name: string;
-    country: string;
-    logo: string;
-    round: string;
-  };
-  teams: {
-    home: {
-      id: number;
-      name: string;
-      logo: string;
-    };
-    away: {
-      id: number;
-      name: string;
-      logo: string;
-    };
-  };
-  goals: {
-    home: number | null;
-    away: number | null;
-  };
-  score: {
-    halftime: {
-      home: number | null;
-      away: number | null;
-    };
-    fulltime: {
-      home: number | null;
-      away: number | null;
-    };
-  };
-}
-
-interface StandingsTeam {
-  position: number;
-  team: {
-    id: number;
-    name: string;
-    logo: string;
-  };
-  played: number;
-  won: number;
-  drawn: number;
-  lost: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  goalDifference: number;
-  points: number;
-}
+type Match = ApiFixture;
 
 export function ChampionsLeague() {
   const navigate = useNavigate();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'matches' | 'standings'>('matches');
+  const [error, setError] = useState<string | null>(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [matchTab, setMatchTab] = useState<'live' | 'upcoming' | 'past'>('upcoming');
 
-  useEffect(() => {
-    const loadMatches = () => {
-      setLoading(true);
-      
-      // Mock Champions League matches data
-      const mockMatches: Match[] = [
-        {
-          fixture: {
-            id: 2001,
-            date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Santiago Bernabéu', city: 'Madrid' },
-            status: { short: 'NS', elapsed: null }
-          },
-          league: { name: 'UEFA Champions League', country: 'Europe', logo: '', round: 'Round of 16' },
-          teams: {
-            home: { id: 541, name: 'Real Madrid', logo: 'https://media.api-sports.io/football/teams/541.png' },
-            away: { id: 529, name: 'Bayern Munich', logo: 'https://media.api-sports.io/football/teams/529.png' }
-          },
-          goals: { home: null, away: null },
-          score: { halftime: { home: null, away: null }, fulltime: { home: null, away: null } }
-        },
-        {
-          fixture: {
-            id: 2002,
-            date: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Allianz Arena', city: 'Munich' },
-            status: { short: 'NS', elapsed: null }
-          },
-          league: { name: 'UEFA Champions League', country: 'Europe', logo: '', round: 'Round of 16' },
-          teams: {
-            home: { id: 157, name: 'Manchester City', logo: 'https://media.api-sports.io/football/teams/157.png' },
-            away: { id: 85, name: 'Paris Saint Germain', logo: 'https://media.api-sports.io/football/teams/85.png' }
-          },
-          goals: { home: null, away: null },
-          score: { halftime: { home: null, away: null }, fulltime: { home: null, away: null } }
-        },
-        {
-          fixture: {
-            id: 2003,
-            date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Camp Nou', city: 'Barcelona' },
-            status: { short: 'NS', elapsed: null }
-          },
-          league: { name: 'UEFA Champions League', country: 'Europe', logo: '', round: 'Round of 16' },
-          teams: {
-            home: { id: 529, name: 'Barcelona', logo: 'https://media.api-sports.io/football/teams/529.png' },
-            away: { id: 40, name: 'Liverpool', logo: 'https://media.api-sports.io/football/teams/40.png' }
-          },
-          goals: { home: null, away: null },
-          score: { halftime: { home: null, away: null }, fulltime: { home: null, away: null } }
-        },
-        {
-          fixture: {
-            id: 2004,
-            date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'San Siro', city: 'Milan' },
-            status: { short: 'FT', elapsed: null }
-          },
-          league: { name: 'UEFA Champions League', country: 'Europe', logo: '', round: 'Group Stage - Matchday 6' },
-          teams: {
-            home: { id: 505, name: 'Inter Milan', logo: 'https://media.api-sports.io/football/teams/505.png' },
-            away: { id: 492, name: 'Napoli', logo: 'https://media.api-sports.io/football/teams/492.png' }
-          },
-          goals: { home: 3, away: 2 },
-          score: { halftime: { home: 2, away: 1 }, fulltime: { home: 3, away: 2 } }
-        },
-        {
-          fixture: {
-            id: 2005,
-            date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-            venue: { name: 'Old Trafford', city: 'Manchester' },
-            status: { short: 'FT', elapsed: null }
-          },
-          league: { name: 'UEFA Champions League', country: 'Europe', logo: '', round: 'Group Stage - Matchday 6' },
-          teams: {
-            home: { id: 33, name: 'Manchester United', logo: 'https://media.api-sports.io/football/teams/33.png' },
-            away: { id: 50, name: 'Chelsea', logo: 'https://media.api-sports.io/football/teams/50.png' }
-          },
-          goals: { home: 1, away: 1 },
-          score: { halftime: { home: 0, away: 1 }, fulltime: { home: 1, away: 1 } }
-        }
-      ];
+  // 🔽 NEW: team filter state
+  const [teamFilter, setTeamFilter] = useState<number | 'all'>('all');
 
-      setTimeout(() => {
-        setMatches(mockMatches);
+  useEffect(() => {
+    const loadMatches = async () => {
+      setLoading(true);
+      setError(null);
+      setDataLoaded(false);
+
+      try {
+        let response = getLeagueFixtures();
+        if (!response) {
+          response = await fetchLeagueFixtures();
+        }
+
+        // Prefer UCL; fallback to another European competition if needed
+        const championsLeagueData =
+          response.results.find(
+            (league) =>
+              league.league === 'UCL' ||
+              league.league === 'Champions League' ||
+              league.league.toLowerCase().includes('champions') ||
+              league.league.toLowerCase().includes('uefa')
+          ) ?? null;
+
+        if (championsLeagueData) {
+          setMatches(championsLeagueData.fixtures);
+          setDataLoaded(true);
+
+          if (championsLeagueData.fixtures.length === 0) {
+            setError('Champions League data is currently unavailable - no fixtures found');
+          }
+        } else {
+          const europeanLeagueData =
+            response.results.find(
+              (league) =>
+                league.league.toLowerCase().includes('europa') ||
+                league.league.toLowerCase().includes('europe')
+            ) ?? null;
+
+          if (europeanLeagueData) {
+            setMatches(europeanLeagueData.fixtures);
+            setDataLoaded(true);
+
+            if (europeanLeagueData.fixtures.length === 0) {
+              setError('European competition data is currently unavailable - no fixtures found');
+            }
+          } else {
+            setError('No Champions League fixtures found');
+            setDataLoaded(true);
+          }
+        }
+      } catch (err) {
+        console.error('❌ Failed to load matches:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load matches');
+        setDataLoaded(true);
+      } finally {
         setLoading(false);
-      }, 500);
+      }
     };
 
+    const unsub = onFixturesReady(() => loadMatches());
     loadMatches();
+    return () => unsub();
   }, []);
 
   const handleMatchClick = (match: Match) => {
     navigate('/match', { state: { match } });
   };
 
-  const filterMatches = (matches: Match[]) => {
-    const now = new Date();
-    
-    switch (matchTab) {
-      case 'live':
-        return matches.filter(m => ['1H', '2H', 'HT', 'ET', 'P'].includes(m.fixture.status.short));
-      case 'upcoming':
-        return matches.filter(m => 
-          m.fixture.status.short === 'NS' && new Date(m.fixture.date) > now
-        );
-      case 'past':
-        return matches.filter(m => 
-          ['FT', 'AET', 'PEN'].includes(m.fixture.status.short) || 
-          (m.fixture.status.short === 'NS' && new Date(m.fixture.date) < now)
-        );
-      default:
-        return matches;
+  const retryLoading = async () => {
+    setLoading(true);
+    setError(null);
+    setDataLoaded(false);
+
+    try {
+      const response = await fetchLeagueFixtures();
+
+      const championsLeagueData =
+        response.results.find(
+          (league) =>
+            league.league === 'UCL' ||
+            league.league === 'Champions League' ||
+            league.league.toLowerCase().includes('champions') ||
+            league.league.toLowerCase().includes('uefa')
+        ) ?? null;
+
+      if (championsLeagueData) {
+        setMatches(championsLeagueData.fixtures);
+        setDataLoaded(true);
+      } else {
+        const europeanLeagueData =
+          response.results.find(
+            (league) =>
+              league.league.toLowerCase().includes('europa') ||
+              league.league.toLowerCase().includes('europe')
+          ) ?? null;
+
+        if (europeanLeagueData) {
+          setMatches(europeanLeagueData.fixtures);
+          setDataLoaded(true);
+        } else {
+          setError('No Champions League fixtures found');
+          setDataLoaded(true);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load matches:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load matches');
+      setDataLoaded(true);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const filteredMatches = filterMatches(matches);
+  const filterMatches = (list: Match[]) => {
+    const now = new Date();
 
-  // Mock standings data for Group A
-  const groupAStandings: StandingsTeam[] = [
-    { position: 1, team: { id: 541, name: 'Real Madrid', logo: 'https://media.api-sports.io/football/teams/541.png' }, played: 6, won: 5, drawn: 1, lost: 0, goalsFor: 15, goalsAgainst: 4, goalDifference: 11, points: 16 },
-    { position: 2, team: { id: 529, name: 'Bayern Munich', logo: 'https://media.api-sports.io/football/teams/529.png' }, played: 6, won: 4, drawn: 1, lost: 1, goalsFor: 14, goalsAgainst: 6, goalDifference: 8, points: 13 },
-    { position: 3, team: { id: 157, name: 'Manchester City', logo: 'https://media.api-sports.io/football/teams/157.png' }, played: 6, won: 2, drawn: 1, lost: 3, goalsFor: 8, goalsAgainst: 10, goalDifference: -2, points: 7 },
-    { position: 4, team: { id: 85, name: 'Paris Saint Germain', logo: 'https://media.api-sports.io/football/teams/85.png' }, played: 6, won: 0, drawn: 1, lost: 5, goalsFor: 3, goalsAgainst: 20, goalDifference: -17, points: 1 },
-  ];
+    switch (matchTab) {
+      case 'live':
+        return list.filter((m) => ['1H', '2H', 'HT', 'ET', 'P'].includes(m.fixture.status.short));
+      case 'upcoming':
+        return list.filter((m) => m.fixture.status.short === 'NS' && new Date(m.fixture.date) > now);
+      case 'past':
+        return list.filter(
+          (m) =>
+            ['FT', 'AET', 'PEN'].includes(m.fixture.status.short) ||
+            (m.fixture.status.short === 'NS' && new Date(m.fixture.date) < now)
+        );
+      default:
+        return list;
+    }
+  };
 
-  // Mock standings data for Group B
-  const groupBStandings: StandingsTeam[] = [
-    { position: 1, team: { id: 40, name: 'Liverpool', logo: 'https://media.api-sports.io/football/teams/40.png' }, played: 6, won: 6, drawn: 0, lost: 0, goalsFor: 18, goalsAgainst: 3, goalDifference: 15, points: 18 },
-    { position: 2, team: { id: 505, name: 'Inter Milan', logo: 'https://media.api-sports.io/football/teams/505.png' }, played: 6, won: 3, drawn: 2, lost: 1, goalsFor: 10, goalsAgainst: 7, goalDifference: 3, points: 11 },
-    { position: 3, team: { id: 529, name: 'Barcelona', logo: 'https://media.api-sports.io/football/teams/529.png' }, played: 6, won: 2, drawn: 1, lost: 3, goalsFor: 9, goalsAgainst: 11, goalDifference: -2, points: 7 },
-    { position: 4, team: { id: 33, name: 'Manchester United', logo: 'https://media.api-sports.io/football/teams/33.png' }, played: 6, won: 0, drawn: 1, lost: 5, goalsFor: 5, goalsAgainst: 21, goalDifference: -16, points: 1 },
-  ];
+  // 🔽 NEW: compute unique teams for the dropdown (memoized)
+  const uniqueTeams = useMemo(() => {
+    const map = new Map<number, { id: number; name: string; logo: string }>();
+    for (const m of matches) {
+      map.set(m.teams.home.id, { id: m.teams.home.id, name: m.teams.home.name, logo: m.teams.home.logo });
+      map.set(m.teams.away.id, { id: m.teams.away.id, name: m.teams.away.name, logo: m.teams.away.logo });
+    }
+    // sort alphabetically by name for nicer UX
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [matches]);
+
+  // 🔽 Apply existing time-status filter, then team filter (logic unchanged otherwise)
+  const filteredMatches = filterMatches(matches).filter(
+    (m) =>
+      teamFilter === 'all' ||
+      m.teams.home.id === teamFilter ||
+      m.teams.away.id === teamFilter
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-950 to-blue-950 transition-colors duration-200">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-950 to-gray-900 transition-colors duration-200">
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Trophy className="text-ucl-purple" size={40} />
-            <h1 className="text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">
+            <Trophy className="text-green-400" size={40} />
+            <h1 className="text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-green-500 to-green-400">
               UEFA Champions League
             </h1>
           </div>
@@ -225,195 +184,113 @@ export function ChampionsLeague() {
           </p>
         </div>
 
-        {/* Main Tabs */}
+        {/* 🔽 NEW: Team filter (kept minimal to not change existing UI; uses same styling language) */}
+        <div className="mb-4 flex justify-center">
+          <div className="glass-card-dark rounded-xl px-3 py-2 flex items-center gap-3">
+            <span className="text-sm text-gray-300">Team:</span>
+            <select
+              value={teamFilter === 'all' ? 'all' : String(teamFilter)}
+              onChange={(e) =>
+                setTeamFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))
+              }
+              className="bg-transparent text-gray-200 border border-white/10 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-green-600/40"
+            >
+              <option value="all" className="bg-gray-900">
+                All teams
+              </option>
+              {uniqueTeams.map((t) => (
+                <option key={t.id} value={t.id} className="bg-gray-900">
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Match Sub-Tabs (old styling) */}
         <div className="mb-6 flex justify-center">
-          <div className="flex gap-2 glass-card-ucl p-2 rounded-xl inline-flex">
-            {['matches', 'standings'].map((tab) => (
+          <div className="flex gap-2 glass-card-dark p-2 rounded-xl inline-flex">
+            {(['live', 'upcoming', 'past'] as const).map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab as 'matches' | 'standings')}
-                className={`px-8 py-2 rounded-lg capitalize transition-all duration-200 ${
-                  activeTab === tab
-                    ? 'glass-ucl-dark text-ucl-purple shadow-lg'
+                onClick={() => setMatchTab(tab)}
+                className={`px-6 py-2 rounded-lg capitalize transition-all duration-200 ${
+                  matchTab === tab
+                    ? 'glass-green-dark text-green-400 shadow-lg'
                     : 'text-gray-300 hover:text-white hover:bg-white/5'
                 }`}
               >
                 {tab}
+                {tab === 'live' && (
+                  <span className="ml-2 inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                )}
+                {loading && (
+                  <span className="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                )}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Match Sub-Tabs (only show when matches tab is active) */}
-        {activeTab === 'matches' && (
-          <div className="mb-6 flex justify-center">
-            <div className="flex gap-2 glass-card-ucl p-2 rounded-xl inline-flex">
-              {['live', 'upcoming', 'past'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setMatchTab(tab as 'live' | 'upcoming' | 'past')}
-                  className={`px-6 py-2 rounded-lg capitalize transition-all duration-200 ${
-                    matchTab === tab
-                      ? 'glass-ucl-dark text-ucl-blue shadow-lg'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {tab}
-                  {tab === 'live' && (
-                    <span className="ml-2 inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Content */}
-        {activeTab === 'matches' ? (
-          // Matches Grid
-          loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="glass-card-ucl p-6 rounded-xl animate-pulse">
-                  <div className="h-24 bg-white/10 rounded-lg mb-4"></div>
-                  <div className="h-4 bg-white/10 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-white/10 rounded w-1/2"></div>
-                </div>
-              ))}
-            </div>
-          ) : filteredMatches.length === 0 ? (
-            <div className="glass-card-ucl p-12 rounded-xl text-center">
-              <Trophy className="mx-auto mb-4 text-gray-500" size={48} />
-              <h3 className="text-xl text-gray-300 mb-2">No matches found</h3>
-              <p className="text-gray-400">
-                {matchTab === 'live' && 'No live matches at the moment'}
-                {matchTab === 'upcoming' && 'No upcoming matches scheduled'}
-                {matchTab === 'past' && 'No past matches available'}
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMatches.map((match) => (
-                <MatchCard key={match.fixture.id} match={match} onClick={() => handleMatchClick(match)} />
-              ))}
-            </div>
-          )
-        ) : (
-          // Standings Tables
-          <div className="space-y-8">
-            {/* Group A */}
-            <div className="glass-card-ucl p-6 rounded-xl">
-              <h2 className="text-xl mb-4 text-ucl-purple">Group A</h2>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-white/10 hover:bg-white/5">
-                      <TableHead className="text-gray-300">Pos</TableHead>
-                      <TableHead className="text-gray-300">Team</TableHead>
-                      <TableHead className="text-center text-gray-300">P</TableHead>
-                      <TableHead className="text-center text-gray-300">W</TableHead>
-                      <TableHead className="text-center text-gray-300">D</TableHead>
-                      <TableHead className="text-center text-gray-300">L</TableHead>
-                      <TableHead className="text-center text-gray-300">GF</TableHead>
-                      <TableHead className="text-center text-gray-300">GA</TableHead>
-                      <TableHead className="text-center text-gray-300">GD</TableHead>
-                      <TableHead className="text-center text-gray-300">Pts</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {groupAStandings.map((team) => (
-                      <TableRow 
-                        key={team.position} 
-                        className={`border-white/10 hover:bg-white/5 ${
-                          team.position <= 2 ? 'bg-blue-500/10' : ''
-                        }`}
-                      >
-                        <TableCell className="text-gray-200">{team.position}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <img src={team.team.logo} alt={team.team.name} className="w-6 h-6 object-contain" />
-                            <span className="text-gray-200">{team.team.name}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center text-gray-300">{team.played}</TableCell>
-                        <TableCell className="text-center text-gray-300">{team.won}</TableCell>
-                        <TableCell className="text-center text-gray-300">{team.drawn}</TableCell>
-                        <TableCell className="text-center text-gray-300">{team.lost}</TableCell>
-                        <TableCell className="text-center text-gray-300">{team.goalsFor}</TableCell>
-                        <TableCell className="text-center text-gray-300">{team.goalsAgainst}</TableCell>
-                        <TableCell className={`text-center ${team.goalDifference > 0 ? 'text-green-400' : team.goalDifference < 0 ? 'text-red-400' : 'text-gray-300'}`}>
-                          {team.goalDifference > 0 ? '+' : ''}{team.goalDifference}
-                        </TableCell>
-                        <TableCell className="text-center text-ucl-purple">{team.points}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+        {loading ? (
+          // Old UI’s skeleton loaders
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="glass-card-dark p-6 rounded-xl animate-pulse">
+                <div className="h-24 bg-white/10 rounded-lg mb-4"></div>
+                <div className="h-4 bg-white/10 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-white/10 rounded w-1/2"></div>
               </div>
-              <div className="mt-4 flex items-center gap-4 text-xs text-gray-400">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-blue-500/30 rounded"></div>
-                  <span>Qualification to Round of 16</span>
-                </div>
-              </div>
-            </div>
+            ))}
+          </div>
+        ) : error && dataLoaded ? (
+          <div className="glass-card-dark p-12 rounded-xl text-center">
+            <Trophy className="mx-auto mb-4 text-gray-500" size={48} />
+            <h3 className="text-xl text-gray-300 mb-2">
+              {error.includes('no fixtures found')
+                ? 'No Data Available'
+                : error.includes('too long to respond')
+                ? 'API Taking Too Long'
+                : 'Error Loading Matches'}
+            </h3>
+            <p className="text-gray-400 mb-4">{error}</p>
 
-            {/* Group B */}
-            <div className="glass-card-ucl p-6 rounded-xl">
-              <h2 className="text-xl mb-4 text-ucl-purple">Group B</h2>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-white/10 hover:bg-white/5">
-                      <TableHead className="text-gray-300">Pos</TableHead>
-                      <TableHead className="text-gray-300">Team</TableHead>
-                      <TableHead className="text-center text-gray-300">P</TableHead>
-                      <TableHead className="text-center text-gray-300">W</TableHead>
-                      <TableHead className="text-center text-gray-300">D</TableHead>
-                      <TableHead className="text-center text-gray-300">L</TableHead>
-                      <TableHead className="text-center text-gray-300">GF</TableHead>
-                      <TableHead className="text-center text-gray-300">GA</TableHead>
-                      <TableHead className="text-center text-gray-300">GD</TableHead>
-                      <TableHead className="text-center text-gray-300">Pts</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {groupBStandings.map((team) => (
-                      <TableRow 
-                        key={team.position} 
-                        className={`border-white/10 hover:bg-white/5 ${
-                          team.position <= 2 ? 'bg-blue-500/10' : ''
-                        }`}
-                      >
-                        <TableCell className="text-gray-200">{team.position}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <img src={team.team.logo} alt={team.team.name} className="w-6 h-6 object-contain" />
-                            <span className="text-gray-200">{team.team.name}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center text-gray-300">{team.played}</TableCell>
-                        <TableCell className="text-center text-gray-300">{team.won}</TableCell>
-                        <TableCell className="text-center text-gray-300">{team.drawn}</TableCell>
-                        <TableCell className="text-center text-gray-300">{team.lost}</TableCell>
-                        <TableCell className="text-center text-gray-300">{team.goalsFor}</TableCell>
-                        <TableCell className="text-center text-gray-300">{team.goalsAgainst}</TableCell>
-                        <TableCell className={`text-center ${team.goalDifference > 0 ? 'text-green-400' : team.goalDifference < 0 ? 'text-red-400' : 'text-gray-300'}`}>
-                          {team.goalDifference > 0 ? '+' : ''}{team.goalDifference}
-                        </TableCell>
-                        <TableCell className="text-center text-ucl-purple">{team.points}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+            {error.includes('no fixtures found') ? (
+              <div className="bg-blue-900/20 p-4 rounded-lg mb-4">
+                <p className="text-blue-300 text-sm">
+                  ℹ️ The API is working but currently has no fixture data. This might be because:
+                </p>
+                <ul className="text-blue-200 text-sm mt-2 text-left">
+                  <li>• Season hasn&apos;t started yet</li>
+                  <li>• Data is being updated</li>
+                  <li>• API is temporarily out of sync</li>
+                </ul>
               </div>
-              <div className="mt-4 flex items-center gap-4 text-xs text-gray-400">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-blue-500/30 rounded"></div>
-                  <span>Qualification to Round of 16</span>
-                </div>
-              </div>
-            </div>
+            ) : null}
+
+            <button
+              onClick={retryLoading}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : dataLoaded && filteredMatches.length === 0 ? (
+          <div className="glass-card-dark p-12 rounded-xl text-center">
+            <Trophy className="mx-auto mb-4 text-gray-500" size={48} />
+            <h3 className="text-xl text-gray-300 mb-2">No matches found</h3>
+            <p className="text-gray-400">
+              {matchTab === 'live' && 'No live matches at the moment'}
+              {matchTab === 'upcoming' && 'No upcoming matches scheduled'}
+              {matchTab === 'past' && 'No past matches available'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredMatches.map((match) => (
+              <MatchCard key={match.fixture.id} match={match} onClick={() => handleMatchClick(match)} />
+            ))}
           </div>
         )}
       </main>
@@ -452,7 +329,7 @@ function MatchCard({ match, onClick }: MatchCardProps) {
   return (
     <div
       onClick={onClick}
-      className="glass-card-ucl p-6 rounded-xl cursor-pointer glass-hover-ucl group"
+      className="glass-card-dark p-6 rounded-xl cursor-pointer glass-hover-dark glass-glow group"
     >
       {/* Status Badge */}
       <div className="flex items-center justify-between mb-4">
@@ -469,7 +346,7 @@ function MatchCard({ match, onClick }: MatchCardProps) {
             </span>
           )}
           {!isLive && !isFinished && (
-            <span className="px-3 py-1 glass-ucl-dark text-ucl-blue rounded-full text-xs">
+            <span className="px-3 py-1 glass-green-dark text-green-400 rounded-full text-xs">
               {formatTime(fixture.date)}
             </span>
           )}
@@ -491,7 +368,7 @@ function MatchCard({ match, onClick }: MatchCardProps) {
             </span>
           </div>
           {goals.home !== null && (
-            <span className="text-2xl text-ucl-purple ml-2">
+            <span className="text-2xl text-green-400 ml-2">
               {goals.home}
             </span>
           )}
@@ -510,7 +387,7 @@ function MatchCard({ match, onClick }: MatchCardProps) {
             </span>
           </div>
           {goals.away !== null && (
-            <span className="text-2xl text-ucl-purple ml-2">
+            <span className="text-2xl text-green-400 ml-2">
               {goals.away}
             </span>
           )}
@@ -523,7 +400,7 @@ function MatchCard({ match, onClick }: MatchCardProps) {
           <Calendar size={14} />
           <span>{formatDate(fixture.date)}</span>
         </div>
-        {fixture.venue && (
+        {fixture.venue && fixture.venue.name && (
           <div className="flex items-center gap-2 text-gray-400 text-xs">
             <MapPin size={14} />
             <span>{fixture.venue.name}, {fixture.venue.city}</span>

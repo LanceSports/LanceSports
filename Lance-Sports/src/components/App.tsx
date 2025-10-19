@@ -9,8 +9,13 @@ import LiveUpcomingPastMatches from './LiveUpcomingPastMatches';
 import { useSession } from './hooks/useSession';
 import { ChatbotButton } from './ChatbotButton';
 import { ChampionsLeague } from './ChampionsLeague';
+import { Afcon } from './Afcon';
 import { PremierLeague } from './PremierLeague';
 import { ChatBot } from './ChatBot';
+import { ProtectedRoute } from './ProtectedRoute';
+import OddsGeneralDisplay from './OddsGeneralDisplay';
+import OddsSpecificDisplay from './OddsSpecificDisplay';
+import LeagueStandingsDisplay from './LeagueStandingsDisplay';
 
 interface HomeProps {
   isSignedIn: boolean;
@@ -18,6 +23,8 @@ interface HomeProps {
 }
 
 function Home({ isSignedIn, userData }: HomeProps) {
+  const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-950 to-gray-900 transition-colors duration-200">
       <main className="max-w-7xl mx-auto px-4 py-8">
@@ -26,10 +33,16 @@ function Home({ isSignedIn, userData }: HomeProps) {
           <h1 className="text-3xl md:text-4xl mb-8 text-center text-gray-100">
             The Future of Sports, all in one place.
           </h1>
-          {isSignedIn && (
+          {isSignedIn ? (
             <div className="text-center mb-4">
               <p className="text-green-400 glass-green-dark inline-block px-6 py-3 rounded-full glass-glow">
                 ✓ Welcome back, {userData?.name || userData?.username || 'User'}!
+              </p>
+            </div>
+          ) : (
+            <div className="text-center mb-4">
+              <p className="text-blue-400 glass-card-dark inline-block px-6 py-3 rounded-full border border-blue-500/30">
+                🔐 Sign in to access live scores, match details, and league standings
               </p>
             </div>
           )}
@@ -56,6 +69,47 @@ function Home({ isSignedIn, userData }: HomeProps) {
                   during matches across Premier League, Rugby, Cricket, and more.
                 </p>
               </div>
+
+              {/* New Features Section */}
+              {isSignedIn && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                  <div className="glass-card-dark p-4 rounded-xl glass-hover-dark glass-glow cursor-pointer" onClick={() => navigate('/odds-general')}>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <span className="text-green-400 text-lg">📊</span>
+                      </div>
+                      <h4 className="text-gray-100 font-semibold">Betting Odds</h4>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      View comprehensive betting odds from multiple bookmakers
+                    </p>
+                  </div>
+
+                  <div className="glass-card-dark p-4 rounded-xl glass-hover-dark glass-glow cursor-pointer" onClick={() => navigate('/odds-specific')}>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                        <span className="text-blue-400 text-lg">🎯</span>
+                      </div>
+                      <h4 className="text-gray-100 font-semibold">Detailed Odds</h4>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      Explore detailed market-specific betting information
+                    </p>
+                  </div>
+
+                  <div className="glass-card-dark p-4 rounded-xl glass-hover-dark glass-glow cursor-pointer" onClick={() => navigate('/league-standings')}>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                        <span className="text-purple-400 text-lg">🏆</span>
+                      </div>
+                      <h4 className="text-gray-100 font-semibold">League Standings</h4>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      Check current standings across all major leagues
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -78,11 +132,18 @@ function AppContent() {
     document.documentElement.classList.add('dark'); // Force dark mode
   }, []);
 
-  const handleSignIn = (userData?: any, redirectTo?: string) => {
+  const handleSignIn = async (userData?: any, redirectTo?: string) => {
     if (userData) {
-      signIn(userData);
+      try {
+        await signIn(userData);
+        // Wait for state to update, then navigate
+        if (redirectTo) navigate(redirectTo);
+      } catch (error) {
+        console.error('❌ Failed to sign in:', error);
+      }
+    } else if (redirectTo) {
+      navigate(redirectTo);
     }
-    if (redirectTo) navigate(redirectTo);
   };
 
   const handleLogout = () => {
@@ -106,11 +167,49 @@ function AppContent() {
         <Route path="/" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
         <Route path="/preview_page.html" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
         <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
-        <Route path="/match" element={<MatchDetail />} />
-        <Route path="/football-leagues" element={<LiveUpcomingPastMatches />} />
-        <Route path="champions-league" element = {<ChampionsLeague/>}/>
-        <Route path = "premier-league" element={<PremierLeague/>}/>
-        <Route path = "/chatbot" element={<ChatBot/>}/>
+        <Route path="/match" element={
+          <ProtectedRoute>
+            <MatchDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/football-leagues" element={
+          <ProtectedRoute>
+            <LiveUpcomingPastMatches />
+          </ProtectedRoute>
+        } />
+        <Route path="/champions-league" element={
+          <ProtectedRoute>
+            <ChampionsLeague />
+          </ProtectedRoute>
+        } />
+        <Route path="/premier-league" element={
+          <ProtectedRoute>
+            <PremierLeague />
+          </ProtectedRoute>
+        } />
+        <Route path="/chatbot" element={
+          <ProtectedRoute>
+            <ChatBot />
+          </ProtectedRoute>
+        } />
+        <Route path="/odds-general" element={
+          <ProtectedRoute>
+            <OddsGeneralDisplay />
+          </ProtectedRoute>
+        } />
+        <Route path="/odds-specific" element={
+          <ProtectedRoute>
+            <OddsSpecificDisplay />
+          </ProtectedRoute>
+        } />
+        <Route path="/league-standings" element={
+          <ProtectedRoute>
+            <LeagueStandingsDisplay />
+          </ProtectedRoute>
+        } />
+        <Route path = '/psl' element={<ProtectedRoute> 
+          <Afcon/>
+        </ProtectedRoute>}/>
         {/* fallback */}
         <Route path="*" element={<Home isSignedIn={isSignedIn} userData={userData} />} />
       </Routes>
