@@ -1,45 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWithCacheJSON } from './lib/cache';
+import { getLeagueFixtures, onFixturesReady, ensureLeagueFixtures } from './lib/globalFixtures';
 import { Filter, X } from 'lucide-react';
 import MatchCard from './MatchCard';
+import { ApiFixture, LeagueFixturesResponse } from './lib/footyApi';
 
-interface Fixture {
-  fixture: {
-    id: number;
-    referee: string | null;
-    timezone: string;
-    date: string;
-    timestamp: number;
-    periods: { first: number | null; second: number | null };
-    venue: { id: number | null; name: string | null; city: string | null };
-    status: { long: string; short: string; elapsed: number | null; extra: number | null };
-  };
-  league: {
-    id: number;
-    name: string;
-    country: string;
-    logo: string;
-    flag: string;
-    season: number;
-    round: string;
-    standings: boolean;
-  };
-  teams: {
-    home: { id: number; name: string; logo: string; winner: boolean | null };
-    away: { id: number; name: string; logo: string; winner: boolean | null };
-  };
-  goals: { home: number | null; away: number | null };
-  score: {
-    halftime: { home: number | null; away: number | null };
-    fulltime: { home: number | null; away: number | null };
-    extratime: { home: number | null; away: number | null };
-    penalty: { home: number | null; away: number | null };
-  };
-}
+ 
+// Removed the local Fixture interface to avoid type collisions
+// and replaced it with the imported ApiFixture type.
 
 const LiveUpcomingPastMatches: React.FC = () => {
-  const [fixtures, setFixtures] = useState<Fixture[]>([]);
+  const [fixtures, setFixtures] = useState<ApiFixture[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -59,10 +31,11 @@ const LiveUpcomingPastMatches: React.FC = () => {
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const currentDate = `${year}-${month}-${day}`;
-        const url = `https://lancesports-fixtures-api.onrender.com/leagueFixtures`// uncomment if you wnat to use live api`https://lancesports-fixtures-api.onrender.com/leagueFixtures`;
+        const url = "https://lancesports-fixtures-api.onrender.com/leagueFixtures"// uncomment if you wnat to use live api`https://lancesports-fixtures-api.onrender.com/leagueFixtures`;
+        //'public/mocks/fixtures-mock.json'
         
-        // Mock data for testing UI look when API is offline
-        const mockFixtures: Fixture[] = [
+  // Mock data for testing UI look when API is offline
+        const mockFixtures: ApiFixture[] = [
           {
             fixture: {
               id: 1,
@@ -70,7 +43,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
               timezone: "UTC",
               date: new Date().toISOString(),
               timestamp: Math.floor(Date.now() / 1000),
-              periods: { first: 45, second: null },
+              periods: { first: 45, second: 0 },
               venue: { id: 1, name: "Old Trafford", city: "Manchester" },
               status: { long: "First Half", short: "1H", elapsed: 23, extra: null }
             },
@@ -85,8 +58,8 @@ const LiveUpcomingPastMatches: React.FC = () => {
               standings: true
             },
             teams: {
-              home: { id: 33, name: "Manchester United", logo: "https://media.api-sports.io/football/teams/33.png", winner: null },
-              away: { id: 40, name: "Liverpool", logo: "https://media.api-sports.io/football/teams/40.png", winner: null }
+              home: { id: 33, name: "Manchester United", logo: "https://media.api-sports.io/football/teams/33.png", winner: false },
+              away: { id: 40, name: "Liverpool", logo: "https://media.api-sports.io/football/teams/40.png", winner: false }
             },
             goals: { home: 1, away: 0 },
             score: {
@@ -94,11 +67,27 @@ const LiveUpcomingPastMatches: React.FC = () => {
               fulltime: { home: null, away: null },
               extratime: { home: null, away: null },
               penalty: { home: null, away: null }
-            }
+            },
+            events: [],
+            statistics: [],
+            players: [],
           }
         ];
         //uncommnet below when api is live
-        const {data} = await fetchWithCacheJSON<Fixture[]>(url, 5 * 60 * 1000);
+        // Prefer the shared global fetch (reuses in-flight promise)
+        let data: any = null;
+        try {
+          const globalResp = await ensureLeagueFixtures();
+          data = globalResp;
+        } catch (err) {
+          // If global fetch fails or isn't ready, fall back to local cached fetch
+          console.warn('Global fixtures not available, falling back to local cache', err);
+          const resp = await fetchWithCacheJSON<any>(url, 5 * 60 * 1000);
+          data = resp.data;
+        }
+        
+        
+        
 
 // response is the array of fixtures
 // For now, use mock data instead of API call
@@ -119,7 +108,12 @@ const LiveUpcomingPastMatches: React.FC = () => {
       }
     };
     console.log("object");
+    // Subscribe so if global fetch completes later we re-run loader to pick it up
+    const unsub = onFixturesReady((d) => {
+      if (d) load();
+    });
     load();
+    return () => unsub();
   }, []);
 
   if (loading) {
@@ -160,7 +154,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
   };
 
   // Apply filters
-  const applyFilters = (fixturesList: Fixture[]) => {
+  const applyFilters = (fixturesList: ApiFixture[]) => {
     return fixturesList.filter(fixture => {
       if (filters.league && !fixture.league.name.toLowerCase().includes(filters.league.toLowerCase())) {
         return false;

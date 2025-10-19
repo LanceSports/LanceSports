@@ -212,7 +212,7 @@ function AppContent() {
             <LeagueStandingsDisplay />
           </ProtectedRoute>
         } />
-        <Route path = '/afcon' element={<ProtectedRoute> 
+        <Route path = '/psl' element={<ProtectedRoute> 
           <Afcon/>
         </ProtectedRoute>}/>
         {/* fallback */}

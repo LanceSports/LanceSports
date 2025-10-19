@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Trophy, Calendar, MapPin } from 'lucide-react';
 import { ChatbotButton } from './ChatbotButton';
 import { fetchLeagueFixtures, ApiFixture } from './lib/footyApi';
+import { getLeagueFixtures, onFixturesReady } from './lib/globalFixtures';
 
 type Match = ApiFixture;
 
@@ -25,9 +26,13 @@ export function PremierLeague() {
       setDataLoaded(false);
 
       try {
-        console.log('📡 Fetching from API...');
-        const response = await fetchLeagueFixtures();
-        console.log('✅ API Response received:', response);
+        console.log('📡 Fetching from API or cache...');
+        let response = getLeagueFixtures();
+        if (!response) {
+          console.log("failed that glboal nonsense thingy");
+          response = await fetchLeagueFixtures();
+        }
+        console.log('✅ API Response received or cached:', response);
 
         // Prefer UCL; fallback to another European competition if needed
         const premierLeagueData = response.results.find(league => 
@@ -93,7 +98,9 @@ export function PremierLeague() {
       }
     };
 
+    const unsub = onFixturesReady(() => loadMatches());
     loadMatches();
+    return () => unsub();
   }, []);
 
   const handleMatchClick = (match: Match) => {
@@ -111,10 +118,7 @@ export function PremierLeague() {
       const championsLeagueData =
         response.results.find(
           (league) =>
-            league.league === 'UCL' ||
-            league.league === 'Champions League' ||
-            league.league.toLowerCase().includes('champions') ||
-            league.league.toLowerCase().includes('uefa')
+            league.league === 'EPL' 
         ) ?? null;
 
       if (championsLeagueData) {

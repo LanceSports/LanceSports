@@ -37,7 +37,7 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
     const fetchStandingsData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/mocks/StandingsGeneral.json');
+        const response = await fetch('https://lancesports-fixtures-api.onrender.com/leagues/standings');
         if (!response.ok) {
           throw new Error('Failed to fetch standings data');
         }

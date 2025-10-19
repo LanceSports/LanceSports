@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import App from './App';
+import { initLeagueFixtures } from './lib/globalFixtures';
 
 const IntroPage: React.FC = () => {
   const [showApp, setShowApp] = useState(false);
@@ -17,6 +18,9 @@ const IntroPage: React.FC = () => {
       setImageOpacity(1);
     }, 500); // Start fade-in after 0.5 seconds
     
+    // Start fetching global fixtures immediately so other components can read cached data
+    initLeagueFixtures().catch((err) => console.warn('initLeagueFixtures failed', err));
+
     // Navigate to main app after 3 seconds
     const appTimer = setTimeout(() => {
       console.log('Animation complete, navigating to main app...');

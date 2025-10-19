@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Trophy, Calendar, MapPin } from 'lucide-react';
 import { ChatbotButton } from './ChatbotButton';
 import { fetchLeagueFixtures, ApiFixture } from './lib/footyApi';
+import { getLeagueFixtures, onFixturesReady } from './lib/globalFixtures';
 
 type Match = ApiFixture;
 
@@ -19,50 +20,56 @@ export function Afcon() {
 
   useEffect(() => {
     const loadMatches = async () => {
-      console.log('🔄 Starting to load AFCON matches...');
+      console.log('🔄 Starting to load PSL matches...');
       setLoading(true);
       setError(null);
       setDataLoaded(false);
 
       try {
-        console.log('📡 Fetching from API...');
-        const response = await fetchLeagueFixtures();
-        console.log('✅ API Response received:', response);
+        console.log('dfsgdd📡 Fetching from API or cache...');
+        let response = getLeagueFixtures();
+        if (!response) {
+          console.log("failed that glboal nonsense thingy");
+          // wait for network fetch
+          response = await fetchLeagueFixtures();
+        }
+        console.log('✅ API Response received or cached:', response);
 
-        // Find AFCON fixtures (Africa Cup of Nations)
-        const afconData =
+        // Find Premier Soccer League (PSL) fixtures robustly
+        const pslData =
           response.results.find((league) => {
             const name = String(league.league || '').toLowerCase();
+            // match common variants: exact, contains, or acronym
             return (
-              name === 'AFCON' ||
-              name.includes('afcon') ||
-              name.includes('africa cup') ||
-              name.includes('african cup of nations') ||
-              name.includes('africa cup of nations')
+              name === 'premier soccer league' ||
+              name.includes('premier soccer') ||
+              name.includes('premier soccer league') ||
+              name === 'psl' ||
+              name.includes('psl')
             );
           }) ?? null;
 
-        if (afconData) {
+        if (pslData && Array.isArray(pslData.fixtures)) {
           console.log(
-            '⚽ AFCON data found:',
-            afconData.league,
+            '⚽ PSL data found:',
+            pslData.league,
             'with',
-            afconData.fixtures.length,
+            pslData.fixtures.length,
             'fixtures'
-          );
-          setMatches(afconData.fixtures);
+          ,pslData );
+          setMatches(pslData.fixtures);
           setDataLoaded(true);
 
-          if (afconData.fixtures.length === 0) {
-            console.log('⚠️ AFCON found but has no fixtures');
-            setError('AFCON data is currently unavailable — no fixtures found');
+          if (pslData.fixtures.length === 0) {
+            console.log('⚠️ PSL found but has no fixtures');
+            setError('PSL data is currently unavailable — no fixtures found');
           }
         } else {
           console.log(
-            '❌ No AFCON competition found. Available leagues:',
+            '❌ No PSL competition found. Available leagues:',
             response.results.map((r) => r.league)
           );
-          setError('No AFCON fixtures found');
+          setError('No PSL fixtures found');
           setDataLoaded(true);
         }
       } catch (err) {
@@ -75,7 +82,10 @@ export function Afcon() {
       }
     };
 
+    // If global cache populates later, re-run matcher when ready
+    const unsub = onFixturesReady(() => loadMatches());
     loadMatches();
+    return () => unsub();
   }, []);
 
   const handleMatchClick = (match: Match) => {
@@ -90,23 +100,24 @@ export function Afcon() {
     try {
       const response = await fetchLeagueFixtures();
 
-      const afconData =
+      const pslData =
         response.results.find((league) => {
           const name = String(league.league || '').toLowerCase();
           return (
-            name === 'afcon' ||
-            name.includes('afcon') ||
+            name === 'premier soccer league' ||
+            name.includes('premier soccer') ||
+            name.includes('psl') ||
             name.includes('africa cup') ||
             name.includes('african cup of nations') ||
             name.includes('africa cup of nations')
           );
         }) ?? null;
 
-      if (afconData) {
-        setMatches(afconData.fixtures);
+      if (pslData && Array.isArray(pslData.fixtures)) {
+        setMatches(pslData.fixtures);
         setDataLoaded(true);
       } else {
-        setError('No AFCON fixtures found');
+        setError('No PSL fixtures found');
         setDataLoaded(true);
       }
     } catch (err) {
@@ -163,11 +174,11 @@ export function Afcon() {
           <div className="flex items-center justify-center gap-3 mb-4">
             <Trophy className="text-green-400" size={40} />
             <h1 className="text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-green-500 to-green-400">
-              Africa Cup of Nations (AFCON)
+              PSL (MZANSI)
             </h1>
           </div>
           <p className="text-gray-300 max-w-2xl mx-auto">
-            The premier international tournament in African football
+            The premier tournament in South African football
           </p>
         </div>
 

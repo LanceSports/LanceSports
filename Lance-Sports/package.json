@@ -1,6 +1,7 @@
 {
       "name": "Sports Landing Page with Slideshow",
       "version": "0.1.0",
+      "type": "module",
       "private": true,
       "dependencies": {
             "@radix-ui/react-accordion": "^1.2.3",
@@ -31,10 +32,14 @@
             "@radix-ui/react-tooltip": "^1.1.8",
             "@react-oauth/google": "^0.12.2",
             "@supabase/supabase-js": "^2.58.0",
+            "@types/express": "^5.0.3",
             "class-variance-authority": "^0.7.1",
             "clsx": "^2.1.1",
             "cmdk": "^1.1.1",
+            "concurrently": "^9.2.1",
+            "cors": "^2.8.5",
             "embla-carousel-react": "^8.6.0",
+            "express": "^5.1.0",
             "input-otp": "^1.4.2",
             "lucide-react": "^0.487.0",
             "next-themes": "^0.4.6",
@@ -47,12 +52,13 @@
             "recharts": "^2.15.2",
             "sonner": "^2.0.3",
             "tailwind-merge": "^3.3.1",
+            "typescript": "^5.9.3",
             "vaul": "^1.1.2"
       },
       "devDependencies": {
             "@testing-library/jest-dom": "^6.6.3",
             "@testing-library/react": "^16.0.0",
-            "@types/node": "^20.10.0",
+            "@types/node": "^20.19.22",
             "@types/react": "^19.1.14",
             "@types/react-dom": "^19.1.9",
             "@vitejs/plugin-react-swc": "^3.10.2",
@@ -60,6 +66,7 @@
             "jsdom": "^25.0.1",
             "postcss": "^8.5.6",
             "tailwindcss": "^4.1.14",
+            "ts-node": "^10.9.2",
             "vite": "6.3.5",
             "vitest": "^2.1.8"
       },
@@ -71,6 +78,8 @@
             "test:coverage": "vitest run --coverage --reporter=verbose",
             "test:simple": "vitest run tests/simple.test.ts --coverage",
             "test:basic": "vitest run tests/simple.test.ts tests/basic-coverage.test.tsx --coverage",
-            "coverage": "vitest run --coverage"
+            "coverage": "vitest run --coverage",
+            "server": "node server/index.js",
+            "start": "concurrently \"npm run dev\" \"npm run server\""
       }
 }

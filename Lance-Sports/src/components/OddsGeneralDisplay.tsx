@@ -40,7 +40,7 @@ const OddsGeneralDisplay: React.FC<OddsGeneralDisplayProps> = ({ className = '' 
       try {
         setLoading(true);
         //https://lancesports-fixtures-api.onrender.com/leagues/odds
-        const response = await fetch('public/mocks/OddsGeneral.json');
+        const response = await fetch('https://lancesports-fixtures-api.onrender.com/leagues/odds');
         if (!response.ok) {
           throw new Error('Failed to fetch odds data');
         }

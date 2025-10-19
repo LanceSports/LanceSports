@@ -23,7 +23,7 @@ interface SessionHook {
 
 const SESSION_KEY = 'lancesports_user';
 const SIGNED_IN_KEY = 'lancesports_signed_in';
-const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+const SESSION_DURATION = 0.5* 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
 export function useSession(): SessionHook {
   const [isSignedIn, setIsSignedIn] = useState(false);
