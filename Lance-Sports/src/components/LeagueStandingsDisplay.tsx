@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ChatbotButton } from './ChatbotButton';
 
 // TypeScript interfaces for League Standings
 interface TeamStanding {
@@ -182,26 +183,22 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
   }
 
   return (
-    <div
-    style={{width:"100%", height:"2000px"}} 
-    className={`min-h-screen bg-gradient-to-br from-gray-900 via-green-950 to-gray-900 ${className}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-green-950 to-gray-900 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-100 mb-2">
+          <h1 className="text-3xl md:text-4xl text-center text-gray-100 mb-2">
             League Standings
           </h1>
-          <p className="text-center text-gray-300 text-lg">
+          <p className="text-center text-gray-300">
             Current season standings across all leagues
           </p>
         </div>
 
         {/* League Selector */}
-        <div className="mb-6"
-        style={{height:"fit"}}
-        >
+        <div className="mb-6">
           <div className="glass-card-dark p-4 rounded-xl glass-glow">
             {/* Quick filters for common leagues */}
-            <div className="flex gap-2 justify-center mb-3">
+            <div className="flex flex-wrap gap-2 justify-center mb-3">
               <button
                 onClick={() => {
                   const id = findLeagueIdByLabel('Champions');
@@ -262,9 +259,9 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
         <div className="mb-6">
           <div className="glass-card-dark p-4 rounded-xl glass-glow">
             <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap justify-center">
                 <span className="text-gray-300">Sort by:</span>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 justify-center">
                   {sortOptions.map(opt => (
                     <button
                       key={opt.key as string}
@@ -291,82 +288,81 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
                 className="px-3 py-1.5 rounded-lg text-sm transition-colors border bg-gray-700/40 text-gray-200 border-white/10 hover:bg-gray-600/40"
                 aria-label="Toggle sort direction"
               >
-                Direction: <span className="ml-1 font-semibold">{sortDirection === 'asc' ? 'Asc ↑' : 'Desc ↓'}</span>
+                Direction: <span className="ml-1">{sortDirection === 'asc' ? 'Asc ↑' : 'Desc ↓'}</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Standings Table */}
-        <div className="glass-card-dark p-6 rounded-xl glass-hover-dark glass-glow"
-        style={{height:"1100px"}}>
-          {/* Make this area scrollable with a max height so the table doesn't bleed off the screen */}
-          <div className="overflow-auto" style={{ maxHeight: '60vh' }}>
-            <table className="w-full">
+        <div className="glass-card-dark p-4 md:p-6 rounded-xl glass-hover-dark glass-glow">
+          {/* Mobile-friendly: horizontal scroll on small screens */}
+          <div className="overflow-x-auto scrollbar-visible">
+            <table className="w-full min-w-[800px]">
               <thead>
                 <tr className="border-b border-gray-700/50">
                   <th
-                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-left py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-left py-3 px-2 md:px-4 text-gray-300 cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('rank')}
                   >
                     Rank {sortField === 'rank' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
-                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-left py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-left py-3 px-2 md:px-4 text-gray-300 cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('team_name')}
                   >
                     Team {sortField === 'team_name' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
-                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-2 md:px-4 text-gray-300 cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('points')}
                   >
                     Pts {sortField === 'points' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
-                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-2 md:px-4 text-gray-300 cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('played')}
                   >
                     P {sortField === 'played' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
-                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-2 md:px-4 text-gray-300 cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('win')}
                   >
                     W {sortField === 'win' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
-                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-2 md:px-4 text-gray-300 cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('draw')}
                   >
                     D {sortField === 'draw' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
-                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-2 md:px-4 text-gray-300 cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('lose')}
                   >
                     L {sortField === 'lose' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
-                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-2 md:px-4 text-gray-300 cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('goals_for')}
                   >
                     GF {sortField === 'goals_for' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
-                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-2 md:px-4 text-gray-300 cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('goals_against')}
                   >
                     GA {sortField === 'goals_against' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
-                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-4 text-gray-300 font-medium cursor-pointer hover:text-gray-100 transition-colors"
+                    className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-2 md:px-4 text-gray-300 cursor-pointer hover:text-gray-100 transition-colors"
                     onClick={() => handleSort('goals_diff')}
                   >
                     GD {sortField === 'goals_diff' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
-                  <th className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-4 text-gray-300 font-medium">Form</th>
-                  <th className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-4 text-gray-300 font-medium">League</th>
+                  <th className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-2 md:px-4 text-gray-300">Form</th>
+                  <th className="sticky top-0 bg-gray-900/90 backdrop-blur z-10 text-center py-3 px-2 md:px-4 text-gray-300">League</th>
                 </tr>
               </thead>
               <tbody>
@@ -375,32 +371,32 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
                     key={`${team.league_id}-${team.team_id}`}
                     className="border-b border-gray-700/30 hover:bg-gray-700/20 transition-colors"
                   >
-                    <td className="py-3 px-4">
-                      <span className={`inline-block px-3 py-1 rounded-full text-sm font-bold border ${getRankColor(team.rank)}`}>
+                    <td className="py-3 px-2 md:px-4">
+                      <span className={`inline-block px-2 md:px-3 py-1 rounded-full text-sm border ${getRankColor(team.rank)}`}>
                         {team.rank}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-gray-200 font-medium">{team.team_name}</td>
-                    <td className="py-3 px-4 text-center">
-                      <span className="text-lg font-bold text-green-400">{team.points}</span>
+                    <td className="py-3 px-2 md:px-4 text-gray-200">{team.team_name}</td>
+                    <td className="py-3 px-2 md:px-4 text-center">
+                      <span className="text-green-400">{team.points}</span>
                     </td>
-                    <td className="py-3 px-4 text-center text-gray-300">{team.played}</td>
-                    <td className="py-3 px-4 text-center text-gray-300">{team.win}</td>
-                    <td className="py-3 px-4 text-center text-gray-300">{team.draw}</td>
-                    <td className="py-3 px-4 text-center text-gray-300">{team.lose}</td>
-                    <td className="py-3 px-4 text-center text-gray-300">{team.goals_for}</td>
-                    <td className="py-3 px-4 text-center text-gray-300">{team.goals_against}</td>
-                    <td className="py-3 px-4 text-center">
-                      <span className={`font-semibold ${team.goals_diff >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <td className="py-3 px-2 md:px-4 text-center text-gray-300">{team.played}</td>
+                    <td className="py-3 px-2 md:px-4 text-center text-gray-300">{team.win}</td>
+                    <td className="py-3 px-2 md:px-4 text-center text-gray-300">{team.draw}</td>
+                    <td className="py-3 px-2 md:px-4 text-center text-gray-300">{team.lose}</td>
+                    <td className="py-3 px-2 md:px-4 text-center text-gray-300">{team.goals_for}</td>
+                    <td className="py-3 px-2 md:px-4 text-center text-gray-300">{team.goals_against}</td>
+                    <td className="py-3 px-2 md:px-4 text-center">
+                      <span className={`${team.goals_diff >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                         {team.goals_diff >= 0 ? '+' : ''}{team.goals_diff}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-center">
+                    <td className="py-3 px-2 md:px-4 text-center">
                       <span className={`text-sm font-mono ${getFormColor(team.form)}`}>
                         {formatForm(team.form)}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-center">
+                    <td className="py-3 px-2 md:px-4 text-center">
                       <span className="text-xs text-gray-400 bg-gray-700/50 px-2 py-1 rounded">
                         {getLeagueName(team.league_id)}
                       </span>
@@ -408,51 +404,48 @@ const LeagueStandingsDisplay: React.FC<LeagueStandingsDisplayProps> = ({ classNa
                   </tr>
                 ))}
               </tbody>
-              <tfoot>
-                <tr>
-                  <td colSpan={12} className="pt-6">
-                    <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {availableLeagues.slice(0, 3).map(leagueId => {
-                        const leagueTeams = standingsData.filter(team => team.league_id === leagueId);
-                        const totalGoals = leagueTeams.reduce((sum, team) => sum + team.goals_for, 0);
-                        const avgGoals = leagueTeams.length > 0 ? totalGoals / leagueTeams.length : 0;
-
-                        return (
-                          <div key={leagueId} className="glass-card-dark p-6 rounded-xl glass-glow">
-                            <h3 className="text-lg font-semibold text-gray-100 mb-4 text-center">
-                              {getLeagueName(leagueId)} Stats
-                            </h3>
-                            <div className="space-y-3">
-                              <div className="flex justify-between">
-                                <span className="text-gray-300">Teams:</span>
-                                <span className="text-gray-100 font-semibold">{leagueTeams.length}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-300">Total Goals:</span>
-                                <span className="text-gray-100 font-semibold">{totalGoals}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-300">Avg Goals/Team:</span>
-                                <span className="text-gray-100 font-semibold">{avgGoals.toFixed(1)}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-300">Leader:</span>
-                                <span className="text-green-400 font-semibold">
-                                  {leagueTeams.find(team => team.rank === 1)?.team_name || 'N/A'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </td>
-                </tr>
-              </tfoot>
             </table>
           </div>
         </div>
+
+        {/* League Stats - Mobile friendly grid */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {availableLeagues.slice(0, 3).map(leagueId => {
+            const leagueTeams = standingsData.filter(team => team.league_id === leagueId);
+            const totalGoals = leagueTeams.reduce((sum, team) => sum + team.goals_for, 0);
+            const avgGoals = leagueTeams.length > 0 ? totalGoals / leagueTeams.length : 0;
+
+            return (
+              <div key={leagueId} className="glass-card-dark p-4 md:p-6 rounded-xl glass-glow">
+                <h3 className="text-gray-100 mb-4 text-center">
+                  {getLeagueName(leagueId)} Stats
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Teams:</span>
+                    <span className="text-gray-100">{leagueTeams.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Total Goals:</span>
+                    <span className="text-gray-100">{totalGoals}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Avg Goals/Team:</span>
+                    <span className="text-gray-100">{avgGoals.toFixed(1)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Leader:</span>
+                    <span className="text-green-400">
+                      {leagueTeams.find(team => team.rank === 1)?.team_name || 'N/A'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
+      <ChatbotButton />
     </div>
   );
 };

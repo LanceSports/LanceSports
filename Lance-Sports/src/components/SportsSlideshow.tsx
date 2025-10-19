@@ -131,23 +131,8 @@ export function SportsSlideshow() {
       </div>
 
       {/* Navigation Arrows */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 glass dark:glass-dark text-white hover:bg-white/20 transition-all duration-200"
-        onClick={prevSlide}
-      >
-        <ChevronLeft size={24} />
-      </Button>
       
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 glass dark:glass-dark text-white hover:bg-white/20 transition-all duration-200"
-        onClick={nextSlide}
-      >
-        <ChevronRight size={24} />
-      </Button>
+      
 
       {/* Slide Indicators */}
       <div className="absolute bottom-6 right-6 flex space-x-2">
