@@ -20,19 +20,15 @@ export function PremierLeague() {
 
   useEffect(() => {
     const loadMatches = async () => {
-      console.log('🔄 Starting to load Champions League matches...');
       setLoading(true);
       setError(null);
       setDataLoaded(false);
 
       try {
-        console.log('📡 Fetching from API or cache...');
         let response = getLeagueFixtures();
         if (!response) {
-          console.log("failed that glboal nonsense thingy");
           response = await fetchLeagueFixtures();
         }
-        console.log('✅ API Response received or cached:', response);
 
         // Prefer UCL; fallback to another European competition if needed
         const premierLeagueData = response.results.find(league => 
@@ -42,18 +38,10 @@ export function PremierLeague() {
         );
 
         if (premierLeagueData) {
-          console.log(
-            '⚽ Champions League data found:',
-            premierLeagueData.league,
-            'with',
-            premierLeagueData.fixtures.length,
-            'fixtures'
-          );
           setMatches(premierLeagueData.fixtures);
           setDataLoaded(true);
 
           if (premierLeagueData.fixtures.length === 0) {
-            console.log('⚠️ Champions League found but has no fixtures');
             setError('Champions League data is currently unavailable - no fixtures found');
           }
         } else {
@@ -65,25 +53,13 @@ export function PremierLeague() {
             ) ?? null;
 
           if (europeanLeagueData) {
-            console.log(
-              '🏆 European competition data found:',
-              europeanLeagueData.league,
-              'with',
-              europeanLeagueData.fixtures.length,
-              'fixtures'
-            );
             setMatches(europeanLeagueData.fixtures);
             setDataLoaded(true);
 
             if (europeanLeagueData.fixtures.length === 0) {
-              console.log('⚠️ European competition found but has no fixtures');
               setError('European competition data is currently unavailable - no fixtures found');
             }
           } else {
-            console.log(
-              '❌ No Champions League or European competition found. Available leagues:',
-              response.results.map((r) => r.league)
-            );
             setError('No Champions League fixtures found');
             setDataLoaded(true);
           }
@@ -93,7 +69,6 @@ export function PremierLeague() {
         setError(err instanceof Error ? err.message : 'Failed to load matches');
         setDataLoaded(true);
       } finally {
-        console.log('🏁 Loading completed');
         setLoading(false);
       }
     };

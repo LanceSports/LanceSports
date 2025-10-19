@@ -21,7 +21,6 @@ export async function askFootyBot(message: string): Promise<string> {
   }
 
   const data = await resp.json().catch(() => ({}));
-  //console.log(data);
   return data?.reply ?? "Sorry, I couldn't generate a reply.";
 }
 

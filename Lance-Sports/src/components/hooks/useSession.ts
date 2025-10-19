@@ -56,7 +56,6 @@ export function useSession(): SessionHook {
 
         // Check if session has expired
         if (userData.expiresAt && new Date(userData.expiresAt) < new Date()) {
-          console.log('❌ Session expired, clearing...');
           signOut();
           return;
         }
@@ -64,13 +63,7 @@ export function useSession(): SessionHook {
         // Session is valid
         setIsSignedIn(true);
         setUserData(userData);
-        console.log('✅ Session restored:', userData.name);
         
-        // Log session info
-        if (userData.sessionStart) {
-          const sessionAge = Math.round((Date.now() - new Date(userData.sessionStart).getTime()) / (1000 * 60 * 60));
-          console.log(`📅 Session age: ${sessionAge} hours`);
-        }
       } else {
         // No valid session
         setIsSignedIn(false);
@@ -98,9 +91,6 @@ export function useSession(): SessionHook {
       // Update state
       setIsSignedIn(true);
       setUserData(sessionData);
-
-      console.log('✅ User signed in:', sessionData.name);
-      console.log('✅ Session saved to localStorage');
       
       // Return a resolved promise to indicate completion
       return Promise.resolve();
@@ -118,9 +108,6 @@ export function useSession(): SessionHook {
     // Update state
     setIsSignedIn(false);
     setUserData(null);
-
-    console.log('✅ User signed out');
-    console.log('✅ Session cleared from localStorage');
   }, []);
 
   const refreshSession = useCallback(() => {
@@ -133,7 +120,6 @@ export function useSession(): SessionHook {
 
       localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUserData));
       setUserData(updatedUserData);
-      console.log('✅ Session refreshed');
     }
   }, [userData]);
 

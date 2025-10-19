@@ -39,4 +39,6 @@ app.post('/api/save-data', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`JSON Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  // Server started successfully
+});

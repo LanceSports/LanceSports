@@ -32,7 +32,6 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
       try {
         const { error } = await supabase.from('users').select('count').limit(1);
         if (error) console.error('❌ Supabase connection test failed:', error);
-        else console.log('✅ Supabase connection test successful');
       } catch (err) {
         console.error('❌ Supabase connection error:', err);
       }
@@ -45,7 +44,6 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
     onSuccess: async (response) => {
       setIsLoading(true);
       try {
-        console.log('Google OAuth successful:', response);
 
         const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
           headers: { Authorization: `Bearer ${response.access_token}` },
@@ -105,7 +103,6 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Username/password login (placeholder):', { username, password });
     onSignIn({ username }, '/');
   };
 

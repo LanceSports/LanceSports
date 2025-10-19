@@ -93,7 +93,6 @@ export function SportsSlideshow() {
 
   const handleEventClick = (link: string) => {
     // In a real app, this would navigate to the event page
-    console.log(`Navigating to ${link}`);
     alert(`Redirecting to ${sportsEvents[currentSlide].title}`);
   };
 

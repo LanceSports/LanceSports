@@ -7,11 +7,7 @@ const IntroPage: React.FC = () => {
   const [animationComplete, setAnimationComplete] = useState(false);
   const [imageOpacity, setImageOpacity] = useState(0);
 
-  // Basic debugging
-  console.log('IntroPage rendering...', { showApp, animationComplete });
-
   useEffect(() => {
-    console.log('IntroPage useEffect running...');
     
     // Start image fade-in immediately
     const imageTimer = setTimeout(() => {
@@ -23,7 +19,6 @@ const IntroPage: React.FC = () => {
 
     // Navigate to main app after 3 seconds
     const appTimer = setTimeout(() => {
-      console.log('Animation complete, navigating to main app...');
       setAnimationComplete(true);
       setShowApp(true); // Automatically go to main app after 3 seconds
     }, 8000); // 3 second delay

@@ -20,20 +20,16 @@ export function Afcon() {
 
   useEffect(() => {
     const loadMatches = async () => {
-      console.log('🔄 Starting to load PSL matches...');
       setLoading(true);
       setError(null);
       setDataLoaded(false);
 
       try {
-        console.log('dfsgdd📡 Fetching from API or cache...');
         let response = getLeagueFixtures();
         if (!response) {
-          console.log("failed that glboal nonsense thingy");
           // wait for network fetch
           response = await fetchLeagueFixtures();
         }
-        console.log('✅ API Response received or cached:', response);
 
         // Find Premier Soccer League (PSL) fixtures robustly
         const pslData =
@@ -50,25 +46,13 @@ export function Afcon() {
           }) ?? null;
 
         if (pslData && Array.isArray(pslData.fixtures)) {
-          console.log(
-            '⚽ PSL data found:',
-            pslData.league,
-            'with',
-            pslData.fixtures.length,
-            'fixtures'
-          ,pslData );
           setMatches(pslData.fixtures);
           setDataLoaded(true);
 
           if (pslData.fixtures.length === 0) {
-            console.log('⚠️ PSL found but has no fixtures');
             setError('PSL data is currently unavailable — no fixtures found');
           }
         } else {
-          console.log(
-            '❌ No PSL competition found. Available leagues:',
-            response.results.map((r) => r.league)
-          );
           setError('No PSL fixtures found');
           setDataLoaded(true);
         }
@@ -77,7 +61,6 @@ export function Afcon() {
         setError(err instanceof Error ? err.message : 'Failed to load matches');
         setDataLoaded(true);
       } finally {
-        console.log('🏁 Loading completed');
         setLoading(false);
       }
     };

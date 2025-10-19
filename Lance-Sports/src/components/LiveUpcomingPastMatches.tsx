@@ -24,7 +24,6 @@ const LiveUpcomingPastMatches: React.FC = () => {
     const load = async () => {
       setLoading(true); // make it true when you want to actually fetch from api and not use mock
       try {
-        console.log("in try catch");
         // Use local date to avoid timezone off-by-one issues
         const now = new Date();
         const year = now.getFullYear();
@@ -96,9 +95,7 @@ const LiveUpcomingPastMatches: React.FC = () => {
 
         // Log size in KB
         //uncoment for when API is live {
-        console.log(data)
         const jsonSize = new Blob([JSON.stringify(data)]).size / 1024;
-        console.log(`API response size: ${jsonSize.toFixed(2)} KB`);
         setFixtures(data.fixtures || []);
         // }
       } catch (err) {
@@ -107,7 +104,6 @@ const LiveUpcomingPastMatches: React.FC = () => {
         setLoading(false);
       }
     };
-    console.log("object");
     // Subscribe so if global fetch completes later we re-run loader to pick it up
     const unsub = onFixturesReady((d) => {
       if (d) load();

@@ -42,14 +42,11 @@ export function MatchDetail() {
     try {
       // 1) Normalize directly from the passed-in match object
       const base = fromMatchToDetails(match);
-      console.log(base);
 
       // 2) If match lacks details, synthesize non-blocking mock data
       // still mock timeline stats
       
       const needMockEvents = (base.events?.length ?? 0) === 0;
-      console.log(base.events)
-      console.log("players", base.players)
       const needMockStats = (base.stats?.length ?? 0) === 0;
       const needMockPlayers = (base.players?.length ?? 0) === 0;
 
@@ -60,13 +57,10 @@ export function MatchDetail() {
         stats: needMockStats ? [] : base.stats,
         players: needMockPlayers ? [] : base.players, 
       };
-      console.log("enriched",enriched)
 
 
 
       setMatchDetails(enriched);
-      console.log(enriched.stats);
-      console.log("players",enriched.players)
     } finally {
       setLoading(false);
     }

@@ -133,20 +133,15 @@ function AppContent() {
   }, []);
 
   const handleSignIn = async (userData?: any, redirectTo?: string) => {
-    console.log('🚀 handleSignIn called:', { userData: !!userData, redirectTo });
-    
     if (userData) {
       try {
-        console.log('📝 Calling signIn with userData:', userData.name);
         await signIn(userData);
-        console.log('✅ signIn completed, navigating to:', redirectTo);
         // Wait for state to update, then navigate
         if (redirectTo) navigate(redirectTo);
       } catch (error) {
         console.error('❌ Failed to sign in:', error);
       }
     } else if (redirectTo) {
-      console.log('🔄 No userData, navigating directly to:', redirectTo);
       navigate(redirectTo);
     }
   };
