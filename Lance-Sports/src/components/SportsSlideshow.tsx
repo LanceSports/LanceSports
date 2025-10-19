@@ -126,12 +126,6 @@ export function SportsSlideshow() {
             <div className="text-sm text-gray-300 mb-4">
               {sportsEvents[currentSlide].date}
             </div>
-            <Button 
-              onClick={() => handleEventClick(sportsEvents[currentSlide].link)}
-              className="glass-green dark:glass-green-dark text-white hover:bg-green-600/80 dark:hover:bg-green-700/80 transition-all duration-200 glass-glow"
-            >
-              View Event Details
-            </Button>
           </div>
         </div>
       </div>

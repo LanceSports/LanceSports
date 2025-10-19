@@ -5,6 +5,7 @@ import { Label } from './ui/label';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { ThemeToggle } from './ThemeToggle';
 import { useGoogleLogin } from '@react-oauth/google';
+import { useLocation } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 
 interface SignInProps {
@@ -16,6 +17,10 @@ interface SignInProps {
 export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignInProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const location = useLocation();
+  
+  // Get the intended destination from the location state
+  const from = location.state?.from?.pathname || '/';
 
   // Optional: basic username/password form (placeholder only)
   const [username, setUsername] = useState('');
@@ -75,7 +80,7 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
 
         setIsSuccess(true);
         setTimeout(() => {
-          onSignIn(userData, '/');
+          onSignIn(userData, from);
         }, 1500);
       } catch (error) {
         console.error('Failed to authenticate:', error);
@@ -85,7 +90,7 @@ export function SignIn({ onSignIn, isDarkMode = false, onToggleDarkMode }: SignI
           email: 'user@example.com',
           avatar_url: null,
         };
-        onSignIn(fallbackUserData, '/premier-league');
+        onSignIn(fallbackUserData, from);
       } finally {
         setIsLoading(false);
       }

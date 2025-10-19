@@ -8,7 +8,7 @@ import {
   DrawerClose,
 } from './ui/drawer';
 import { Button } from './ui/button';
-import { X, Home, Trophy, Calendar, User, Globe, MessageCircle } from 'lucide-react';
+import { X, Home, Trophy, Calendar, User, Globe, MessageCircle, BarChart3, Target, TrendingUp } from 'lucide-react';
 import { Link,useNavigate } from 'react-router-dom';
 
 interface NavigationDrawerProps {
@@ -32,7 +32,9 @@ export function NavigationDrawer({
      {name: 'Lance AI Assistant', to: '/chatbot', icon: MessageCircle, highlight: true },
     {name: 'Champions League', to:'/champions-league', icon: Trophy },
     { name: 'Fixtures', to: '/football-leagues', icon: Globe },
-    
+    { name: 'League Standings', to: '/league-standings', icon: TrendingUp },
+    { name: 'Betting Odds', to: '/odds-general', icon: BarChart3 },
+    { name: 'Detailed Odds', to: '/odds-specific', icon: Target },
   ];
 
   const handleItemClick = () => {
@@ -126,39 +128,6 @@ export function NavigationDrawer({
           </div>
 
           {/* Quick Links */}
-          <div className="pt-4 space-y-2">
-            <h4 className="text-green-300 mb-3">Quick Links</h4>
-            <div className="space-y-2 text-sm">
-              <a 
-                href="#live-scores" 
-                onClick={handleItemClick}
-                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
-              >
-                Live Scores
-              </a>
-              <a 
-                href="#news" 
-                onClick={handleItemClick}
-                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
-              >
-                Sports News
-              </a>
-              <a 
-                href="#standings" 
-                onClick={handleItemClick}
-                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
-              >
-                League Standings
-              </a>
-              <a 
-                href="#highlights" 
-                onClick={handleItemClick}
-                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
-              >
-                Match Highlights
-              </a>
-            </div>
-          </div>
         </div>
       </DrawerContent>
     </Drawer>
