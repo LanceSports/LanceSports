@@ -1,5 +1,5 @@
   [![codecov](https://codecov.io/gh/LanceSports/LanceSports/branch/main/graph/badge.svg)](https://codecov.io/gh/LanceSports/LanceSports/)
-  # Sports Landing Page with Slideshow
+  # LanceSports
 
   [![codecov](https://codecov.io/gh/LanceSports/LanceSports/branch/main/graph/badge.svg)](https://codecov.io/gh/LanceSports/LanceSports/)
 
