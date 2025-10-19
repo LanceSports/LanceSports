@@ -46,7 +46,7 @@ const finals: Final[] = [
     winner: "Manchester City",
     score: "1-0",
     color: "text-purple-600 dark:text-purple-400",
-    link: "https://youtu.be/2QOsQCZjlsQ?si=lZu7cdX7lm3A3eS6"
+    link: "https://www.youtube.com/watch?v=EmBH8AGVBB4&pp=ygUYbWFuYyBjaXR5IHZzIGludGVyIG1pbGFu"
   },
   {
     id: 4,
@@ -58,7 +58,7 @@ const finals: Final[] = [
     winner: "Chelsea",
     score: "1-0",
     color: "text-red-600 dark:text-red-400",
-    link: "#champions-league-2021"
+    link: "https://www.youtube.com/watch?v=2QOsQCZjlsQ&t=1s&pp=ygUTbWFuIGNpdHkgdnMgY2hlbHNlYQ%3D%3D"
   }
 ];
 

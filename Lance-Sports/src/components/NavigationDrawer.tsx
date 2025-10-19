@@ -128,53 +128,6 @@ export function NavigationDrawer({
           </div>
 
           {/* Quick Links */}
-          <div className="pt-4 space-y-2">
-            <h4 className="text-green-300 mb-3">Quick Links</h4>
-            <div className="space-y-2 text-sm">
-              <a 
-                href="#live-scores" 
-                onClick={handleItemClick}
-                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
-              >
-                Live Scores
-              </a>
-              <a 
-                href="#news" 
-                onClick={handleItemClick}
-                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
-              >
-                Sports News
-              </a>
-              <Link 
-                to="/league-standings" 
-                onClick={handleItemClick}
-                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
-              >
-                League Standings
-              </Link>
-              <Link 
-                to="/odds-general" 
-                onClick={handleItemClick}
-                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
-              >
-                Betting Odds
-              </Link>
-              <Link 
-                to="/odds-specific" 
-                onClick={handleItemClick}
-                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
-              >
-                Detailed Odds
-              </Link>
-              <a 
-                href="#highlights" 
-                onClick={handleItemClick}
-                className="block p-2 text-gray-400 hover:text-green-400 transition-all duration-200 rounded-lg hover:bg-white/10"
-              >
-                Match Highlights
-              </a>
-            </div>
-          </div>
         </div>
       </DrawerContent>
     </Drawer>
