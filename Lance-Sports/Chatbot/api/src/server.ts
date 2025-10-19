@@ -49,7 +49,7 @@ app.post("/api/football-chat", async (req, res) => {
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-5" //"gpt-4" for development, gpt-5 for prod,
+      model: "gpt-4" //"gpt-4" for development, gpt-5 for prod,
       temperature: 0.3,
       messages: conversations.get(sessionId)!
     });
