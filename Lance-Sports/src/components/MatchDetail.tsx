@@ -26,7 +26,7 @@ export function MatchDetail() {
 
   type LocationState = { match: Match };
   const state = location.state as LocationState | null;
-  const match = state?.match;
+  const match = state?.match; // the match info was passed into teh card Matchdetails as {match}
 
   const [matchDetails, setMatchDetails] = useState<MatchDetailData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,24 +42,31 @@ export function MatchDetail() {
     try {
       // 1) Normalize directly from the passed-in match object
       const base = fromMatchToDetails(match);
+      console.log(base);
 
       // 2) If match lacks details, synthesize non-blocking mock data
       // still mock timeline stats
+      
       const needMockEvents = (base.events?.length ?? 0) === 0;
+      console.log(base.events)
+      console.log("players", base.players)
       const needMockStats = (base.stats?.length ?? 0) === 0;
       const needMockPlayers = (base.players?.length ?? 0) === 0;
 
       const elapsed = match.fixture.status.elapsed || 90;
       const enriched: MatchDetailData = {
         ...base,
-        events: needMockEvents
-          ? generateMockEvents(match, elapsed)
-          : base.events,
-        stats: needMockStats ? generateMockStats(match) : base.stats,
-        players: needMockPlayers ? generateMockPlayers(match) : base.players,
+        events: needMockEvents ? [] : base.events,
+        stats: needMockStats ? [] : base.stats,
+        players: needMockPlayers ? [] : base.players, 
       };
+      console.log("enriched",enriched)
+
+
 
       setMatchDetails(enriched);
+      console.log(enriched.stats);
+      console.log("players",enriched.players)
     } finally {
       setLoading(false);
     }
@@ -101,12 +108,12 @@ export function MatchDetail() {
           {/* League and Venue Info */}
           <div className="flex flex-wrap items-center justify-center gap-4 mb-6 text-sm text-gray-400">
             <div className="flex items-center space-x-2">
-              <Activity className="w-4 h-4 text-green-400" />
+              <Activity className="w-4 h-4 text-green-600" />
               <span>{matchDetails.league.name}</span>
             </div>
             <div className="hidden md:block text-gray-700">•</div>
             <div className="flex items-center space-x-2">
-              <MapPin className="w-4 h-4 text-green-400" />
+              <MapPin className="w-4 h-4 text-green-600" />
               <span>{matchDetails.venue.name}</span>
             </div>
             {isLive && (
@@ -131,8 +138,9 @@ export function MatchDetail() {
             {/* Score */}
             <div className="px-6 md:px-8">
               <div
-                className={`text-4xl md:text-5xl font-mono mb-2 ${
-                  isLive ? "text-green-400" : "text-gray-100"
+              style={{fontSize:"32px"}}
+                className={`text-4xl md:text-5xl text-center font-mono mb-2 ${
+                  isLive ? "text-green-400" : "text-green-400"
                 }`}
               >
                 {matchDetails.goals.home} : {matchDetails.goals.away}
@@ -197,6 +205,7 @@ export function MatchDetail() {
               },
             }}
           />
+    
         )}
         {activeTab === "stats" && (
           <StatsTab
@@ -390,6 +399,50 @@ function StatsTab({
 }) {
   const statTypes = Array.from(new Set(stats.map((s) => s.type)));
 
+  // Helper function to parse values and handle percentages and null values
+  const parseStatValue = (value: string): { numeric: number; display: string; isPercentage: boolean } => {
+    if (!value || value === null || value === undefined) {
+      return { numeric: 0, display: "-", isPercentage: false };
+    }
+    
+    const stringValue = String(value);
+    
+    // Handle percentage values
+    if (stringValue.includes('%')) {
+      const numericValue = parseFloat(stringValue.replace('%', ''));
+      return { 
+        numeric: isNaN(numericValue) ? 0 : numericValue, 
+        display: stringValue, 
+        isPercentage: true 
+      };
+    }
+    
+    // Handle regular numeric values
+    const numericValue = parseFloat(stringValue);
+    return { 
+      numeric: isNaN(numericValue) ? 0 : numericValue, 
+      display: stringValue, 
+      isPercentage: false 
+    };
+  };
+
+  // Helper function to determine if a stat should show progress bars
+  const shouldShowProgressBar = (statType: string): boolean => {
+    const progressBarStats = [
+      'Ball Possession',
+      'Passes %',
+      'Total Shots',
+      'Shots on Goal',
+      'Shots off Goal',
+      'Total passes',
+      'Passes accurate',
+      'Fouls',
+      'Corner Kicks',
+      'Offsides'
+    ];
+    return progressBarStats.some(stat => statType.toLowerCase().includes(stat.toLowerCase()));
+  };
+
   return (
     <div className="glass-card-dark rounded-xl p-6 border border-green-800/30">
       <h3 className="text-xl text-gray-100 mb-6 flex items-center space-x-2">
@@ -405,35 +458,58 @@ function StatsTab({
             (s) => s.type === statType && s.team_id === teams.away.team_id
           );
 
-          const homeValue = parseFloat(homeStat?.value || "0");
-          const awayValue = parseFloat(awayStat?.value || "0");
-          const total = homeValue + awayValue;
-          const homePercentage = total > 0 ? (homeValue / total) * 100 : 50;
-          const awayPercentage = total > 0 ? (awayValue / total) * 100 : 50;
+          const homeParsed = parseStatValue(homeStat?.value || "0");
+          const awayParsed = parseStatValue(awayStat?.value || "0");
+          
+          // For percentage stats, use the percentage values directly
+          // For other stats, calculate relative percentages
+          let homePercentage = 50;
+          let awayPercentage = 50;
+          
+          if (homeParsed.isPercentage && awayParsed.isPercentage) {
+            // Both are percentages, use them directly
+            homePercentage = homeParsed.numeric;
+            awayPercentage = awayParsed.numeric;
+          } else if (shouldShowProgressBar(statType)) {
+            // Calculate relative percentages for non-percentage stats
+            const total = homeParsed.numeric + awayParsed.numeric;
+            homePercentage = total > 0 ? (homeParsed.numeric / total) * 100 : 50;
+            awayPercentage = total > 0 ? (awayParsed.numeric / total) * 100 : 50;
+          }
 
           return (
             <div key={statType} className="glass-dark rounded-lg p-4 border border-green-800/20">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-green-400">{homeStat?.value || "0"}</span>
-                <span className="text-gray-300 text-sm">{statType}</span>
-                <span className="text-green-400">{awayStat?.value || "0"}</span>
+                <span className="text-green-400 font-mono">
+                  {homeParsed.display}
+                </span>
+                <span className="text-gray-300 text-sm text-center px-2">
+                  {statType}
+                </span>
+                <span className="text-green-400 font-mono">
+                  {awayParsed.display}
+                </span>
               </div>
 
-              <div className="flex h-2 rounded-full overflow-hidden bg-gray-800">
-                <div
-                  className="bg-gradient-to-r from-green-600 to-green-500 transition-all duration-500"
-                  style={{ width: `${homePercentage}%` }}
-                />
-                <div
-                  className="bg-gradient-to-l from-blue-600 to-blue-500 transition-all duration-500"
-                  style={{ width: `${awayPercentage}%` }}
-                />
-              </div>
+              {shouldShowProgressBar(statType) && (
+                <>
+                  <div className="flex h-2 rounded-full overflow-hidden bg-gray-800">
+                    <div
+                      className="bg-gradient-to-r from-green-600 to-green-500 transition-all duration-500"
+                      style={{ width: `${homePercentage}%` }}
+                    />
+                    <div
+                      className="bg-gradient-to-l from-blue-600 to-blue-500 transition-all duration-500"
+                      style={{ width: `${awayPercentage}%` }}
+                    />
+                  </div>
 
-              <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                <span>{teams.home.name}</span>
-                <span>{teams.away.name}</span>
-              </div>
+                  <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+                    <span className="truncate max-w-[120px]">{teams.home.name}</span>
+                    <span className="truncate max-w-[120px] text-right">{teams.away.name}</span>
+                  </div>
+                </>
+              )}
             </div>
           );
         })}
@@ -455,43 +531,56 @@ function PlayersTab({
   const homePlayers = players.filter((p) => p.team_id === teams.home.team_id);
   const awayPlayers = players.filter((p) => p.team_id === teams.away.team_id);
 
+  // Helper function to shorten stat names
+  const shortenStatName = (statType: string): string => {
+    const shortNames: Record<string, string> = {
+      'Position': 'Pos',
+      'Rating': 'Rating',
+      'Minutes': 'Min',
+      'Assists': 'Asts',
+      'Passes': 'Pas',
+      'Pass Accuracy %': 'Pas. Acc',
+      'Shots': 'Shots',
+      'Shots on Target': 'SoT',
+      'Goals': 'Goals',
+      'Tackles': 'Tackles',
+      'Yellow Cards': 'YC',
+      'Red Cards': 'RC'
+    };
+    return shortNames[statType] || statType;
+  };
+
   const PlayerCard = ({ player }: { player: Player }) => (
-    <div className="glass-dark rounded-lg p-4 border border-green-800/20 glass-hover-dark transition-all duration-200">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center space-x-3">
-          <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center text-sm ${
-              player.position === "G"
-                ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                : player.position === "D"
-                ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                : player.position === "M"
-                ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                : "bg-red-500/20 text-red-400 border border-red-500/30"
-            }`}
-          >
-            {player.position}
-          </div>
-          <div>
-            <p className="text-gray-200">{player.name}</p>
-            <p className="text-xs text-gray-500">
-              {player.position === "G"
-                ? "Goalkeeper"
-                : player.position === "D"
-                ? "Defender"
-                : player.position === "M"
-                ? "Midfielder"
-                : "Forward"}
-            </p>
-          </div>
+    <div className="glass-dark rounded-lg p-3 border border-green-800/20 glass-hover-dark transition-all duration-200 w-32 h-32 flex flex-col">
+      {/* Player Info Section */}
+      <div className="flex flex-col items-center mb-2 flex-1">
+        <div
+          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs mb-1 ${
+            player.position === "G"
+              ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+              : player.position === "D"
+              ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+              : player.position === "M"
+              ? "bg-green-500/20 text-green-400 border border-green-500/30"
+              : "bg-red-500/20 text-red-400 border border-red-500/30"
+          }`}
+        >
+          {player.position}
         </div>
+        <p className="text-xs text-gray-200 text-left  w-full px-1"
+        style={{fontSize:"15px"}}
+        >{player.name}</p>
+        {/* <p className="text-xs text-gray-500  w-full text-center">
+          {(player.position)}
+        </p> */}
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        {player.stats.map((stat) => (
-          <div key={stat.type} className="bg-black/20 rounded p-2">
-            <div className="text-xs text-gray-500 mb-1">{stat.type}</div>
-            <div className="text-green-400">{stat.value}</div>
+      {/* Stats Section */}
+      <div className="grid grid-cols-2 gap-1 text-center">
+        {player.stats.slice(0, 5).map((stat) => (
+          <div key={stat.type} className="bg-black/20 rounded p-1">
+            <div className="text-xs text-gray-500 truncate">{shortenStatName(stat.type)}</div>
+            <div className="text-xs text-green-400 font-mono">{stat.value}</div>
           </div>
         ))}
       </div>
@@ -505,7 +594,7 @@ function PlayersTab({
           <Users className="w-5 h-5 text-green-400" />
           <span>{teams.home.name}</span>
         </h3>
-        <div className="space-y-3 max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track-transparent">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track-transparent">
           {homePlayers.map((player) => (
             <PlayerCard key={player.player_id} player={player} />
           ))}
@@ -517,7 +606,7 @@ function PlayersTab({
           <Users className="w-5 h-5 text-blue-400" />
           <span>{teams.away.name}</span>
         </h3>
-        <div className="space-y-3 max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track-transparent">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-green-600/50 scrollbar-track-transparent">
           {awayPlayers.map((player) => (
             <PlayerCard key={player.player_id} player={player} />
           ))}
